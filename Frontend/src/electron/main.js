@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron');
 const path = require ('path');
 
 // Ativa o reload automático observando a pasta de build
-require('electron-reload')(path.join(__dirname, '../../dist/orion-ui'), {
+require('electron-reload')(path.join(__dirname, '../../dist/orion-ui/browser'), {
   electron: path.join(__dirname, '../../node_modules', '.bin', 'electron')
 });
 
@@ -17,7 +17,7 @@ function createWindow() {
   });
 
   // Aponta para o arquivo gerado pelo build do Angular
-  win.loadFile(path.join(__dirname, '../../dist/orion-ui/index.html'));
+  win.loadFile(path.join(__dirname, '../../dist/orion-ui/browser/index.html'));
 
   // Abre o console do desenvolvedor automaticamente
   win.webContents.openDevTools();

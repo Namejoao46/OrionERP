@@ -6,24 +6,32 @@ require('electron-reload')(path.join(__dirname, '../../dist/orion-ui/browser'), 
   electron: path.join(__dirname, '../../node_modules', '.bin', 'electron')
 });
 
+app.disableHardwareAcceleration();
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false // Facilita a comunicação inicial, mas requer atenção em produção
     }
   });
 
-  // Aponta para o arquivo gerado pelo build do Angular
-  win.loadFile(path.join(__dirname, '../../dist/orion-ui/browser/index.html'));
+  if (process.env.NODE_ENV === 'development') {
+    // Em desenvolvimento, conecta ao servidor Angular
+    win.loadURL('http://localhost:4200');
+    win.webContents.openDevTools();
+  } else {
+    // Em produção, carrega o build do Angular
+    win.loadFile(path.join(__dirname, '../../dist/orion-ui/browser/index.html'));
+  }
 
-  // Abre o console do desenvolvedor automaticamente
-  win.webContents.openDevTools();
+  win.on('closed', function() {
+    win = null
+  })
 }
 
-app.whenReady().then(createWindow);
+app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();

@@ -1,14 +1,15 @@
 {
   "name": "orion-ui",
   "version": "0.0.0",
+  "main": "src/electron/main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --base-href ./",
     "watch": "ng build --watch --configuration development --base-href ./",
     "test": "ng test",
-    "electron": "electron src/electron/main.js",
-    "dev": "concurrently \"npm run watch\" \"wait-on -d 2000 dist/orion-ui/browser/index.html && npm run electron\""
+    "electron": "electron .",
+    "electron:dev": "concurrently \"npm run start\" \"wait-on http://localhost:4200 && cross-env NODE_ENV=development npm run electron\""
   },
   "private": true,
   "dependencies": {
@@ -30,6 +31,7 @@
     "@angular/cli": "^19.2.12",
     "@angular/compiler-cli": "^19.2.0",
     "@types/jasmine": "~5.1.0",
+    "cross-env": "^10.1.0",
     "electron": "^40.8.0",
     "electron-reload": "^2.0.0-alpha.1",
     "jasmine-core": "~5.6.0",

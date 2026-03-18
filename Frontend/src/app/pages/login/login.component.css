@@ -4,6 +4,18 @@
   align-items: center;
   z-index: 0;
   background-color: #13A8FE;
-  width: 1200px;
-  height: 700px;
 }
+
+p{
+  color: #13A8FE;
+  background-color: black;
+}
+
+
+/*.conteiner_img{
+
+}
+
+.conteiner_login{
+
+}*/

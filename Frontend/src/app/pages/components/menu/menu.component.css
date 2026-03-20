@@ -1,0 +1,69 @@
+.botao_menu{
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.seta{
+    width: 30px;
+    height: 5px;
+    color: white;
+    background-color: #2b97fa;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    border-radius: 2px; 
+}
+
+.menuAberto .seta1{
+    transform: rotate(-50deg) translate(-8px, 2px);
+}
+
+.menuAberto .seta2{
+    transform: rotate(0deg) translate(-5px, 20px);
+    width: 50px;
+}
+
+.menuAberto .seta3{
+    transform: rotate(50deg) translate(-3px, -20px);
+}
+
+.backdrop {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* fundo semi-transparente */
+  z-index: 1000;
+}
+
+.menu_lateral {
+    display: none;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.menu_lateral.aberto {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 15%;
+    height: 100%;
+    background-color: #0d0d1f;
+    color: white;
+    pointer-events: auto;
+    transition: left 0.3s ease;
+    z-index: 1000;
+}
+
+.opcoes{
+    width: 100%;
+    height: 100%;
+    padding: 10px 0;
+    margin-top: 70px;
+    border-top: 4px solid #2b97fa;
+}

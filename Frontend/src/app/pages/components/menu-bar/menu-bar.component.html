@@ -1,0 +1,33 @@
+<nav class="conteiner">
+    <div class="conteiner_menu">
+        <app-menu></app-menu>
+    </div>
+
+    <div class="conteiner_logo">
+        <div class="img">
+            <img src="assets/orion.png" alt="Logo">
+            
+            <h1>
+                <span class="orion">Orion</span><span class="erp">ERP</span>
+            </h1>
+        </div>
+    </div>
+
+    <div class="conteiner_pesquisa">
+        <input type="search" placeholder="Busca...">
+        <button class="busca-btn">
+            <img src="assets/lupa.png" alt="lupa">
+        </button>
+    </div>
+
+    <div class="conteiner_notificacoes">
+        <li><img src="assets/sino.png" alt="notificações"></li>
+        <li><img src="assets/bater-papo.png" alt="mensagens"></li>
+    </div>
+    
+    <div class="conteiner_perfil">
+        <img [src]="userImage || 'assets/perfil.png'" alt="Imagem de perfil">
+        <span class="perfil-nome">{{ userName || 'Usuário' }}</span>
+    </div>
+</nav>
+

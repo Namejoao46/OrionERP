@@ -112,7 +112,7 @@ input[type="password"]:hover,
 input[type="password"]:focus{
   transform: scale(1.10);
   font-weight: bolder;
-   border-bottom: 3px solid #2B97FA;
+  border-bottom: 3px solid #2B97FA;
   border-left: 3px solid #2B97FA;
   color: #fff;
 }
@@ -137,4 +137,8 @@ input::placeholder{
 .forms button:hover{
   color: #fff;
   transform: scale(1.10);
+}
+
+.busca-btn img{
+  background-color: transparent;
 }

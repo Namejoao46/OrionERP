@@ -1,12 +1,38 @@
 
 <div class="conteiner">
-  <div class="conteiner_img">
-    <div>
-      <p> my JOAO PAULO</p>
+  <div class="conteiner_secundario">
+
+    <!--lado esquerdo-->
+    <div class="conteiner-logo">
+      <div class="img">
+        <img src="assets/orion.png" alt="Logo">
+        <h1>
+          <span class="orion">Orion</span><span class="erp">ERP</span>
+        </h1>
+      </div>
     </div>
-  </div>
 
-  <div class="conteiner_login">
+    <!--lado direito-->
+    <div class="conteiner-login">
+      <div class="forms">
+       
+        <div class="title">
+          <h1>ENTRAR</h1>
+        </div>
+        
+        <form action="/enviar-dados">
 
+          <label for="usuario">Usuario:</label>
+          <input type="text" id="nome" placeholder="Digite seu email ou matricula" required>
+          
+          <label for="senha">Senha:</label>
+          <input type="password" id="senha" placeholder="Digite sua senha" name="senha" required>
+
+        </form>
+
+        <button type="submit">Entrar</button>
+
+      </div>
+    </div>
   </div>
 </div>

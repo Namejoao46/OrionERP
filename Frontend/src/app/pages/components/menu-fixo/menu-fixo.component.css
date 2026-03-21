@@ -1,0 +1,27 @@
+.conteiner{
+    height: 82%;
+    width: 15%;
+    background-color: #0d0d1f;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    border-top: 2px solid #2B97FA ;
+    border-right: 2px solid #2B97FA;
+}
+
+.conteiner_config{
+    position: fixed;
+    width: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    bottom: 20px;
+    font-size: 14px;
+    color: #fff;
+
+}
+
+.conteiner_config img{
+    height: 45px;
+}

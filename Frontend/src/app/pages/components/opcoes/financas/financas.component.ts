@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [RouterModule, CommonModule, FormsModule],
   templateUrl: './financas.component.html',
-  styleUrl: './financas.component.css'
+  styleUrls: ['./financas.component.css']
 })
 export class FinancasComponent {
 

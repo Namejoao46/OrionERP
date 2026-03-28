@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [RouterModule, CommonModule, FormsModule],
   templateUrl: './painel.component.html',
-  styleUrl: './painel.component.css'
+  styleUrls: ['./painel.component.css']
 })
 export class PainelComponent {
 

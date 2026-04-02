@@ -26,7 +26,7 @@ public class DatabaseConfig {
         dataSource.setUrl("jdbc:firebirdsql://localhost:3050/" + path.replace("\\", "/") + "?encoding=UTF8");
         
         dataSource.setUsername("SYSDBA");
-        dataSource.setPassword("masterkey");
+        dataSource.setPassword("1811");
         
         return dataSource;
     }

@@ -20,17 +20,17 @@
           <h1>ENTRAR</h1>
         </div>
         
-        <form action="/enviar-dados">
+        <form (ngSubmit)="entrar()" #LoginForm="ngForm">
 
           <label for="usuario">Usuario:</label>
-          <input type="text" id="nome" placeholder="Digite seu email ou matricula" required>
+          <input type="text" id="nome" [(ngModel)]="login" name="login" placeholder="Digite seu email ou matricula" required>
           
           <label for="senha">Senha:</label>
-          <input type="password" id="senha" placeholder="Digite sua senha" name="senha" required>
+          <input type="password" id="senha" [(ngModel)]="senha" name="senha" placeholder="Digite sua senha" required>
 
         </form>
 
-        <button type="submit" routerLink="/home">Entrar</button>
+        <button (click)="entrar()">Entrar</button>
 
       </div>
     </div>

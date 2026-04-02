@@ -23,12 +23,19 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<?> efetuarLogin(@RequestBody Map<String, String> dados) {
+        System.out.println(">>> [LoginController] Tentativa de login com usuário: " + dados.get("login"));
+
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.get("login"), dados.get("senha"));
         
-        var authentication = manager.authenticate(authenticationToken);
-        
-        var tokenJWT = tokenService.gerarToken((Colaborador) authentication.getPrincipal());
+        try {
+            var authentication = manager.authenticate(authenticationToken);
+            var tokenJWT = tokenService.gerarToken((Colaborador) authentication.getPrincipal());
 
-        return ResponseEntity.ok(Map.of("token", tokenJWT));
+            System.out.println(">>> [LoginController] Login bem-sucedido para usuário: " + dados.get("login"));
+            return ResponseEntity.ok(Map.of("token", tokenJWT));
+        } catch (Exception e) {
+            System.out.println(">>> [LoginController] Falha na autenticação: " + e.getMessage());
+            return ResponseEntity.status(403).body(Map.of("erro", "Credenciais inválidas"));
+        }
     }
 }

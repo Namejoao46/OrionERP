@@ -18,7 +18,7 @@ public class ConfigService {
             props.load(in);
             return props.getProperty("db.path", "C:/OrionERP/DADOS.FDB");
         } catch (IOException e) {
-            return "C:/OrionERP/DADOS.FDB";
+            return "C:/Users/joaop/Documents/OrionERP/DADOS.FDB";
         }
     }
     public void saveDbPath(String newPath) throws IOException {

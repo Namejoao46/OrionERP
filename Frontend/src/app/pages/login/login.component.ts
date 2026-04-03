@@ -25,11 +25,12 @@ export class LoginComponent {
   entrar() {
     this.authService.login(this.login, this.senha).subscribe({
       next: (res) => {
-        localStorage.setItem('token', res.token);
-        alert('Login realizado com sucesso!'); 
-        
+        // Atualiza o AuthService com os dados recebidos
+        this.authService.setUserData(res.token, res.nome, res.foto);
+
+        alert('Login realizado com sucesso!');
         this.router.navigate(['/home']).then(() => {
-            this.cdr.detectChanges(); // Garante que a tela mude após navegar
+          this.cdr.detectChanges();
         });
       },
       error: (err) => {

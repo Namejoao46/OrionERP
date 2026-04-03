@@ -59,6 +59,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "liveReload": true
+          },
           "configurations": {
             "production": {
               "buildTarget": "orion-ui:build:production"

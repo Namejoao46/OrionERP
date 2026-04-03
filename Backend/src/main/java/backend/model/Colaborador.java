@@ -1,4 +1,5 @@
 package backend.model;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -62,6 +63,14 @@ public class Colaborador implements UserDetails {
     public String getLogin() { return login; }
     public String getNome() { return nome; }
     public String getCargo() { return cargo; }
+    public String getSenha() { return senha; }
+    public String getSobrenome() { return sobrenome; }
+    public String getCpf() { return cpf; }
+    public String getMatricula() { return matricula; }
+    public String getEndereco() { return endereco; }
+    public String getTipoColaborador() { return tipoColaborador; }
+    public LocalDate getDataNascimento() { return dataNascimento; }
+    public byte[] getFoto() { return foto; }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -85,4 +94,4 @@ public class Colaborador implements UserDetails {
 
     @Override
     public boolean isEnabled() { return true; }
-} 
+}

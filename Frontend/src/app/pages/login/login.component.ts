@@ -25,13 +25,17 @@ export class LoginComponent {
   entrar() {
     this.authService.login(this.login, this.senha).subscribe({
       next: (res) => {
-        // Atualiza o AuthService com os dados recebidos
-        this.authService.setUserData(res.token, res.nome, res.foto);
+        console.log(">>> Resposta do Servidor:", res); // Isso vai nos mostrar se a foto veio no JSON
+        
+        if (res.token) {
+          // Passa os dados para o service (o campo deve ser 'foto' conforme seu Controller Java)
+          this.authService.setUserData(res.token, res.nome, res.foto);
 
-        alert('Login realizado com sucesso!');
-        this.router.navigate(['/home']).then(() => {
-          this.cdr.detectChanges();
-        });
+          alert('Login realizado com sucesso!');
+          this.router.navigate(['/home']).then(() => {
+            this.cdr.detectChanges();
+          });
+        }
       },
       error: (err) => {
         console.error('Erro no login', err);

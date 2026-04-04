@@ -38,6 +38,11 @@ public class LoginController {
         try {
             var authentication = manager.authenticate(authenticationToken);
             var colaborador = (Colaborador) authentication.getPrincipal();
+            System.out.println(">>> [DEBUG] Usuário: " + colaborador.getLogin());
+            System.out.println(">>> [DEBUG] Tem foto no banco? " + (colaborador.getFoto() != null));
+            if(colaborador.getFoto() != null) {
+                System.out.println(">>> [DEBUG] Tamanho da foto: " + colaborador.getFoto().length + " bytes");
+            }
             var tokenJWT = tokenService.gerarToken((Colaborador) authentication.getPrincipal());
 
             System.out.println(">>> [LoginController] Login bem-sucedido para usuário: " + dados.get("login"));

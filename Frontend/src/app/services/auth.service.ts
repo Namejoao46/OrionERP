@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/internal/Observable';
-import { BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +8,10 @@ import { BehaviorSubject } from 'rxjs';
 export class AuthService {
   private apiUrl = 'http://localhost:8080/api/auth';
 
-  private tokenSubject = new BehaviorSubject<string | null>(null)
-  private userNameSubject = new BehaviorSubject<string | null>(null);
-  private userImageSubject = new BehaviorSubject<string | null>(null);
+  // Inicializa os Subjects com o que já estiver no localStorage
+  private tokenSubject = new BehaviorSubject<string | null>(localStorage.getItem('token'));
+  private userNameSubject = new BehaviorSubject<string | null>(localStorage.getItem('userName'));
+  private userImageSubject = new BehaviorSubject<string | null>(localStorage.getItem('userImage'));
 
   token$ = this.tokenSubject.asObservable();
   userName$ = this.userNameSubject.asObservable();
@@ -20,19 +20,29 @@ export class AuthService {
   constructor(private http: HttpClient) {}
   
   login(login: string, senha: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, {
-      login: login,
-      senha: senha
-    });
+    return this.http.post(`${this.apiUrl}/login`, { login, senha });
   }
 
-  setUserData(token: string, nome: string, foto: string) {
+  setUserData(token: string, nome: string, foto: string | null) {
+    localStorage.setItem('token', token);
+    localStorage.setItem('userName', nome);
+    
+    if (foto) {
+      // Remove espaços ou quebras de linha que o JSON possa ter inserido
+      const fotoLimpa = foto.replace(/\s/g, '');
+      localStorage.setItem('userImage', fotoLimpa);
+      this.userImageSubject.next(fotoLimpa);
+    } else {
+      localStorage.removeItem('userImage');
+      this.userImageSubject.next(null);
+    }
+
     this.tokenSubject.next(token);
     this.userNameSubject.next(nome);
-    this.userImageSubject.next(foto);
   }
 
   logout() {
+    localStorage.clear();
     this.tokenSubject.next(null);
     this.userNameSubject.next(null);
     this.userImageSubject.next(null);

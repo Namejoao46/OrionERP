@@ -26,7 +26,7 @@
     </div>
     
     <div class="conteiner_perfil">
-        <img [src]="(userImage$ | async) ? 'data:image/png;base64,' + (userImage$ | async) : 'assets/perfil.png'" alt="Imagem de perfil">
+        <img [src]="(userImage$ | async) || 'assets/perfil.png'" alt="Imagem de perfil">
         <span class="perfil-nome">{{ (userName$ | async) || 'Usuário' }}</span>
     </div>
 </nav>

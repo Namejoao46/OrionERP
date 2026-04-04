@@ -1,65 +1,73 @@
 .conteiner{
     position: fixed;
-    top: 7.4%;
+    top: 7%;
     left: 0;
     height: 10%;
     width: 100%;
     display: flex;
     align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 9;
+    background-color: transparent;
+    container-type: inline-size;
 }
 
-.conteiner_painel,
-.conteiner_financas,
-.conteiner_vendas,
-.conteiner_compras,
-.conteiner_rh,
-.conteiner_fiscal,
-.conteiner_mais{
-    margin-left: 34px;
-    width: 12%;
+.conteiner_nav-item {
+    max-width: 230px;
+    min-width: 60px; 
     height: 70%;
+    margin: 0 15px; 
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; 
     gap: 10px;
     border-radius: 12px;
     border: 2px solid #2B97FA;
     color: #fff;
     cursor: pointer;
-    transition: 0.2s ease, transform 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    padding: 0 30px; 
+    white-space: nowrap;
 }
 
-.conteiner_painel:hover,.conteiner_financas:hover,
-.conteiner_vendas:hover,.conteiner_compras:hover,
-.conteiner_rh:hover,.conteiner_fiscal:hover,
-.conteiner_mais:hover,.conteiner_painel:focus,
-.conteiner_financas:focus,.conteiner_vendas:focus,
-.conteiner_compras:focus,.conteiner_rh:focus,
-.conteiner_fiscal:focus,.conteiner_mais:focus{
+.conteiner_nav-item:hover,
+.conteiner_nav-item.active{
   transform: scale(1.10);
   font-weight: bolder;
   background-color: #2B97FA;
+  box-shadow: 0px 4px 15px rgba(43, 151, 250, 0.4);
 }
 
-.conteiner_painel img,
-.conteiner_financas img,
-.conteiner_vendas img,
-.conteiner_compras img,
-.conteiner_rh img,
-.conteiner_fiscal img,
-.conteiner_mais img{
-    width: 45px;
+.conteiner_nav-item h1 {
+    font-size: 30px;
+    margin: 0;
+    color: #fff;
+    transition: opacity 0.3s ease;
+    flex-shrink: 1; 
+    overflow: hidden;
+}
+
+.conteiner_nav-item img {
+    width: 40px;
+    height: auto;
+    flex-shrink: 0;
     background-color: black;
-    border-radius: 10px;
+    border-radius: 8px;
+    padding: 5px;
+    display: block;
 }
 
-.conteiner_painel.active,
-.conteiner_financas.active,
-.conteiner_vendas.active,
-.conteiner_compras.active,
-.conteiner_rh.active,
-.conteiner_fiscal.active,
-.conteiner_mais.active{
-    background-color: #2B97FA;
-    cursor: pointer;
+@container (max-width: 1000px) {
+    .conteiner_nav-item h1 {
+        display: none;
+    }
+
+    .conteiner_nav-item {
+        padding: 0;
+        justify-content: center;
+    }
 }

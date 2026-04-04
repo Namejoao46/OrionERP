@@ -1,0 +1,207 @@
+.conteiner_entregas{
+    height: 25vh;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 22px;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.conteiner_entregas-finalizadas,
+.conteiner_entregas-emAndamento,
+.conteiner_entregas-atrasadas{
+    flex: 1 1 280px;
+    min-height: 160px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #0d0d1f;
+    border: 2px solid #2b97fa;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.texto{
+    align-self: flex-start;
+    height: 100%;
+    width: 60%;
+}
+
+.texto h1{
+    color: #fff;
+    font-size: clamp(25px, 1.9vw, 45px);
+    font-weight: bolder;
+    margin: 0;
+    margin-left: 15px;
+}
+
+.texto p{
+    color: #fff;
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: bolder;
+    margin: 5%;
+    margin-bottom: 30px;
+}
+
+.texto h2{
+    color: darkgray;
+    font-size: clamp(12px, 1.2vw, 18px);
+    margin: 0;
+    margin-left: 15px;
+}
+
+.topo {
+    display: flex;
+    justify-content: space-between; /* texto à esquerda, gráfico à direita */
+    align-items: flex-start;
+    width: 100%;
+    height: 75%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+
+.grafico{
+    height: 100%;
+    width: 50%;
+}
+
+.grafico1,
+.grafico2,
+.grafico3{
+    height: 23%;
+    width: 70%;
+    min-width: 90px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    margin-top: 55%;
+    margin-left: 20%;
+    gap: 10px;
+    border-radius: 15px;
+}
+
+.grafico1{
+        background-color: #2ef8a0;
+}
+
+.grafico2{
+        background-color: #FFA300;
+}
+
+.grafico3{
+        background-color: #CF0060;
+}
+
+.grafico1 h1{
+    font-size: clamp(19px, 1.2vw, 30px);
+    color: #1E5128;
+}
+
+.grafico2 h1{
+    font-size: clamp(19px, 1.2vw, 30px);
+    color: #3C0000;
+}
+
+.grafico3 h1{
+    font-size: clamp(19px, 1.2vw, 30px);
+    color: #4c0027;
+}
+
+.grafico1 img,
+.grafico2 img,
+.grafico3 img{
+    margin-left: 8%;
+    width: 25%;
+}
+
+.comparando,
+.comparando2,
+.comparando3{
+    height: 25%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    padding-left: 15px;
+    box-sizing: border-box;
+}
+
+.comparando h1{
+    color: #2ef8a0;
+    font-size: clamp(24px, 1.9vw, 35px);
+    margin: 0;
+}
+
+.comparando2 h1{
+    color: #FFA300;
+    font-size: clamp(24px, 1.9vw, 35px);
+    margin: 0;
+}
+.comparando3 h1{
+    color: #CF0060;
+    font-size: clamp(24px, 1.9vw, 35px);
+    margin: 0;
+}
+
+.comparando h2,
+.comparando2 h2,
+.comparando3 h2 {
+    color: #fff;
+    font-weight: bolder;
+    font-size: clamp(19px, 1.2vw, 30px); 
+    margin: 0;
+}
+
+.conteiner_entregas-tempoTrabalhado{
+    flex: 1 1 200px;
+    min-height: 160px;
+    width: 22%;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    background-color: #0d0d1f;
+    border: 2px solid #2b97fa;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.hora, .tempoTrabalhado {
+    display: flex;
+    align-items: baseline;
+    padding: 0 10px;
+}
+
+.hora{
+    margin-top: 10px;
+}
+
+.hora h1, .tempoTrabalhado h1{
+    color: #fff;
+    font-weight: bolder;
+    font-size: clamp(24px, 1.9vw, 40px);
+    margin: 0;
+}
+
+.hora h2, .tempoTrabalhado h2{
+    color: #2b97fa;
+    font-size: 26px;
+    font-weight: bolder;
+    font-size: clamp(19px, 1.5vw, 30px);
+    margin: 0;
+}
+
+.hora h3, .tempoTrabalhado h3{
+    font-size: 20px;
+    font-weight: bolder;
+    font-size: clamp(19px, 1.2vw, 30px);
+    margin: 0;
+    margin-left: 10px;
+    color: gray;
+}

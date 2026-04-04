@@ -6,35 +6,38 @@
     align-items: center;
     width: 100%;
     height: 7%;
+    min-height: 60px;
     z-index: 10;
     border-bottom: 4px solid #2B97FA;
+    box-sizing: border-box;
 }
 
 .conteiner_menu{
     height: 100%;
     width: 60px;
+    flex-shrink: 0;
 }
 
 .conteiner_logo{
-    width: 15%;
+    flex: 1;
     height: 100%;
     display: flex;
-    align-items: center;
-    margin-right: auto;
+    padding-left: 15px;
+    overflow: hidden;
 }
 
 .img{
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
 .img h1{
     color: white;
-    font-size: 45px;
+    font-size: clamp(20px, 2vw, 45px);
     font-weight: bold;
     font-family: 'Iceberg', sans-serif;
     border-bottom: 2px solid #2B97FA;
+    white-space: nowrap;
 }
 
 .erp{
@@ -42,7 +45,8 @@
 }
 
 .img img{
-    width: 25%;
+    height: 80%;
+    max-width: 50px;
 }
 
 /*Pesquisa*/
@@ -51,9 +55,9 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    width: 15%;
+    width: 250px;
     height: 60%;
-    margin-right: 30px;
+    margin: 0 20px;
     box-sizing: border-box;
     cursor: pointer;
     transition: 0.3s ease, transform 0.3s ease;
@@ -65,7 +69,7 @@ input{
     height: 100%;
     width: 100%;
     color: #2B97FA;
-    padding: 10px;
+    padding: 0 10px;
     background-color: transparent;
     border: none;
 }
@@ -106,18 +110,17 @@ button img{
 
 .conteiner_notificacoes{
     height: 100%;
-    width: 7%;
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-right: 10px;
+    gap: 5px;
+    margin-right: 15px;
 
 }
 
 .conteiner_notificacoes img{
-    height: 45px;
+    height: 35px;
     border-left: 2px solid #2B97FA;
-    padding: 12px;
+    padding: 8px;
     cursor: pointer;
     transition: 0.3s ease, transform 0.3s ease;
 }
@@ -131,26 +134,32 @@ button img{
 .conteiner_perfil{
     display: flex;
     align-items: center;
-    width: 12%;
     height: 100%;
+    padding: 0 15px;
     box-sizing: border-box;
     cursor: pointer;
     transition: 0.3s ease, transform 0.3s ease;
     border-left: 2px solid #2B97FA;
+    max-width: 200px;
 }
 
 .conteiner_perfil img{
-    width: 17%;
+    width: 40px;
     padding: 10px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
     cursor: pointer;
     transition: 0.3s ease, transform 0.3s ease;
 }
 
 .conteiner_perfil span{
     color: #fff;
-    font-size: 25px;
+    font-size: 20px;
     font-weight: bolder;
-    padding: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     cursor: pointer;
     transition: 0.3s ease, transform 0.3s ease;
 }

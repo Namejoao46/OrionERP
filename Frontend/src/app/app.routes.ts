@@ -12,12 +12,23 @@ import { RecursosHComponent } from './pages/components/opcoes/recursos-h/recurso
 import { FiscalComponent } from './pages/components/opcoes/fiscal/fiscal.component';
 import { MaisComponent } from './pages/components/opcoes/mais/mais.component';
 import { MenuFixoComponent } from './pages/components/menu-fixo/menu-fixo.component';
+import { GraficoFinancias } from './pages/components/opcoes/painel/grafico-financias/grafico-financias';
+import { Grafico } from './pages/components/opcoes/painel/grafico/grafico';
+import { Mensagens } from './pages/components/opcoes/painel/mensagens/mensagens';
+import { Metas } from './pages/components/opcoes/painel/metas/metas';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent,
     children:[
-      { path: 'painel', component: PainelComponent },
+      { path: 'painel', component: PainelComponent,
+        children:[
+          { path: 'grafico', component: Grafico },
+          { path: 'grafico-financias', component: GraficoFinancias },
+          { path: 'mensagens', component: Mensagens },
+          { path: 'metas', component: Metas }
+        ]
+       },
       { path: 'financas', component: FinancasComponent },
       { path: 'vendas', component: VendasComponent },
       { path: 'compras', component: ComprasComponent },

@@ -24,8 +24,6 @@ export class HomeComponent {
     // Este intervalo serve para testar se o Live Reload/Detecção de mudanças está vivo
     setInterval(() => {
       this.zone.run(() => {
-        console.log('ZONA ATIVA: O Angular ainda está monitorando mudanças às:', new Date().toLocaleTimeString());
-        // Força a detecção de mudanças para ver se o HTML atualiza
         this.cdr.detectChanges();
       });
     }, 3000);

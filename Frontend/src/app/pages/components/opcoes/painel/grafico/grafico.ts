@@ -18,14 +18,16 @@ export class Grafico {
   entradaColaborador: Date;
 
   constructor(private ngZone: NgZone) {
+
     // tenta recuperar do LocalStorage
-    const entradaSalva = localStorage.getItem('entradaColaborador');
+    const entradaSalva = sessionStorage.getItem('entradaColaborador');
+
     if (entradaSalva) {
       this.entradaColaborador = new Date(entradaSalva);
     } else {
       // se não existir, define agora como entrada
       this.entradaColaborador = new Date();
-      localStorage.setItem('entradaColaborador', this.entradaColaborador.toISOString());
+      sessionStorage.setItem('entradaColaborador', this.entradaColaborador.toISOString());
     }
 
     // roda fora da zona do Angular para não depender do change detection
@@ -67,6 +69,6 @@ export class Grafico {
   }
 
   limparEntrada() {
-    localStorage.removeItem('entradaColaborador');
+    sessionStorage.removeItem('entradaColaborador');
   }
 }

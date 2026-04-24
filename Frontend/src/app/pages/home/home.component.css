@@ -12,6 +12,7 @@
     width: 85%;
     height: 82%;
     position: fixed;
+    overflow-y: auto;
     right: 0;
     bottom: 0;
     border-top: 2px solid #2B97FA;

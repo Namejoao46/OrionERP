@@ -1,0 +1,25 @@
+<div class="calendario-container">
+  <div class="calendario-header">
+    <h2 class="calendario-title">{{ mesExtenso }} <span>{{ anoAtual }}</span></h2>
+    <div class="controles">
+      <button (click)="alterarMes(-1)">&lt;</button>
+      <button (click)="alterarMes(1)">&gt;</button>
+    </div>
+  </div>
+
+  <div class="calendario-grid">
+    <div class="dia-semana" *ngFor="let dia of diasSemana">{{ dia }}</div>
+
+    <div class="dia-vazio" *ngFor="let empty of diasVazios"></div>
+
+    <div 
+      class="dia-num" 
+      *ngFor="let dia of diasDoMes"
+      [class.hoje]="eHoje(dia)"
+      [class.selecionado]="diaSelecionado === dia"
+      (click)="selecionarDia(dia)"
+    >
+      {{ dia }}
+    </div>
+  </div>
+</div>

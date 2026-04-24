@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+.conteiner_metas {
+    width: 100%;
+    background-color: #050a30; /* Fundo azul marinho profundo */
+    border-radius: 15px;
+    padding: 20px 30px 20px 30px;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    color: white;
+}
+
+/* Título com linha azul */
+.title h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    display: inline-block;
+    border-bottom: 3px solid #2b97fa;
+    padding-bottom: 5px;
+}
+
+/* Filtros (Botões/Pills) */
+.metas-setores {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 35px;
+}
+
+.setor-pill {
+    border: 1px solid #2b97fa;
+    border-radius: 10px;
+    padding: 6px 18px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #fff;
+    transition: 0.3s;
+}
+
+.setor-pill.active {
+    background-color: #2b97fa;
+    font-weight: 600;
+}
+
+/* Lista de Colaboradores */
+.metas-pessoas {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.pessoa-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+/* Coluna 1: Avatar e Nome */
+.col-perfil {
+    display: flex;
+    align-items: center;
+    width: 250px; /* Alinhamento garantido */
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+}
+
+.nome {
+    font-weight: 700;
+    font-size: 17px;
+    color: #ffffff;
+}
+
+.cargo {
+    font-size: 14px;
+    color: #b0b3b8; /* Cinza suave para o cargo */
+}
+
+/* Coluna 2: Metas e Status */
+.col-meta {
+    flex: 1;
+    padding: 0 0 0 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.meta-count {
+    font-weight: 600;
+    font-size: 17px;
+}
+
+.status {
+    font-size: 14px;
+    color: #b0b3b8;
+}
+
+/* Coluna 3: Porcentagem */
+.col-badge {
+    width: 110px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 14px;
+    min-width: 90px;
+    justify-content: center;
+}
+
+/* Cores específicas conforme a imagem */
+.positive {
+    background-color: #2ef8a0; /* Verde Vibrante */
+    color: #053a24;
+}
+
+.negative {
+    background-color: #cf0060; /* Magenta/Rosa */
+    color: #ffffff;
+}
+
+.badge img {
+    width: 14px;
+    height: auto;
+}
+
+@media (max-width: 600px) {
+    .pessoa-row {
+        flex-direction: column; /* Empilha as informações da pessoa no celular */
+        align-items: flex-start;
+        gap: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .col-perfil {
+        width: 100%;
+    }
+    
+    .col-badge {
+        width: 100%;
+        justify-content: flex-start; /* Badge alinha à esquerda no celular */
+    }
+}

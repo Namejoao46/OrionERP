@@ -3,11 +3,13 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Grafico } from "./grafico/grafico";
+import { GraficoFinancias } from "./grafico-financias/grafico-financias";
+import { Interacao } from "./interacao/interacao";
 
 @Component({
   selector: 'app-painel',
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, Grafico],
+  imports: [RouterModule, CommonModule, FormsModule, Grafico, GraficoFinancias, Interacao],
   templateUrl: './painel.component.html',
   styleUrls: ['./painel.component.css']
 })

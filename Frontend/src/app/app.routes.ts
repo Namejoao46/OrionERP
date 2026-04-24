@@ -14,8 +14,10 @@ import { MaisComponent } from './pages/components/opcoes/mais/mais.component';
 import { MenuFixoComponent } from './pages/components/menu-fixo/menu-fixo.component';
 import { GraficoFinancias } from './pages/components/opcoes/painel/grafico-financias/grafico-financias';
 import { Grafico } from './pages/components/opcoes/painel/grafico/grafico';
-import { Mensagens } from './pages/components/opcoes/painel/mensagens/mensagens';
-import { Metas } from './pages/components/opcoes/painel/metas/metas';
+import { Mensagens } from './pages/components/opcoes/painel/interacao/mensagens/mensagens';
+import { Metas } from './pages/components/opcoes/painel/interacao/metas/metas';
+import { Interacao } from './pages/components/opcoes/painel/interacao/interacao';
+import { Calendario } from './pages/components/opcoes/painel/interacao/calendario/calendario';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -25,8 +27,13 @@ export const routes: Routes = [
         children:[
           { path: 'grafico', component: Grafico },
           { path: 'grafico-financias', component: GraficoFinancias },
-          { path: 'mensagens', component: Mensagens },
-          { path: 'metas', component: Metas }
+          { path: 'interacao', component: Interacao,
+        children:[
+            { path: 'mensagens', component: Mensagens },
+            { path: 'metas', component: Metas },
+            { path: 'calendario', component: Calendario }
+          ]
+        }
         ]
        },
       { path: 'financas', component: FinancasComponent },

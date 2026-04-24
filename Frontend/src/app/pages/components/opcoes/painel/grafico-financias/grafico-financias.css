@@ -1,0 +1,41 @@
+.conteiner{
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    gap: 28px;
+    box-sizing: border-box;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.conteiner_grafico{
+    height: 7vw;
+    min-height: 100px;
+    width: 16%;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #050a30;
+    border: 2px solid #2b97fa;
+    gap: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.conteiner_grafico h1{
+    color: #fff;
+    font-size: clamp(16px, 1.5vw, 30px);
+    margin: 0;
+}
+
+.conteiner_grafico h2{
+    color: gray;
+    font-size: clamp(12px, 1.2vw, 17px); 
+    margin: 0;      
+}

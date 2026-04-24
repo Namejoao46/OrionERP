@@ -25,6 +25,7 @@
     justify-content: center; 
     gap: 10px;
     border-radius: 12px;
+    background-color: #050a30;
     border: 2px solid #2B97FA;
     color: #fff;
     cursor: pointer;

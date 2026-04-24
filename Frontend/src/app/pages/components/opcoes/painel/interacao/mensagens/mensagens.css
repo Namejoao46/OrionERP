@@ -1,0 +1,75 @@
+/* Importando uma fonte moderna */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+body {
+    background-color: #050a30; /* Fundo escuro como na imagem */
+    font-family: 'Inter', sans-serif;
+}
+
+.conteiner {
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+}
+
+.conteiner_mensagens {
+    width: 100%;
+    max-width: 470px;
+    background-color: #050a30; /* Azul escuro profundo */
+    padding: 24px;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+.mensagens-title {
+    color: #ffffff;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #1a3a6d; /* Linha sutil embaixo do título */
+    padding-bottom: 10px;
+    display: inline-block;
+    width: 100%;
+}
+
+.card-pessoa {
+    display: flex;
+    align-items: flex-start;
+    background-color: rgba(255, 255, 255, 0.05); /* Fundo sutil para o card */
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: background 0.3s ease;
+}
+
+.card-pessoa:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Efeito de hover */
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.pessoa-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.nome {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.mensagem {
+    word-break: break-word; 
+    overflow-wrap: break-word;
+    color: #b0b3b8;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin: 0;
+}

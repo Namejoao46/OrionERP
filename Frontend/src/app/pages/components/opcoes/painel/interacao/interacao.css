@@ -1,0 +1,17 @@
+.conteiner {
+    width: 100%;
+    max-width: 5000px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center; 
+    gap: 30px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.conteiner_metas, .conteiner_mensagens, .conteiner_calendario {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+}

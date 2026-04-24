@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+.calendario-container {
+    width: 100%;
+    background-color: #050a30; /* Mesmo fundo das metas */
+    border-radius: 15px;
+    padding: 20px 40px 20px 40px;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.calendario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendario-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    border-bottom: 2px solid #2b97fa; /* Detalhe azul igual mensagens */
+    padding-bottom: 4px;
+}
+
+.calendario-title span {
+    color: #b0b3b8;
+    font-weight: 400;
+    margin-left: 5px;
+}
+
+.controles button {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #2b97fa;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: 0.3s;
+}
+
+.controles button:hover {
+    background: #2b97fa;
+}
+
+.calendario-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    text-align: center;
+}
+
+.dia-semana {
+    font-size: 12px;
+    font-weight: 700;
+    color: #2b97fa;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.dia-num {
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.2s;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.dia-num:hover {
+    background: rgba(43, 151, 250, 0.2);
+}
+
+.dia-num.hoje {
+    border: 1px solid #2b97fa;
+    color: #2b97fa;
+    font-weight: 700;
+}
+
+.dia-num.selecionado {
+    background-color: #2b97fa;
+    color: white;
+}
+
+.dia-vazio {
+    cursor: default;
+}
+
+@media (max-width: 380px) {
+    .dia-num {
+        height: 30px;
+        font-size: 12px;
+    }
+    .calendario-grid {
+        gap: 4px;
+    }
+}

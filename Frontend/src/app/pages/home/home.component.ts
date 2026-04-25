@@ -14,6 +14,8 @@ import { MenuFixoComponent } from "../components/menu-fixo/menu-fixo.component";
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
+  menuAberto: boolean = true;
+
   // Injetando ferramentas de diagnóstico
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
@@ -27,5 +29,9 @@ export class HomeComponent {
         this.cdr.detectChanges();
       });
     }, 3000);
+  }
+
+  aoMudarMenu(estado: boolean) {
+    this.menuAberto = estado;
   }
 }

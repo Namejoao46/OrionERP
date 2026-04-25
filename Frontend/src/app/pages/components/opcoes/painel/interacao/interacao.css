@@ -1,17 +1,25 @@
 .conteiner {
+    height: auto;
     width: 100%;
-    max-width: 5000px;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Permite quebrar linha quando não couber */
+    align-items: stretch; /* Faz todos terem a mesma altura na mesma linha */
     justify-content: center;
-    align-items: center; 
-    gap: 30px;
-    padding: 20px;
+    flex-direction: row;
+    padding:0 50px 0 50px;
+    gap: clamp(15px, 2vw, 40px); /* Espaçamento entre cards cresce com a tela */
     box-sizing: border-box;
+    overflow: hidden;
 }
 
-.conteiner_metas, .conteiner_mensagens, .conteiner_calendario {
-    flex: 1 1 auto;
-    display: flex;
-    justify-content: center;
+/* Base flexível para os três filhos */
+.conteiner_metas, 
+.conteiner_mensagens, 
+.conteiner_calendario {
+    flex: 1 1 350px; 
+    max-width: 100%;
+    background-color: #050a30;
+    border-radius: 15px;
+    margin: 5px;
+    box-sizing: border-box;
 }

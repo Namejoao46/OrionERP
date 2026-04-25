@@ -6,13 +6,12 @@
     <div class="conteiner_opcoes">
         <app-opcoes></app-opcoes>
     </div>
+    
     <div class="conteiner_menuFixo">
-        <app-menu-fixo></app-menu-fixo>
+        <app-menu-fixo (onToggleMenu)="aoMudarMenu($event)"></app-menu-fixo>
     </div>
 
-    <div class="conteiner_conteudo">
+    <div class="conteiner_conteudo" [class.expandido]="!menuAberto">
         <router-outlet></router-outlet>
     </div>
-
-    <!-- <div class="conteiner"></div> -->
 </div>

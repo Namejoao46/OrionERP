@@ -13,6 +13,7 @@
     z-index: 9;
     background-color: transparent;
     container-type: inline-size;
+    border-bottom: 2px solid #2B97FA;
 }
 
 .conteiner_nav-item {

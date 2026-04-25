@@ -2,9 +2,10 @@
 
 .calendario-container {
     width: 100%;
-    background-color: #050a30; /* Mesmo fundo das metas */
+    background-color: #050a30;
     border-radius: 15px;
-    padding: 20px 40px 20px 40px;
+    /* Padding responsivo: diminui em telas pequenas */
+    padding: clamp(15px, 3vw, 30px);
     box-sizing: border-box;
     font-family: 'Inter', sans-serif;
     color: white;
@@ -16,14 +17,17 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    gap: 10px;
 }
 
 .calendario-title {
-    font-size: 18px;
+    /* Título flui entre 16px e 20px */
+    font-size: clamp(16px, 1.5vw, 20px);
     font-weight: 700;
     margin: 0;
-    border-bottom: 2px solid #2b97fa; /* Detalhe azul igual mensagens */
+    border-bottom: 2px solid #2b97fa;
     padding-bottom: 4px;
+    white-space: nowrap;
 }
 
 .calendario-title span {
@@ -32,15 +36,20 @@
     margin-left: 5px;
 }
 
+.controles {
+    display: flex;
+    gap: 5px;
+}
+
 .controles button {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid #2b97fa;
     color: white;
     border-radius: 5px;
-    padding: 5px 10px;
+    padding: 5px 12px;
     cursor: pointer;
-    margin-left: 5px;
     transition: 0.3s;
+    font-weight: bold;
 }
 
 .controles button:hover {
@@ -49,13 +58,16 @@
 
 .calendario-grid {
     display: grid;
+    /* 7 colunas iguais que ocupam 1 fração do espaço cada */
     grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+    /* Espaçamento entre dias flui entre 4px e 10px */
+    gap: clamp(4px, 1vw, 10px);
     text-align: center;
 }
 
 .dia-semana {
-    font-size: 12px;
+    /* Texto menor em telas pequenas */
+    font-size: clamp(10px, 0.8vw, 12px);
     font-weight: 700;
     color: #2b97fa;
     text-transform: uppercase;
@@ -63,15 +75,17 @@
 }
 
 .dia-num {
-    height: 35px;
+    /* MÁGICA: Mantém o dia sempre quadrado */
+    aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: clamp(12px, 1vw, 14px);
     transition: 0.2s;
     background: rgba(255, 255, 255, 0.03);
+    width: 100%;
 }
 
 .dia-num:hover {
@@ -91,14 +105,4 @@
 
 .dia-vazio {
     cursor: default;
-}
-
-@media (max-width: 380px) {
-    .dia-num {
-        height: 30px;
-        font-size: 12px;
-    }
-    .calendario-grid {
-        gap: 4px;
-    }
 }

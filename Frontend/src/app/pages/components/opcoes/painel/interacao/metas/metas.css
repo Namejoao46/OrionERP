@@ -2,112 +2,91 @@
 
 .conteiner_metas {
     width: 100%;
-    background-color: #050a30; /* Fundo azul marinho profundo */
+    background-color: #050a30;
     border-radius: 15px;
-    padding: 20px 30px 20px 30px;
+    padding: 25px;
     box-sizing: border-box;
     font-family: 'Inter', sans-serif;
     color: white;
 }
 
-/* Título com linha azul */
 .title h1 {
     font-size: 22px;
     font-weight: 700;
-    margin: 0 0 15px 0;
-    display: inline-block;
+    margin: 0 0 20px 0;
     border-bottom: 3px solid #2b97fa;
     padding-bottom: 5px;
+    display: inline-block;
 }
 
-/* Filtros (Botões/Pills) */
 .metas-setores {
     display: flex;
-    gap: 12px;
-    margin-bottom: 35px;
+    gap: 10px;
+    margin-bottom: 25px;
 }
 
 .setor-pill {
     border: 1px solid #2b97fa;
-    border-radius: 10px;
-    padding: 6px 18px;
-    font-size: 14px;
-    cursor: pointer;
+    border-radius: 20px;
+    padding: 5px 15px;
+    font-size: 13px;
     color: #fff;
-    transition: 0.3s;
 }
 
 .setor-pill.active {
     background-color: #2b97fa;
-    font-weight: 600;
 }
 
-/* Lista de Colaboradores */
+/* LISTA - O segredo do alinhamento */
 .metas-pessoas {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 10px;
 }
 
 .pessoa-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 15px;
 }
 
-/* Coluna 1: Avatar e Nome */
+/* Coluna 1: Perfil (Travado para não dançar) */
 .col-perfil {
+    flex: 0 0 250px; 
     display: flex;
     align-items: center;
-    width: 250px; /* Alinhamento garantido */
 }
 
 .avatar {
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    margin-right: 15px;
+    margin-right: 12px;
     object-fit: cover;
 }
 
-.info {
-    display: flex;
-    flex-direction: column;
-}
+.info .nome { font-weight: 700; font-size: 15px; display: block; }
+.info .cargo { font-size: 12px; color: #b0b3b8; display: block; }
 
-.nome {
-    font-weight: 700;
-    font-size: 17px;
-    color: #ffffff;
-}
-
-.cargo {
-    font-size: 14px;
-    color: #b0b3b8; /* Cinza suave para o cargo */
-}
-
-/* Coluna 2: Metas e Status */
+/* Coluna 2: Metas */
 .col-meta {
-    flex: 1;
-    padding: 0 0 0 20px;
-    display: flex;
-    flex-direction: column;
+    flex: 0 0 120px;
 }
 
-.meta-count {
-    font-weight: 600;
-    font-size: 17px;
+.meta-count { font-weight: 600; font-size: 15px; display: block; }
+.status-text { font-size: 12px; color: #b0b3b8; display: block; }
+
+/* Coluna 3: Status */
+.col-status-fixo {
+    flex: 0 0 80px;
 }
 
-.status {
-    font-size: 14px;
-    color: #b0b3b8;
-}
-
-/* Coluna 3: Porcentagem */
+/* Coluna 4: Badge (Aqui estava o erro da imagem gigante) */
 .col-badge {
-    width: 110px;
+    flex: 0 0 100px;
     display: flex;
     justify-content: flex-end;
 }
@@ -115,46 +94,27 @@
 .badge {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border-radius: 25px;
-    font-weight: 700;
-    font-size: 14px;
-    min-width: 90px;
     justify-content: center;
+    gap: 6px;
+    width: 85px; /* Largura fixa do badge */
+    height: 32px; /* Altura fixa do badge */
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
 }
 
-/* Cores específicas conforme a imagem */
-.positive {
-    background-color: #2ef8a0; /* Verde Vibrante */
-    color: #053a24;
-}
-
-.negative {
-    background-color: #cf0060; /* Magenta/Rosa */
-    color: #ffffff;
-}
-
+/* TRAVA PARA A IMAGEM NÃO EXPLODIR */
 .badge img {
-    width: 14px;
-    height: auto;
+    width: 14px !important; 
+    height: 14px !important;
+    object-fit: contain;
 }
 
-@media (max-width: 600px) {
-    .pessoa-row {
-        flex-direction: column; /* Empilha as informações da pessoa no celular */
-        align-items: flex-start;
-        gap: 15px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .col-perfil {
-        width: 100%;
-    }
-    
-    .col-badge {
-        width: 100%;
-        justify-content: flex-start; /* Badge alinha à esquerda no celular */
-    }
+.positive { background-color: #2ef8a0; color: #053a24; }
+.negative { background-color: #cf0060; color: #ffffff; }
+
+/* Mobile: Se a tela for pequena, ele empilha */
+@media (max-width: 1000px) {
+    .pessoa-row { flex-wrap: wrap; }
+    .col-perfil { flex: 1 1 100%; }
 }

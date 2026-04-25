@@ -1,67 +1,59 @@
-/* Importando uma fonte moderna */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
-body {
-    background-color: #050a30; /* Fundo escuro como na imagem */
-    font-family: 'Inter', sans-serif;
-}
-
-.conteiner {
-    padding: 8px;
-    display: flex;
-    justify-content: center;
-}
 
 .conteiner_mensagens {
     width: 100%;
-    max-width: 470px;
-    background-color: #050a30; /* Azul escuro profundo */
-    padding: 24px;
+    background-color: #050a30; 
+    padding: clamp(15px, 3vw, 30px);
     box-sizing: border-box;
-    border-radius: 8px;
+    border-radius: 15px;
 }
 
 .mensagens-title {
     color: #ffffff;
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #1a3a6d; /* Linha sutil embaixo do título */
+    /* Fonte cresce entre 20px e 24px conforme a tela */
+    font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+    margin: 0 0 20px 0;
+    border-bottom: 2px solid #1a3a6d; 
     padding-bottom: 10px;
     display: inline-block;
     width: 100%;
+    font-weight: 700;
 }
 
 .card-pessoa {
     display: flex;
     align-items: flex-start;
-    background-color: rgba(255, 255, 255, 0.05); /* Fundo sutil para o card */
-    padding: 16px;
+    background-color: rgba(255, 255, 255, 0.05); 
+    padding: clamp(12px, 2vw, 16px);
     border-radius: 12px;
     margin-bottom: 12px;
     transition: background 0.3s ease;
+    gap: 15px; /* Espaço entre avatar e texto */
 }
 
 .card-pessoa:hover {
-    background-color: rgba(255, 255, 255, 0.1); /* Efeito de hover */
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .avatar {
-    width: 50px;
-    height: 50px;
+    /* Avatar diminui em telas muito pequenas */
+    width: clamp(40px, 5vw, 50px);
+    height: clamp(40px, 5vw, 50px);
     border-radius: 50%;
     object-fit: cover;
-    margin-right: 15px;
+    flex-shrink: 0; /* Impede que a foto seja esmagada */
 }
 
 .pessoa-text {
     display: flex;
     flex-direction: column;
+    flex: 1; /* Ocupa o restante do espaço */
 }
 
 .nome {
     color: #ffffff;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: clamp(0.95rem, 1.2vw, 1.1rem);
     margin-bottom: 4px;
 }
 
@@ -69,7 +61,23 @@ body {
     word-break: break-word; 
     overflow-wrap: break-word;
     color: #b0b3b8;
-    font-size: 0.95rem;
+    font-size: clamp(0.85rem, 1vw, 0.95rem);
     line-height: 1.4;
     margin: 0;
+    
+    /* Ajuste para o erro de compatibilidade */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3; /* Limita a 3 linhas no Chrome/Safari */
+    line-clamp: 3;         /* Propriedade padrão (o que o erro pediu) */
+    
+    overflow: hidden;
+}
+
+/* Ajuste para telas minúsculas */
+@media (max-width: 150px) {
+    .card-pessoa {
+        padding: 10px;
+        gap: 10px;
+    }
 }

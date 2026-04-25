@@ -1,0 +1,19 @@
+<div class="notification-wrapper">
+  @for (note of activeNotifications; track note) {
+    <div class="toast" 
+         [class]="note.type" 
+         [class.removing]="note.isRemoving">
+      
+      <div class="content">
+        {{ note.message }}
+      </div>
+      
+      <div class="progress-bar">
+        <div 
+          class="progress-fill" 
+          [style.animationDuration.ms]="note.duration">
+        </div>
+      </div>
+    </div>
+  }
+</div>

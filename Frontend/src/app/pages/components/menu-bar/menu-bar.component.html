@@ -21,11 +21,15 @@
     </div>
 
     <div class="conteiner_notificacoes">
-        <li><img src="assets/sino.png" alt="notificações"></li>
-        <li><img src="assets/bater-papo.png" alt="mensagens"></li>
+        <li #notifRef (click)="abrirNotificacoes(notifRef)">
+            <img src="assets/sino.png" alt="notificações">
+        </li>
+        <li #msgRef (click)="abrirMensagens(msgRef)">
+            <img src="assets/bater-papo.png" alt="mensagens">
+        </li>
     </div>
     
-    <div class="conteiner_perfil">
+    <div class="conteiner_perfil" #perfilRef (click)="abrirMenuPerfil(perfilRef)">
         <img [src]="(userImage$ | async) || 'assets/perfil.png'" alt="Imagem de perfil">
         <span class="perfil-nome">{{ (userName$ | async) || 'Usuário' }}</span>
     </div>

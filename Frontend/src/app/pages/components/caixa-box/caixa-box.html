@@ -1,0 +1,10 @@
+<div class="caixabox-container">
+  <ul class="caixabox-list">
+    <li *ngFor="let item of options" 
+        (click)="select(item)" 
+        class="caixabox-item">
+      <i *ngIf="item.icon" [class]="item.icon"></i>
+      <span class="caixabox-label">{{ item.label }}</span>
+    </li>
+  </ul>
+</div>

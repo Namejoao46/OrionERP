@@ -13,11 +13,12 @@ import { FiscalComponent } from './pages/components/opcoes/fiscal/fiscal.compone
 import { MaisComponent } from './pages/components/opcoes/mais/mais.component';
 import { MenuFixoComponent } from './pages/components/menu-fixo/menu-fixo.component';
 import { GraficoFinancias } from './pages/components/opcoes/painel/grafico-financias/grafico-financias';
-import { Grafico } from './pages/components/opcoes/painel/grafico/grafico';
+import { Grafico } from './pages/components/opcoes/components-opcoes/grafico/grafico';
 import { Mensagens } from './pages/components/opcoes/painel/interacao/mensagens/mensagens';
 import { Metas } from './pages/components/opcoes/painel/interacao/metas/metas';
 import { Interacao } from './pages/components/opcoes/painel/interacao/interacao';
 import { Calendario } from './pages/components/opcoes/painel/interacao/calendario/calendario';
+import { Estoque } from './pages/components/opcoes/estoque/estoque';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -42,6 +43,7 @@ export const routes: Routes = [
       { path: 'recursosH', component: RecursosHComponent },
       { path: 'fiscal', component: FiscalComponent },
       { path: 'mais', component: MaisComponent },
+      { path: 'estoque', component: Estoque },
 
       { path: '', redirectTo: 'painel', pathMatch: 'full' },
     ]

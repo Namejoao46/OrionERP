@@ -1,6 +1,34 @@
 <div class="conteiner">
     <div class="conteiner_grafico">
-        <app-grafico></app-grafico>
+        <!-- Renderizar 1 card -->
+        <app-grafico [config]="{
+            titulo: 'Finalizadas',
+            subtitulo: 'Total de vendas',
+            valor: 12,
+            percentual: '3,5%',
+            comparacao: '+2',
+            tipo: 'verde'
+        }"></app-grafico>
+
+        <app-grafico   [config]="{
+            titulo: 'Em andamento',
+            subtitulo: 'Total de vendas',
+            valor: 30,
+            percentual: '6,2%',
+            comparacao: '+5',
+            tipo: 'laranja'
+        }"></app-grafico>
+
+        <app-grafico [config]="{
+            titulo: 'Atrasadas',
+            subtitulo: 'Total de vendas',
+            valor: 50,
+            percentual: '8,1%',
+            comparacao: '-10',
+            tipo: 'vermelho'
+        }"></app-grafico>
+
+        <app-card-tempo></app-card-tempo>
     </div>
     <div class="conteiner_grafico-financias">
         <app-grafico-financias></app-grafico-financias>

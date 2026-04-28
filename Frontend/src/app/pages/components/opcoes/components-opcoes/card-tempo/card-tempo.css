@@ -1,0 +1,54 @@
+.conteiner_entregas-tempoTrabalhado {
+    /* Mesma lógica de tamanho dos cards de gráfico */
+    flex: 1 1 320px; 
+    min-height: 180px;
+    background-color: #050a30;
+    border-radius: 20px; /* Arredondamento igual aos outros */
+    padding: 25px;       /* Padding igual aos outros */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centraliza o conteúdo verticalmente */
+    gap: 20px;               /* Espaço entre 'Hora' e 'Trabalhado' */
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
+}
+
+/* Efeito hover para manter o padrão */
+.conteiner_entregas-tempoTrabalhado:hover {
+    transform: translateY(-5px);
+}
+
+.bloco-tempo {
+    display: flex;
+    align-items: baseline; 
+    gap: 12px; 
+}
+
+.numeros {
+    display: flex;
+    align-items: baseline;
+    min-width: fit-content;
+}
+
+.valor-principal {
+    color: #fff;
+    font-weight: 900;
+    /* Fonte maior para acompanhar o número grande do gráfico */
+    font-size: 38px; 
+    line-height: 1;
+}
+
+.segundos {
+    color: #2b97fa;
+    font-weight: 800;
+    /* Segundos acompanham o destaque */
+    font-size: 24px; 
+    line-height: 1;
+}
+
+.label {
+    color: #8a8a8a; /* Cinza igual ao subtitulo do gráfico */
+    font-weight: 600;
+    font-size: 16px;
+    white-space: nowrap;
+}

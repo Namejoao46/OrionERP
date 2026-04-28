@@ -1,0 +1,104 @@
+/* Container principal do card */
+.conteiner_entregas-finalizadas,
+.conteiner_entregas-emAndamento,
+.conteiner_entregas-atrasadas {
+    flex: 1 1 320px; /* Base de 320px, mas expande para preencher a linha */
+    min-height: 180px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #050a30;
+    box-sizing: border-box;
+    padding: 25px;
+    transition: transform 0.2s ease;
+}
+
+/* Efeito ao passar o mouse (opcional, mas fica profissional) */
+.conteiner_entregas-finalizadas:hover,
+.conteiner_entregas-emAndamento:hover,
+.conteiner_entregas-atrasadas:hover {
+    transform: translateY(-5px);
+}
+
+.topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.texto {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.texto p {
+    color: #fff;
+    font-size: 38px;
+    font-weight: 900;
+    margin: 0;
+    line-height: 1;
+}
+
+.texto h2 {
+    color: #8a8a8a;
+    font-size: 14px;
+    font-weight: 400;
+    margin: 5px 0;
+}
+
+.texto h1 {
+    color: #fff;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Badges de Porcentagem */
+.grafico1, .grafico2, .grafico3 {
+    display: flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 25px;
+    gap: 8px;
+}
+
+.grafico1 { background-color: #2ef8a0; }
+.grafico2 { background-color: #FFA300; }
+.grafico3 { background-color: #CF0060; }
+
+.grafico1 h1, .grafico2 h1, .grafico3 h1 {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.grafico1 h1 { color: #054d2b; }
+.grafico2 h1 { color: #3c2a00; }
+.grafico3 h1 { color: #ffffff; }
+
+.grafico img {
+    width: 18px;
+    height: 18px;
+}
+
+/* Rodapé do Card (Comparação) */
+.comparando, .comparando2, .comparando3 {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.comparando h1 { color: #2ef8a0; font-size: 32px; margin: 0; font-weight: 800; }
+.comparando2 h1 { color: #FFA300; font-size: 32px; margin: 0; font-weight: 800; }
+.comparando3 h1 { color: #CF0060; font-size: 32px; margin: 0; font-weight: 800; }
+
+.comparando h2, .comparando2 h2, .comparando3 h2 {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0;
+}

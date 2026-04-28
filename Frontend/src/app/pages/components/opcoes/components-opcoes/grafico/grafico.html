@@ -1,0 +1,59 @@
+<div class="conteiner_entregas-finalizadas" *ngIf="config.tipo === 'verde'">
+  <div class="topo">
+    <div class="texto">
+      <p>{{ config.valor }}</p>
+      <h2>{{ config.subtitulo }}</h2>
+      <h1>{{ config.titulo }}</h1>
+    </div>
+    <div class="grafico">
+      <div class="grafico1">
+        <img src="assets/ascender.png" alt="">
+        <h1>{{ config.percentual }}</h1>
+      </div>
+    </div>
+  </div>
+  <div class="comparando">
+    <h1>{{ config.comparacao }}</h1>
+    <h2>comparado a semana anterior</h2>
+  </div>
+</div>
+
+<div class="conteiner_entregas-emAndamento" *ngIf="config.tipo === 'laranja'">
+  <div class="topo">
+    <div class="texto">
+      <p>{{ config.valor }}</p>
+      <h2>{{ config.subtitulo }}</h2>
+      <h1>{{ config.titulo }}</h1>
+    </div>
+    <div class="grafico">
+      <div class="grafico2">
+        <img src="assets/ascender.png" alt="">
+        <h1>{{ config.percentual }}</h1>
+      </div>
+    </div>
+  </div>
+  <div class="comparando2">
+    <h1>{{ config.comparacao }}</h1>
+    <h2>comparado a semana anterior</h2>
+  </div>
+</div>
+
+<div class="conteiner_entregas-atrasadas" *ngIf="config.tipo === 'vermelho'">
+  <div class="topo">
+    <div class="texto">
+      <p>{{ config.valor }}</p>
+      <h2>{{ config.subtitulo }}</h2>
+      <h1>{{ config.titulo }}</h1>
+    </div>
+    <div class="grafico">
+      <div class="grafico3">
+        <img src="assets/ascender.png" alt="">
+        <h1>{{ config.percentual }}</h1>
+      </div>
+    </div>
+  </div>
+  <div class="comparando3">
+    <h1>{{ config.comparacao }}</h1>
+    <h2>comparado a semana anterior</h2>
+  </div>
+</div>

@@ -8,3 +8,20 @@
     box-sizing: border-box;
     overflow: hidden;
 }
+
+.conteiner_grafico {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap; /* Importante para responsividade */
+    gap: 25px;       /* Espaço entre os cards */
+    width: 100%;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+/* Garante que o card de tempo acompanhe a altura dos outros */
+app-grafico, .conteiner_entregas-tempoTrabalhado {
+    flex: 1 1 320px; 
+    display: flex;
+}

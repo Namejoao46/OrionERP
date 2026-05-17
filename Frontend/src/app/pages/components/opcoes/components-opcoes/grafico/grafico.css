@@ -2,8 +2,8 @@
 .conteiner_entregas-finalizadas,
 .conteiner_entregas-emAndamento,
 .conteiner_entregas-atrasadas {
-    flex: 1 1 320px; /* Base de 320px, mas expande para preencher a linha */
-    min-height: 180px;
+    flex: 1 1 200px; /* Base de 320px, mas expande para preencher a linha */
+    min-height: 0;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
@@ -51,8 +51,9 @@
 
 .texto h1 {
     color: #fff;
-    font-size: 26px;
+    font-size: clamp(18px, 2vw, 28px);
     font-weight: 700;
+    white-space: nowrap;
     margin: 0;
 }
 

@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+.container{
+  width: 100%;
+  height: 100%;
+  background: #050a30;
+  border-radius: 16px;
+  font-family: 'Inter', sans-serif;
+  padding: 1px;
+}
+
+.container h1 {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 10px 0 20px 20px;
+    border-bottom: 3px solid #2b97fa;
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.scroll-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.arrow {
+  background: #0b0f29;
+  color: #00c3ff;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0,195,255,0.4);
+  transition: background 0.3s ease;
+}
+
+.arrow:hover {
+  background: #2b97fa;
+  color: #fff;
+}
+
+.scroll-horizontal {
+  display: flex;
+  gap: 35px;
+  overflow-x: auto;
+  padding: 10px 5px;
+  scrollbar-width: none;
+  margin: 0 30px; /* espaço para as setas */
+}
+
+.scroll-horizontal::-webkit-scrollbar {
+  display: none;
+}
+
+.card-fornecedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 85px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.avatar-wrapper {
+  position: relative;
+}
+
+.avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #1e264a, #11183d);
+  padding: 3px; /* Espaço para a borda gradiente */
+  border: 2px solid rgba(0, 195, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: grayscale(20%); /* Fica colorido no hover */
+  transition: 0.3s ease;
+}
+
+/* Status Online no cantinho */
+.status-indicator {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 12px;
+  height: 12px;
+  background: #00ff88;
+  border: 2px solid #0b0f29;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+/* --- EFEITOS DE HOVER --- */
+
+.card-fornecedor:hover {
+  transform: translateY(-5px);
+}
+
+.card-fornecedor:hover .avatar {
+  border-color: #00c3ff;
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(0, 195, 255, 0.4);
+}
+
+.card-fornecedor:hover .avatar img {
+  filter: grayscale(0%);
+}
+
+.fornecedor-nome {
+  color: #cbd5e0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  max-width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+.card-fornecedor:hover .fornecedor-nome {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}

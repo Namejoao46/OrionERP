@@ -1,1 +1,43 @@
-<p>estoque works!</p>
+<div class="conteiner">
+  <div class="conteiner_1">
+    <section class="conteiner_fornecedores">
+      <app-fornecedores-lista></app-fornecedores-lista>
+    </section>
+    
+    <section class="conteiner_cards">
+          <app-grafico [config]="{
+              titulo: 'Finalizadas',
+              subtitulo: 'Total de vendas',
+              valor: 12,
+              percentual: '3,5%',
+              comparacao: '+2',
+              tipo: 'verde'
+          }"></app-grafico>
+
+          <app-grafico   [config]="{
+              titulo: 'Em andamento',
+              subtitulo: 'Total de vendas',
+              valor: 30,
+              percentual: '6,2%',
+              comparacao: '+5',
+              tipo: 'laranja'
+          }"></app-grafico>
+
+          <app-grafico [config]="{
+              titulo: 'Atrasadas',
+              subtitulo: 'Total de vendas',
+              valor: 50,
+              percentual: '8,1%',
+              comparacao: '-10',
+              tipo: 'vermelho'
+          }"></app-grafico>
+    </section>
+  </div>
+  <section class="conteiner_produtos-lista">
+    <app-produtos-grid [produtos]="produtos"></app-produtos-grid>
+  </section>
+
+  <section class="conteiner_ultimos-adicionados">
+    <app-ultimos-produtos [ultimos]="ultimos"></app-ultimos-produtos>
+  </section>
+</div>

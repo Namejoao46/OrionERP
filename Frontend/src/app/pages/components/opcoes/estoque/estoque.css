@@ -1,0 +1,122 @@
+/* Layout Principal */
+.conteiner {
+  display: flex;
+  flex-wrap: wrap;   /* permite quebrar linha */
+  gap: 20px;
+  padding: 30px;
+  align-items: flex-start;
+}
+
+.conteiner_1 {
+    width: 100%;
+    max-height: 200px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap; /* Mude para nowrap para garantir que fiquem lado a lado em telas grandes */
+    gap: 20px;
+    align-items: stretch; /* Garante que as alturas se alinhem */
+}
+
+/* Fornecedores no canto superior esquerdo */
+.conteiner_fornecedores {
+    flex: 0 0 36%; /* Não cresce, não diminui, base de 40% */
+    min-width: 300px;
+    max-width: 570px;
+}
+
+/* Produtos Lista abaixo dos fornecedores (mais largo) */
+.conteiner_produtos-lista {
+  width: 70%;
+  min-height: 500px;
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: auto;
+  position: relative;
+}
+
+.conteiner_produtos-lista::-webkit-scrollbar,
+.conteiner_ultimos-adicionados::-webkit-scrollbar {
+  width: 8px;   /* vertical */
+  height: 8px;  /* horizontal */
+}
+
+.conteiner_produtos-lista::-webkit-scrollbar-track,
+.conteiner_ultimos-adicionados::-webkit-scrollbar-track {
+  background: #0a0e29;
+  border-radius: 10px;
+}
+
+.conteiner_produtos-lista::-webkit-scrollbar-thumb, 
+.conteiner_ultimos-adicionados::-webkit-scrollbar-thumb {
+  background: #2b97fa;   /* azul */
+  border-radius: 10px;
+}
+
+.conteiner_produtos-lista::-webkit-scrollbar-thumb:hover, 
+.conteiner_ultimos-adicionados::-webkit-scrollbar-thumb:hover {
+  background: #00c3ff;   /* azul mais claro no hover */
+}
+
+/* Cards no canto superior direito */
+.conteiner_cards {
+    flex: 1 1 auto; /* ISSO É A CHAVE: ele vai crescer para ocupar o resto da largura */
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+
+app-grafico{
+    flex: 1 1 320px; 
+    display: flex;
+}
+
+/* Últimos adicionados abaixo dos cards (mais estreito) */
+.conteiner_ultimos-adicionados {
+  width: 28%;
+  min-height: 500px;
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #2d354a;
+  border-radius: 10px;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .conteiner {
+    flex-direction: column; /* tudo em uma coluna */
+  }
+
+  .conteiner_fornecedores,
+  .conteiner_cards,
+  .conteiner_produtos-lista,
+  .conteiner_ultimos-adicionados {
+    flex: 1 1 100%; /* cada um ocupa toda a largura */
+  }
+
+  .conteiner_cards {
+    flex-direction: column; /* empilha os cards */
+  }
+}
+
+@media (max-width: 600px) {
+  .conteiner {
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .card-tivo {
+    border-radius: 10px;
+  }
+
+  .conteiner_cards {
+    gap: 10px;
+  }
+}

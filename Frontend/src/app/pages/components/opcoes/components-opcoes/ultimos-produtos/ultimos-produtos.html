@@ -1,0 +1,15 @@
+<div class="sidebar-ultimos">
+  <h1>Recentemente Adicionados</h1>
+  
+  <div class="item-recente" *ngFor="let item of ultimos">
+    <div class="status-dot"></div>
+    
+    <div class="info">
+      <strong>{{ item.nome }}</strong>
+      <span>
+        <i class="time-icon">🕒</i> {{ item.data | date:'HH:mm' }} — 
+        <b style="color: #00c3ff;">{{ item.qtd }} un</b>
+      </span>
+    </div>
+  </div>
+</div>

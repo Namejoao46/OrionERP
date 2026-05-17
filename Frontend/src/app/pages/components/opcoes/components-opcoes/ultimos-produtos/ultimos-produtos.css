@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+.sidebar-ultimos {
+    padding: 10px;
+    background: #050a30;
+    border-radius: 16px;
+    font-family: 'Inter', sans-serif;
+}
+
+h1 {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 10px 0 20px 20px;
+    border-bottom: 3px solid #2b97fa;
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.item-recente {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #060b26; /* Fundo padrão dos cards */
+  border-radius: 10px;
+  border: 1px solid #1a2245;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+/* Efeito de vir para frente no Hover */
+.item-recente:hover {
+  transform: translateX(-5px); /* Move levemente para a esquerda */
+  background: #0d143d;
+  border-color: #00c3ff;
+}
+
+/* Indicador de Status (Aquele pontinho) */
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00ff88;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+  flex-shrink: 0; /* Não deixa o círculo amassar */
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info strong {
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.info span {
+  font-size: 0.75rem;
+  color: #5d6588; /* Cinza azulado para não brigar com o título */
+}
+
+/* Estilo para quando o item for uma saída (opcional para o futuro) */
+.item-recente.saida .status-dot {
+  background: #ff0055;
+  box-shadow: 0 0 8px rgba(255, 0, 85, 0.4);
+}

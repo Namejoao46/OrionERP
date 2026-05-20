@@ -12,7 +12,7 @@
     max-height: 200px;
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap; /* Mude para nowrap para garantir que fiquem lado a lado em telas grandes */
+    flex-wrap: nowrap; 
     gap: 20px;
     align-items: stretch; /* Garante que as alturas se alinhem */
 }

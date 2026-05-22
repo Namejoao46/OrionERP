@@ -12,6 +12,20 @@
     </div>
 
     <div class="conteiner_conteudo" [class.expandido]="!menuAberto">
+        <button (click)="abrirCard()">Abrir Card Flutuante</button>
+        
         <router-outlet></router-outlet>
     </div>
 </div>
+
+<app-card-flutuante 
+    [exibir]="mostrarModal" 
+    titulo="Título do Card" 
+    (aoFechar)="mostrarModal = false">
+    
+    <div class="meu-conteudo-personalizado">
+        <h3>Bem-vindo ao Card!</h3>
+        <p>Este conteúdo é dinâmico e reutilizável.</p>
+        </div>
+
+</app-card-flutuante>

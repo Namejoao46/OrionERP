@@ -1,0 +1,15 @@
+<div class="overlay" *ngIf="exibir" (click)="fechar()">
+  
+  <div class="card-container" (click)="$event.stopPropagation()">
+    
+    <div class="card-header">
+      <h2 class="titulo">{{ titulo }}</h2>
+      <button class="btn-fechar" (click)="fechar()">&times;</button>
+    </div>
+
+    <div class="card-conteudo">
+      <ng-content></ng-content>
+    </div>
+
+  </div>
+</div>

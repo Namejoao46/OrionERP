@@ -5,11 +5,12 @@ import { RouterModule } from '@angular/router';
 import { MenuBarComponent } from "../components/menu-bar/menu-bar.component";
 import { OpcoesComponent } from "../components/opcoes/opcoes.component";
 import { MenuFixoComponent } from "../components/menu-fixo/menu-fixo.component";
+import { CardFlutuante } from "../components/card-flutuante/card-flutuante";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, MenuBarComponent, OpcoesComponent, MenuFixoComponent],
+  imports: [RouterModule, CommonModule, FormsModule, MenuBarComponent, OpcoesComponent, MenuFixoComponent, CardFlutuante],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -19,6 +20,8 @@ export class HomeComponent {
   // Injetando ferramentas de diagnóstico
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
+  
+  mostrarModal: boolean = false;
 
   ngOnInit() {
     console.log('HomeComponent carregado. Verificando estabilidade do Zone.js...');
@@ -33,5 +36,9 @@ export class HomeComponent {
 
   aoMudarMenu(estado: boolean) {
     this.menuAberto = estado;
+  }
+
+  abrirCard() {
+    this.mostrarModal = true;
   }
 }

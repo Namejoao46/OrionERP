@@ -1,13 +1,18 @@
 package backend.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationService {
-    public void enviarNotificacao(String token, String titulo, String mensagem) {
-        System.out.println(">>> Enviando notificação:");
-        System.out.println("Token: " + token);
-        System.out.println("Título: " + titulo);
-        System.out.println("Mensagem: " + mensagem);
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    public void enviarNotificacao(String destinatario, String titulo, String mensagem) {
+        // envia para o tópico do usuário
+        messagingTemplate.convertAndSend("/topic/" + destinatario,
+                titulo + ": " + mensagem);
     }
 }

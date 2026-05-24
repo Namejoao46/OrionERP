@@ -34,6 +34,12 @@ public class SecurityConfigurations {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll() 
+                .requestMatchers(HttpMethod.GET,  "/api/produtos/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/produtos/**").authenticated()
+                .requestMatchers(HttpMethod.PUT,  "/api/produtos/**").authenticated()
+                .requestMatchers(HttpMethod.PATCH,"/api/produtos/**").authenticated()
+                .requestMatchers(HttpMethod.GET,  "/api/notas-recebimento/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/notas-recebimento/**").authenticated()
                 .anyRequest().authenticated() 
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

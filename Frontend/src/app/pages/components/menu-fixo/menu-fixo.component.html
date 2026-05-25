@@ -3,6 +3,11 @@
         {{ isMenuAberto ? '❮' : '❯' }}
     </button>
 
+    <div class="conteiner_mensagem" (click)="notificarCliqueCard()" style="cursor: pointer;">
+        <img src="assets/bater-papo.png" alt="config">
+        <h1 *ngIf="isMenuAberto">ola</h1>
+    </div>
+
     <div class="conteiner_config">
         <img src="assets/configuracoes (2).png" alt="config">
         <h1 *ngIf="isMenuAberto">Configurações</h1>

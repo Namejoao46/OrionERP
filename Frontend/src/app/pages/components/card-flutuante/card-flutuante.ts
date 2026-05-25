@@ -11,11 +11,14 @@ import { RouterModule } from '@angular/router';
   styleUrl: './card-flutuante.css',
 })
 export class CardFlutuante {
-  @Input() exibir: boolean = false;
+  exibir: boolean = false; // Agora ela não precisa ser @Input obrigatoriamente
   @Input() titulo: string = 'Aviso';
-  @Output() aoFechar = new EventEmitter<void>();
+
+  abrir() {
+    this.exibir = true;
+  }
 
   fechar() {
-    this.aoFechar.emit();
+    this.exibir = false;
   }
 }

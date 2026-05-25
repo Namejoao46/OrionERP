@@ -34,6 +34,25 @@
     min-width: 40px;
 }
 
+.conteiner_mensagem{
+    position: absolute;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 10px;
+    gap: 10px;
+    bottom: 90px;
+    font-size: 14px;
+    color: #fff;
+    white-space: nowrap;
+}
+    
+.conteiner_mensagem img{
+    height: 45px;
+    min-width: 40px;
+}
+
 .btn-toggle {
     position: absolute;
     top: 10px;
@@ -44,4 +63,22 @@
     cursor: pointer;
     border-radius: 5px;
     padding: 2px 8px;
+}
+
+.item-menu {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    gap: 10px;
+    transition: background 0.3s;
+    border-radius: 8px;
+}
+
+.item-menu:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.item-menu img {
+    width: 24px;
+    height: 24px;
 }

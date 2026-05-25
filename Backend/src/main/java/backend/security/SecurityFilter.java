@@ -28,7 +28,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         
-        System.out.println(">>> [SecurityFilter] Requisição recebida: " + request.getMethod() + " " + request.getRequestURI());
+        //System.out.println(">>> [SecurityFilter] Requisição recebida: " + request.getMethod() + " " + request.getRequestURI());
 
         if (request.getRequestURI().equals("/api/auth/login")) {
             filterChain.doFilter(request, response);
@@ -38,7 +38,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         var tokenJWT = recuperarToken(request);
 
         if (tokenJWT != null) {
-             System.out.println(">>> [SecurityFilter] Token encontrado: " + tokenJWT);
+             //System.out.println(">>> [SecurityFilter] Token encontrado: " + tokenJWT);
             var subject = tokenService.getSubject(tokenJWT);
             var colaborador = repository.findByLogin(subject);
 
@@ -55,7 +55,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 System.out.println(">>> [SecurityFilter] Usuário não encontrado para subject: " + subject);
             }
         } else {
-            System.out.println(">>> [SecurityFilter] Nenhum token presente na requisição.");
+            //System.out.println(">>> [SecurityFilter] Nenhum token presente na requisição.");
         }
 
         filterChain.doFilter(request, response);

@@ -11,13 +11,18 @@ import { RouterModule } from '@angular/router';
   styleUrl: './menu-fixo.component.css'
 })
 export class MenuFixoComponent {
-  isMenuAberto: boolean = true; // Começa aberto por padrão
+  isMenuAberto: boolean = true;
 
   @Output() onToggleMenu = new EventEmitter<boolean>();
-  
+
+  @Output() onAbrirCard = new EventEmitter<void>(); 
+
   toggleMenu() {
     this.isMenuAberto = !this.isMenuAberto;
-    // Emitimos o novo estado (true ou false)
     this.onToggleMenu.emit(this.isMenuAberto);
+  }
+
+  notificarCliqueCard() {
+    this.onAbrirCard.emit();
   }
 }

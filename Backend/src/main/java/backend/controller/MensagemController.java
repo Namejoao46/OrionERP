@@ -2,23 +2,21 @@ package backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Comparator;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import backend.model.Mensagem;
+import backend.model.Colaborador;
 import backend.repository.MensagemRepository;
+import backend.repository.ColaboradorRepository;
 import backend.service.NotificationService;
-
 
 @RestController
 @RequestMapping("/api/mensagens")
@@ -31,8 +29,12 @@ public class MensagemController {
     @Autowired
     private MensagemRepository mensagemRepository;
 
+    @Autowired
+    private ColaboradorRepository colaboradorRepository;
+
     private static final Map<String, String> tokensUsuarios = new ConcurrentHashMap<>();
 
+    // Registrar token de notificação
     @PostMapping("/registrar-token")
     public ResponseEntity<?> registrarToken(@RequestBody Map<String, String> payload) {
         String usuario = payload.get("username");
@@ -46,11 +48,16 @@ public class MensagemController {
         return ResponseEntity.badRequest().body(Map.of("erro", "Dados inválidos"));
     }
 
+    // Enviar mensagem (remetente vem do JWT)
     @PostMapping("/enviar")
-    public ResponseEntity<?> enviarMensagem(@RequestBody Map<String, String> payload) {
-        String remetente = payload.get("remetente");       
-        String destinatario = payload.get("destinatario"); 
-        String conteudo = payload.get("mensagem");         
+    public ResponseEntity<?> enviarMensagem(@RequestBody Map<String, String> payload, Principal principal) {
+        String remetente = principal.getName(); // usuário autenticado
+        String destinatario = payload.get("destinatario");
+        String conteudo = payload.get("mensagem");
+
+        if (destinatario == null || conteudo == null) {
+            return ResponseEntity.badRequest().body(Map.of("erro", "Dados inválidos"));
+        }
 
         Mensagem novaMensagem = new Mensagem();
         novaMensagem.setRemetente(remetente);
@@ -70,19 +77,15 @@ public class MensagemController {
         }
     }
 
-    @PostMapping("/pendentes")
-    public ResponseEntity<?> buscarMensagensPendentes(@RequestBody Map<String, String> payload) {
-        String destinatario = payload.get("destinatario");
-
-        if (destinatario == null) {
-            return ResponseEntity.badRequest().body(Map.of("erro", "Destinatário não informado"));
-        }
-
+    // Buscar mensagens pendentes para o usuário logado
+    @GetMapping("/pendentes")
+    public ResponseEntity<?> buscarMensagensPendentes(Principal principal) {
+        String destinatario = principal.getName();
         List<Mensagem> mensagensPendentes = mensagemRepository.findByDestinatarioAndStatus(destinatario, "NAO_LIDA");
-
         return ResponseEntity.ok(mensagensPendentes);
     }
 
+    // Marcar mensagem como lida
     @PostMapping("/marcar-lida")
     @Transactional
     public ResponseEntity<?> marcarMensagemComoLida(@RequestBody Map<String, String> payload) {
@@ -90,10 +93,30 @@ public class MensagemController {
             Long idMensagem = Long.valueOf(payload.get("id"));
             mensagemRepository.marcarComoLida(idMensagem);
             return ResponseEntity.ok(Map.of("status", "Mensagem marcada como lida"));
-        } catch (NumberFormatException | NullPointerException e) {
-            return ResponseEntity.badRequest().body(Map.of("erro", "ID inválido"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("erro", "Erro ao atualizar"));
         }
     }
+
+    // Listar todos os usuários exceto o logado
+    @GetMapping("/usuarios")
+    public ResponseEntity<?> listarUsuarios(Principal principal) {
+        String usuarioLogado = principal.getName();
+        List<Colaborador> todos = colaboradorRepository.findAll();
+        List<String> logins = todos.stream()
+                .map(Colaborador::getLogin)
+                .filter(login -> !login.equals(usuarioLogado))
+                .toList();
+        return ResponseEntity.ok(logins);
+    }
+
+    @GetMapping("/conversa/{contato}")
+    public ResponseEntity<?> buscarConversa(@PathVariable String contato, Principal principal) {
+        String usuarioLogado = principal.getName();
+        List<Mensagem> conversa = mensagemRepository.findByRemetenteAndDestinatario(usuarioLogado, contato);
+        conversa.addAll(mensagemRepository.findByRemetenteAndDestinatario(contato, usuarioLogado));
+        conversa.sort(Comparator.comparing(Mensagem::getDataEnvio));
+        return ResponseEntity.ok(conversa);
+    }
+
 }

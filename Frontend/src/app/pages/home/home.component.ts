@@ -6,11 +6,12 @@ import { MenuBarComponent } from "../components/menu-bar/menu-bar.component";
 import { OpcoesComponent } from "../components/opcoes/opcoes.component";
 import { MenuFixoComponent } from "../components/menu-fixo/menu-fixo.component";
 import { CardFlutuante } from "../components/card-flutuante/card-flutuante";
+import { ChatComponent } from "../components/chat-component/chat-component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, MenuBarComponent, OpcoesComponent, MenuFixoComponent, CardFlutuante],
+  imports: [RouterModule, CommonModule, FormsModule, MenuBarComponent, OpcoesComponent, MenuFixoComponent, CardFlutuante, ChatComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

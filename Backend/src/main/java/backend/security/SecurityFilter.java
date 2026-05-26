@@ -3,6 +3,7 @@ package backend.security;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -26,11 +27,16 @@ public class SecurityFilter extends OncePerRequestFilter {
     private ColaboradorRepository repository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+        @NonNull HttpServletRequest request, 
+        @NonNull HttpServletResponse response, 
+        @NonNull FilterChain filterChain) throws ServletException, IOException {
         
-        //System.out.println(">>> [SecurityFilter] Requisição recebida: " + request.getMethod() + " " + request.getRequestURI());
+        // Pega a URI da requisição atual
+        String uri = request.getRequestURI();
 
-        if (request.getRequestURI().equals("/api/auth/login")) {
+        // 1. REGRA DE EXCEÇÃO: Se for login ou WebSocket, deixa passar direto sem validar Token
+        if (uri.equals("/api/auth/login") || uri.startsWith("/ws")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -38,24 +44,23 @@ public class SecurityFilter extends OncePerRequestFilter {
         var tokenJWT = recuperarToken(request);
 
         if (tokenJWT != null) {
-             //System.out.println(">>> [SecurityFilter] Token encontrado: " + tokenJWT);
-            var subject = tokenService.getSubject(tokenJWT);
-            var colaborador = repository.findByLogin(subject);
+            try {
+                var subject = tokenService.getSubject(tokenJWT);
+                var colaborador = repository.findByLogin(subject);
 
-            if(colaborador != null) {
-                if (colaborador instanceof Colaborador colab) {
-                    System.out.println(">>> [SecurityFilter] Usuário autenticado: " + colab.getLogin());
-                } else {
-                    System.out.println(">>> [SecurityFilter] Usuário autenticado: " + colaborador.getUsername());
+                if (colaborador != null) {
+                    // Log para conferir no terminal se o usuário foi identificado
+                    if (colaborador instanceof Colaborador colab) {
+                        System.out.println(">>> [SecurityFilter] Usuário autenticado: " + colab.getLogin());
+                    }
+
+                    var authentication = new UsernamePasswordAuthenticationToken(colaborador, null, colaborador.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
-
-                var authentication = new UsernamePasswordAuthenticationToken(colaborador, null, colaborador.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                System.out.println(">>> [SecurityFilter] Usuário não encontrado para subject: " + subject);
+            } catch (Exception e) {
+                // Caso o token esteja expirado ou inválido, o erro é pego aqui
+                System.out.println(">>> [SecurityFilter] Erro na validação do token: " + e.getMessage());
             }
-        } else {
-            //System.out.println(">>> [SecurityFilter] Nenhum token presente na requisição.");
         }
 
         filterChain.doFilter(request, response);
@@ -63,7 +68,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     private String recuperarToken(HttpServletRequest request) {
         var authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader != null) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             return authorizationHeader.replace("Bearer ", "");
         }
         return null;

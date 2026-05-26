@@ -22,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurations {
+
     @Autowired
     private SecurityFilter securityFilter;
 
@@ -34,6 +35,11 @@ public class SecurityConfigurations {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll() 
+                
+                // --- ADICIONADO: LIBERAÇÃO DO WEBSOCKET ---
+                .requestMatchers("/ws/**").permitAll() 
+                // ------------------------------------------
+
                 .requestMatchers(HttpMethod.GET,  "/api/produtos/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/produtos/**").authenticated()
                 .requestMatchers(HttpMethod.PUT,  "/api/produtos/**").authenticated()
@@ -49,10 +55,11 @@ public class SecurityConfigurations {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        // Usando origin patterns para evitar problemas com credenciais
         configuration.setAllowedOriginPatterns(List.of("http://localhost:4200"));
         configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true); // Obrigatório para SockJS/WebSockets
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

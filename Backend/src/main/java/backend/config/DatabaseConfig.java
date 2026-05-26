@@ -25,7 +25,8 @@ public class DatabaseConfig {
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(driverClassName);
+        // Use Objects.requireNonNull para garantir que o valor não é nulo
+        dataSource.setDriverClassName(java.util.Objects.requireNonNull(driverClassName));
         dataSource.setUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);

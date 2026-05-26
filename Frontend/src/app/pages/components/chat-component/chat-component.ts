@@ -20,32 +20,47 @@ export class ChatComponent implements OnInit {
   mensagens: any[] = [];
   destinatario: string | null = null;
   novaMensagem = '';
+  
+  // Captura o nome do usuário logado
   userName: string = localStorage.getItem('userName') ?? '';
 
   constructor(private mensagemService: MensagemService) {}
 
   ngOnInit(): void {
-    // Carregar lista de usuários do banco (exceto o logado)
+    // Garante que temos o nome do usuário
+    if (!this.userName) {
+      this.userName = localStorage.getItem('userName') ?? '';
+    }
+
     this.mensagemService.listarUsuarios().subscribe(users => {
       this.contatos = users;
     });
 
-    // Carregar mensagens pendentes do logado
     this.carregarPendentes();
-
-    // Conectar WebSocket
     this.conectarWebSocket();
+  }
+
+  // ESTA É A FUNÇÃO QUE DIRECIONA PARA A DIREITA OU ESQUERDA
+  euEnviei(msg: any): boolean {
+    if (!msg.remetente || !this.userName) return false;
+    
+    // Compara o remetente da mensagem com o usuário logado (ignora Case Sensitivity)
+    return msg.remetente.trim().toLowerCase() === this.userName.trim().toLowerCase();
   }
 
   carregarPendentes(): void {
     this.mensagemService.buscarPendentes().subscribe(data => {
-      // só mostra mensagens entre logado e destinatário
       this.mensagens = data.filter(
         (msg: any) =>
-          (msg.remetente === this.userName && msg.destinatario === this.destinatario) ||
-          (msg.remetente === this.destinatario && msg.destinatario === this.userName)
+          (this.isMesmoUsuario(msg.remetente, this.userName) && this.isMesmoUsuario(msg.destinatario, this.destinatario)) ||
+          (this.isMesmoUsuario(msg.remetente, this.destinatario) && this.isMesmoUsuario(msg.destinatario, this.userName))
       );
     });
+  }
+
+  isMesmoUsuario(user1: string | null, user2: string | null): boolean {
+    if (!user1 || !user2) return false;
+    return user1.trim().toLowerCase() === user2.trim().toLowerCase();
   }
 
   enviar(): void {
@@ -53,30 +68,24 @@ export class ChatComponent implements OnInit {
       this.mensagemService.enviarMensagem(this.destinatario, this.novaMensagem)
         .subscribe(() => {
           this.novaMensagem = '';
-          this.mensagemService.buscarConversa(this.destinatario).subscribe(data => {
+          this.mensagemService.buscarConversa(this.destinatario!).subscribe(data => {
             this.mensagens = data;
           });
         });
     }
   }
 
-  marcarComoLida(id: number): void {
-    this.mensagemService.marcarComoLida(id).subscribe(() => {
-      this.carregarPendentes();
-    });
-  }
-
   abrirConversa(contato: string): void {
     this.destinatario = contato;
     this.mensagemService.buscarConversa(contato).subscribe(data => {
       this.mensagens = data;
+      
+      console.log("Sistema de Lado - Meu userName:", this.userName);
+      if(data.length > 0) {
+        console.log("Remetente da msg:", data[0].remetente);
+        console.log("Identificado como meu envio?", this.euEnviei(data[0]));
+      }
     });
-  }
-
-  logout(): void {
-    console.log('Usuário desconectado');
-    localStorage.clear();
-    // redirecionar para login se necessário
   }
 
   conectarWebSocket(): void {
@@ -91,11 +100,18 @@ export class ChatComponent implements OnInit {
     });
 
     client.onConnect = () => {
-      // Assina o tópico do usuário logado
-      client.subscribe(`/topic/${this.userName}`, message => {
-        console.log('Mensagem recebida via WebSocket:', message.body);
-        this.carregarPendentes();
-      });
+      console.log("WebSocket Conectado com sucesso!");
+      if (this.userName) {
+        client.subscribe(`/topic/${this.userName}`, message => {
+          if (this.destinatario) {
+            this.mensagemService.buscarConversa(this.destinatario).subscribe(data => {
+              this.mensagens = data;
+            });
+          } else {
+            this.carregarPendentes();
+          }
+        });
+      }
     };
 
     client.activate();

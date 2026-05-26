@@ -34,6 +34,7 @@ import backend.repository.NotaRecebimentoRepository;
 import backend.repository.ProdutoFornecedorRepository;
 import backend.repository.ProdutoRepository;
 
+@SuppressWarnings("null")
 @Service
 public class NotaRecebimentoService {
 
@@ -383,14 +384,6 @@ public class NotaRecebimentoService {
     private String getTagValue(String tag, Element element) {
         if (element == null) return null;
         NodeList nl = element.getElementsByTagName(tag);
-        if (nl.getLength() > 0 && nl.item(0).getChildNodes().getLength() > 0) {
-            return nl.item(0).getChildNodes().item(0).getNodeValue();
-        }
-        return null;
-    }
-
-    private String getTagValue(String tag, Document doc) {
-        NodeList nl = doc.getElementsByTagName(tag);
         if (nl.getLength() > 0 && nl.item(0).getChildNodes().getLength() > 0) {
             return nl.item(0).getChildNodes().item(0).getNodeValue();
         }

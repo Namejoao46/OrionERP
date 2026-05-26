@@ -4,7 +4,7 @@
     <ul class="contatos">
       <li *ngFor="let contato of contatos" 
           (click)="abrirConversa(contato)" 
-          [class.active]="destinatario === contato">
+          [class.active]="isMesmoUsuario(destinatario, contato)">
         <span class="icon">👤</span>
         <span class="nome">{{ contato }}</span>
       </li>
@@ -20,10 +20,12 @@
     <section class="chat-container">
       <div class="mensagens">
         <div *ngFor="let msg of mensagens"
-             [ngClass]="{'mensagem remetente': msg.remetente === userName, 
-                         'mensagem destinatario': msg.remetente !== userName}">
+             [ngClass]="{
+               'mensagem remetente': isMesmoUsuario(msg.remetente, userName), 
+               'mensagem destinatario': !isMesmoUsuario(msg.remetente, userName)
+             }">
           <strong class="remetente-label">{{ msg.remetente }}</strong>
-          <span class="texto-mensagem">{{ msg.conteudo }}</span>
+          <span class="texto-mensagem">{{ msg.texto || msg.conteudo }}</span>
         </div>
       </div>
 

@@ -13,6 +13,7 @@ import backend.model.Produto;
 import backend.repository.ProdutoRepository;
 
 @Service
+@SuppressWarnings("null")
 public class ProdutoService {
 
     @Autowired

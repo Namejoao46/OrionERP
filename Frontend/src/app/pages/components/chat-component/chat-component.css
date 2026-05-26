@@ -1,9 +1,11 @@
+/* Container Principal */
 .chat-layout {
   display: flex;
-  height: 100%;
+  height: 100vh; /* Ocupa a altura total da janela */
   width: 100%;
   background-color: #050a18;
   font-family: sans-serif;
+  overflow: hidden; /* Impede que a tela inteira role */
 }
 
 /* Sidebar */
@@ -13,6 +15,7 @@
   border-right: 1px solid #1e3a8a;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0; /* Impede que a sidebar amasse */
 }
 
 .sidenav-header {
@@ -29,6 +32,7 @@
   margin: 0;
   padding: 0;
   overflow-y: auto;
+  flex: 1;
 }
 
 .contatos li {
@@ -49,20 +53,25 @@
   margin-right: 12px;
 }
 
-/* Área de Conteúdo */
+/* Área de Conteúdo (Chat) */
 .chat-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   background-color: #050a18;
+  position: relative;
+  height: 100%; /* Garante que ocupe a altura total */
+  min-width: 0;
 }
 
 .chat-header {
-  padding: 15px 25px;
+  height: 60px; /* Altura fixa para o topo */
+  padding: 0 25px;
   background: #0a122a;
   border-bottom: 1px solid #1e3a8a;
   display: flex;
   align-items: center;
+  flex-shrink: 0; /* Impede que o header suma */
 }
 
 .chat-header .titulo {
@@ -75,43 +84,45 @@
   margin-left: 8px;
 }
 
-/* Container de Mensagens */
+/* Container de Mensagens e Input */
 .chat-container {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  overflow: hidden;
+  flex: 1; 
+  overflow: hidden; /* Oculta o que transbordar do container pai */
 }
 
 .mensagens {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1; /* Faz as mensagens ocuparem todo o espaço central */
+  overflow-y: auto; /* Scroll apenas aqui */
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-/* Balões */
+/* Balões de Mensagem */
 .mensagem {
-  max-width: 75%;
+  max-width: 70%;
   padding: 12px 16px;
   border-radius: 12px;
-  box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+  position: relative;
 }
 
 .mensagem.remetente {
-  align-self: flex-end;
+  align-self: flex-end !important; 
   background: #1e3a8a;
   border: 1px solid #4db8ff;
   color: #fff;
+  border-radius: 15px 15px 4px 15px;
 }
 
 .mensagem.destinatario {
-  align-self: flex-start;
+  align-self: flex-start !important;
   background: #111b33;
   border: 1px solid #1e3a8a;
   color: #e2e8f0;
+  border-radius: 15px 15px 15px 4px;
 }
 
 .remetente-label {
@@ -123,16 +134,19 @@
 
 .texto-mensagem {
   line-height: 1.4;
+  word-break: break-word; /* Evita que o texto saia do balão */
 }
 
-/* Footer */
+/* Rodapé (Input de Mensagem) */
 .nova-mensagem {
-  padding: 20px;
+  height: 80px; /* Altura fixa para o rodapé */
+  padding: 0 20px;
   background: #0a122a;
   border-top: 1px solid #1e3a8a;
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0; /* CRUCIAL: impede que o rodapé seja esmagado */
 }
 
 .mensagem-input {
@@ -160,6 +174,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .btn-enviar:hover {

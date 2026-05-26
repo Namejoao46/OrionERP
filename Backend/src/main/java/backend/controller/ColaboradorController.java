@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import backend.model.Colaborador;
 import backend.repository.ColaboradorRepository;
 
+@SuppressWarnings("null")
 @RestController
 @RequestMapping("/api/colaboradores")
 @CrossOrigin("*")

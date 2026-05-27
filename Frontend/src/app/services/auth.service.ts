@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -23,12 +24,12 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/login`, { login, senha });
   }
 
-  setUserData(token: string, nome: string, foto: string | null) {
+  setUserData(token: string, nome: string, foto: string | null, login: string) { // Adicionamos 'login' aqui
     localStorage.setItem('token', token);
-    localStorage.setItem('userName', nome);
+    localStorage.setItem('userName', nome);   // Nome para exibir na tela (ex: Leandro)
+    localStorage.setItem('username', login);   // Login para o chat (ex: admin)
     
     if (foto) {
-      // Remove espaços ou quebras de linha que o JSON possa ter inserido
       const fotoLimpa = foto.replace(/\s/g, '');
       localStorage.setItem('userImage', fotoLimpa);
       this.userImageSubject.next(fotoLimpa);

@@ -1,46 +1,61 @@
-<div class="chat-layout">
-  <aside class="chat-sidenav">
-    <div class="sidenav-header">Contatos</div>
-    <ul class="contatos">
-      <li *ngFor="let contato of contatos" 
-          (click)="abrirConversa(contato)" 
-          [class.active]="isMesmoUsuario(destinatario, contato)">
-        <span class="icon">👤</span>
-        <span class="nome">{{ contato }}</span>
-      </li>
-    </ul>
-  </aside>
-
-  <main class="chat-content">
-    <header class="chat-header">
-      <span class="titulo">Chat:</span>
-      <span class="destinatario">{{ destinatario || 'Selecione um contato' }}</span>
-    </header>
-
-    <section class="chat-container">
-      <div class="mensagens">
-        <div *ngFor="let msg of mensagens"
-             [ngClass]="{
-               'mensagem remetente': isMesmoUsuario(msg.remetente, userName), 
-               'mensagem destinatario': !isMesmoUsuario(msg.remetente, userName)
-             }">
-          <strong class="remetente-label">{{ msg.remetente }}</strong>
-          <span class="texto-mensagem">{{ msg.texto || msg.conteudo }}</span>
+<div class="chat-container">
+  <aside class="sidebar">
+    <div class="header-sidebar">CONTATOS ORION</div>
+    <div class="lista-contatos">
+      <div class="contato-item" *ngFor="let user of usuarios" 
+           (click)="selecionarUsuario(user)" 
+           [class.active]="usuarioSelecionado?.username === user.username">
+        <div class="avatar-circle">
+          {{ user.username?.charAt(0)?.toUpperCase() || '' }}
+          <span class="status-dot" [style.background]="user.online ? '#00ff88' : '#666'"></span>
+        </div>
+        <div class="contato-info">
+          <span class="nome">{{ user.username }}</span>
+          <span class="preview">Clique para conversar...</span>
         </div>
       </div>
+    </div>
+  </aside>
 
-      <footer class="nova-mensagem" *ngIf="destinatario">
-        <input
-          type="text"
-          [(ngModel)]="novaMensagem"
-          placeholder="Digite sua mensagem..."
-          (keyup.enter)="enviar()"
-          class="mensagem-input"
-        />
-        <button (click)="enviar()" class="btn-enviar">
-          <span style="transform: rotate(-45deg); display: inline-block;">➤</span>
-        </button>
-      </footer>
-    </section>
+  <main class="chat-window">
+    <header class="chat-header" *ngIf="usuarioSelecionado">
+      <div class="header-user">
+        <div class="avatar-small">
+          {{ usuarioSelecionado.username?.charAt(0)?.toUpperCase() }}
+        </div>
+        <div>
+          <span class="header-name">{{ usuarioSelecionado.username }}</span>
+          <small class="header-status">Online</small>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span style="cursor: pointer; margin-right: 15px;">🔍</span>
+        <span style="cursor: pointer;">⋮</span>
+      </div>
+    </header>
+
+    <div class="messages-container" #scrollMe>
+      <div *ngIf="!usuarioSelecionado" class="no-chat">
+        Selecione um contato para iniciar a integração Orion.
+      </div>
+
+      <div *ngFor="let msg of mensagens" 
+           [ngClass]="msg.enviadaPorMim ? 'msg-me' : 'msg-other'" 
+           class="bubble">
+        <span class="text">{{ msg.mensagem }}</span>
+        <span class="time">{{ msg.data | date:'HH:mm' }}</span>
+      </div>
+    </div>
+
+    <footer class="chat-input">
+      <div class="input-wrapper">
+        <span class="icon" style="color: #00aaff; cursor: pointer;">📎</span>
+        <input type="text" 
+               [(ngModel)]="novaMensagem" 
+               (keyup.enter)="enviar()" 
+               placeholder="Digite sua mensagem para a equipe...">
+        <button class="btn-send" (click)="enviar()">ENVIAR</button>
+      </div>
+    </footer>
   </main>
 </div>

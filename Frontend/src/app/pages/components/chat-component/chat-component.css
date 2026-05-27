@@ -1,182 +1,223 @@
-/* Container Principal */
-.chat-layout {
-  display: flex;
-  height: 100vh; /* Ocupa a altura total da janela */
-  width: 100%;
-  background-color: #050a18;
-  font-family: sans-serif;
-  overflow: hidden; /* Impede que a tela inteira role */
-}
+/*Estrutura de Layout (Containers)
+Esta parte define o "esqueleto" do chat. Se o chat sumir ou ficar torto, o problema está aqui.*/
 
-/* Sidebar */
-.chat-sidenav {
-  width: 240px;
-  background-color: #0a122a;
-  border-right: 1px solid #1e3a8a;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0; /* Impede que a sidebar amasse */
-}
-
-.sidenav-header {
-  padding: 15px 20px;
-  color: #4db8ff;
-  font-weight: bold;
-  border-bottom: 1px solid #1e3a8a;
-  text-transform: uppercase;
-  font-size: 0.8rem;
-}
-
-.contatos {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.contatos li {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  cursor: pointer;
-  color: #fff;
-  transition: background 0.2s;
-}
-
-.contatos li:hover, .contatos li.active {
-  background-color: rgba(77, 184, 255, 0.1);
-  color: #4db8ff;
-}
-
-.icon {
-  margin-right: 12px;
-}
-
-/* Área de Conteúdo (Chat) */
-.chat-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background-color: #050a18;
-  position: relative;
-  height: 100%; /* Garante que ocupe a altura total */
-  min-width: 0;
-}
-
-.chat-header {
-  height: 60px; /* Altura fixa para o topo */
-  padding: 0 25px;
-  background: #0a122a;
-  border-bottom: 1px solid #1e3a8a;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0; /* Impede que o header suma */
-}
-
-.chat-header .titulo {
-  color: #4db8ff;
-  font-weight: 600;
-}
-
-.chat-header .destinatario {
-  color: #fff;
-  margin-left: 8px;
-}
-
-/* Container de Mensagens e Input */
+/* CONTAINER PRINCIPAL */
 .chat-container {
   display: flex;
-  flex-direction: column;
-  flex: 1; 
-  overflow: hidden; /* Oculta o que transbordar do container pai */
+  width: 100%;
+  height: 100%;
+  min-height: 550px;
+  background-color: #000d1a;
+  color: #ffffff;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.mensagens {
-  flex: 1; /* Faz as mensagens ocuparem todo o espaço central */
-  overflow-y: auto; /* Scroll apenas aqui */
-  padding: 20px;
+/* COLUNA DA ESQUERDA */
+.sidebar {
+  width: 300px;
+  min-width: 300px;
+  background-color: rgba(0, 26, 51, 0.95);
+  border-right: 1px solid #004080;
   display: flex;
   flex-direction: column;
-  gap: 15px;
 }
 
-/* Balões de Mensagem */
-.mensagem {
-  max-width: 70%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  position: relative;
+/* COLUNA DA DIREITA (JANELA DE CHAT) */
+.chat-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #000d1a;
 }
 
-.mensagem.remetente {
-  align-self: flex-end !important; 
-  background: #1e3a8a;
-  border: 1px solid #4db8ff;
-  color: #fff;
-  border-radius: 15px 15px 4px 15px;
+/*2. Sidebar e Contatos
+Tudo relacionado à lista de pessoas e avatares.*/
+
+.header-sidebar {
+  padding: 20px;
+  background: linear-gradient(90deg, #001a33, #003366);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #00aaff;
+  border-bottom: 1px solid #004080;
+  text-transform: uppercase;
 }
 
-.mensagem.destinatario {
-  align-self: flex-start !important;
-  background: #111b33;
-  border: 1px solid #1e3a8a;
-  color: #e2e8f0;
-  border-radius: 15px 15px 15px 4px;
+.lista-contatos {
+  flex: 1;
+  overflow-y: auto;
 }
 
-.remetente-label {
-  display: block;
-  font-size: 0.75rem;
-  margin-bottom: 4px;
-  color: #4db8ff;
-}
-
-.texto-mensagem {
-  line-height: 1.4;
-  word-break: break-word; /* Evita que o texto saia do balão */
-}
-
-/* Rodapé (Input de Mensagem) */
-.nova-mensagem {
-  height: 80px; /* Altura fixa para o rodapé */
-  padding: 0 20px;
-  background: #0a122a;
-  border-top: 1px solid #1e3a8a;
+.contato-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-shrink: 0; /* CRUCIAL: impede que o rodapé seja esmagado */
+  padding: 15px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0, 64, 128, 0.2);
+  transition: all 0.2s ease;
 }
 
-.mensagem-input {
-  flex: 1;
-  padding: 12px 15px;
-  border-radius: 8px;
-  border: 1px solid #1e3a8a;
-  background: #050a18;
-  color: #fff;
-  outline: none;
+.contato-item:hover { background-color: #00264d; }
+
+.contato-item.active {
+  background: rgba(0, 170, 255, 0.1);
+  border-left: 4px solid #00aaff;
 }
 
-.mensagem-input:focus {
-  border-color: #4db8ff;
-}
-
-.btn-enviar {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  border: none;
+/* AVATARES E STATUS */
+.avatar-circle {
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  color: #fff;
-  width: 45px;
-  height: 45px;
+  background: #001a33;
+  border: 1px solid #00aaff;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
+  margin-right: 12px;
+  font-weight: bold;
+  color: #00aaff;
+  position: relative;
 }
 
-.btn-enviar:hover {
-  background: linear-gradient(135deg, #0056b3, #003d80);
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  border: 2px solid #001a33;
+}
+
+/*3. Área de Mensagens (Onde a conversa acontece)
+Aqui você controla o fundo pontilhado e o comportamento dos balões.*/
+
+.messages-container {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-image: radial-gradient(#001a33 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* BALÃO BASE */
+.bubble {
+  max-width: 70%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  
+  /* QUEBRA DE TEXTO */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* CORES DOS BALÕES */
+.msg-me {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #005099, #00264d);
+  color: #ffffff;
+  border: 1px solid #00aaff;
+  border-bottom-right-radius: 2px;
+}
+
+.msg-other {
+  align-self: flex-start;
+  background-color: #001a33;
+  color: #d1d7db;
+  border: 1px solid #004080;
+  border-bottom-left-radius: 2px;
+}
+
+.time {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  align-self: flex-end;
+  margin-top: 4px;
+  margin-left: 15px;
+  font-style: italic;
+}
+
+/*4. Rodapé e Entrada de Dados
+Controle do input e do botão de envio.*/
+
+.chat-input {
+  background-color: #001a33;
+  padding: 15px 25px;
+  border-top: 1px solid #004080;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: #000d1a;
+  border: 1px solid #004080;
+  border-radius: 25px;
+  padding: 5px 15px;
+  gap: 10px;
+}
+
+.input-wrapper input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 10px;
+  outline: none;
+  font-size: 14px;
+}
+
+.btn-send {
+  background: linear-gradient(180deg, #00aaff, #0055ff);
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 170, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn-send:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
+}
+
+/*5. Elementos Globais e Scrollbar
+Configurações que afetam vários lugares ao mesmo tempo.*/
+
+/* SCROLLBARS */
+.lista-contatos::-webkit-scrollbar, 
+.messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lista-contatos::-webkit-scrollbar-thumb, 
+.messages-container::-webkit-scrollbar-thumb {
+  background: #004080;
+  border-radius: 10px;
+}
+
+/* TELA VAZIA (Sem chat selecionado) */
+.no-chat {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  color: #4f5b66;
+  font-style: italic;
 }

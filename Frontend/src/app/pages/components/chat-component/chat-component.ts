@@ -1,119 +1,84 @@
 import { Component, OnInit } from '@angular/core';
-import { MensagemService } from '../../../services/mensagem.service';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
+import { FormsModule } from '@angular/forms';
+import { MensagemService } from '../../../services/mensagem.service'; 
 
 @Component({
-  selector: 'app-chat',
+  selector: 'app-chat-component',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './chat-component.html',
   styleUrls: ['./chat-component.css']
 })
 export class ChatComponent implements OnInit {
-  contatos: string[] = [];
+  usuarios: any[] = [];
   mensagens: any[] = [];
-  destinatario: string | null = null;
-  novaMensagem = '';
-  
-  // Captura o nome do usuário logado
-  userName: string = localStorage.getItem('userName') ?? '';
+  usuarioSelecionado: any = null;
+  novaMensagem: string = '';
+  meuUsername: string | null = localStorage.getItem('username'); // Pega seu login do storage
 
   constructor(private mensagemService: MensagemService) {}
 
   ngOnInit(): void {
-    // Garante que temos o nome do usuário
-    if (!this.userName) {
-      this.userName = localStorage.getItem('userName') ?? '';
+    this.carregarUsuarios();
+  }
+
+  carregarUsuarios(): void {
+    this.mensagemService.listarUsuarios().subscribe({
+      next: (logins: string[]) => {
+        // Mapeia os logins para objetos que o HTML entende
+        this.usuarios = logins.map(login => ({
+          username: login,
+          nome: login === 'admin' ? 'Leandro (Admin)' : (login === 'admin2' ? 'João Paulo' : login),
+          online: true // Você pode integrar com o status real depois
+        }));
+      },
+      error: (err) => console.error('Erro ao listar usuários', err)
+    });
+  }
+
+  selecionarUsuario(user: any): void {
+    this.usuarioSelecionado = user;
+    this.carregarMensagens();
+  }
+
+  carregarMensagens(): void {
+  if (!this.usuarioSelecionado) return;
+
+  // Pegamos o login salvo (agora garantimos que ele existe)
+  const meuLogin = localStorage.getItem('username') || '';
+
+  this.mensagemService.buscarConversa(this.usuarioSelecionado.username).subscribe({
+    next: (historico: any[]) => {
+      this.mensagens = historico.map(msg => {
+        return {
+          ...msg,
+          mensagem: msg.conteudo,
+          data: msg.dataEnvio,
+          // Compara o remetente do banco com o login salvo no storage
+          enviadaPorMim: String(msg.remetente).toLowerCase() === meuLogin.toLowerCase()
+        };
+      });
     }
-
-    this.mensagemService.listarUsuarios().subscribe(users => {
-      this.contatos = users;
-    });
-
-    this.carregarPendentes();
-    this.conectarWebSocket();
-  }
-
-  // ESTA É A FUNÇÃO QUE DIRECIONA PARA A DIREITA OU ESQUERDA
-  euEnviei(msg: any): boolean {
-    if (!msg.remetente || !this.userName) return false;
-    
-    // Compara o remetente da mensagem com o usuário logado (ignora Case Sensitivity)
-    return msg.remetente.trim().toLowerCase() === this.userName.trim().toLowerCase();
-  }
-
-  carregarPendentes(): void {
-    this.mensagemService.buscarPendentes().subscribe(data => {
-      this.mensagens = data.filter(
-        (msg: any) =>
-          (this.isMesmoUsuario(msg.remetente, this.userName) && this.isMesmoUsuario(msg.destinatario, this.destinatario)) ||
-          (this.isMesmoUsuario(msg.remetente, this.destinatario) && this.isMesmoUsuario(msg.destinatario, this.userName))
-      );
-    });
-  }
-
-  isMesmoUsuario(user1: string | null, user2: string | null): boolean {
-    if (!user1 || !user2) return false;
-    return user1.trim().toLowerCase() === user2.trim().toLowerCase();
-  }
+  });
+}
 
   enviar(): void {
-    if (this.novaMensagem.trim() && this.destinatario) {
-      this.mensagemService.enviarMensagem(this.destinatario, this.novaMensagem)
-        .subscribe(() => {
-          this.novaMensagem = '';
-          this.mensagemService.buscarConversa(this.destinatario!).subscribe(data => {
-            this.mensagens = data;
-          });
+    if (!this.novaMensagem.trim() || !this.usuarioSelecionado) return;
+
+    this.mensagemService.enviarMensagem(this.usuarioSelecionado.username, this.novaMensagem).subscribe({
+      next: () => {
+        // Adiciona a mensagem localmente para feedback instantâneo
+        this.mensagens.push({
+          remetente: this.meuUsername,
+          conteudo: this.novaMensagem,
+          mensagem: this.novaMensagem,
+          enviadaPorMim: true,
+          dataEnvio: new Date()
         });
-    }
-  }
-
-  abrirConversa(contato: string): void {
-    this.destinatario = contato;
-    this.mensagemService.buscarConversa(contato).subscribe(data => {
-      this.mensagens = data;
-      
-      console.log("Sistema de Lado - Meu userName:", this.userName);
-      if(data.length > 0) {
-        console.log("Remetente da msg:", data[0].remetente);
-        console.log("Identificado como meu envio?", this.euEnviei(data[0]));
-      }
-    });
-  }
-
-  conectarWebSocket(): void {
-    const client = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
-      connectHeaders: {
-        Authorization: 'Bearer ' + localStorage.getItem('token')
+        this.novaMensagem = ''; // Limpa o input
       },
-      debug: (str) => { console.log(str); },
-      reconnectDelay: 5000,
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws')
+      error: (err) => console.error('Erro ao enviar', err)
     });
-
-    client.onConnect = () => {
-      console.log("WebSocket Conectado com sucesso!");
-      if (this.userName) {
-        client.subscribe(`/topic/${this.userName}`, message => {
-          if (this.destinatario) {
-            this.mensagemService.buscarConversa(this.destinatario).subscribe(data => {
-              this.mensagens = data;
-            });
-          } else {
-            this.carregarPendentes();
-          }
-        });
-      }
-    };
-
-    client.activate();
   }
 }

@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { CaixaboxService } from '../../../services/caixabox.service';
 import { CaixaboxOption } from '../caixa-box/caixa-box';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-menu-bar',
@@ -21,35 +22,29 @@ export class MenuBarComponent {
   userName$: Observable<string | null>;
   userImage$: Observable<SafeUrl | null>;
 
+  // Variáveis para os alertas
+  temNovasMensagens: boolean = true; 
+  quantidadeNotificacoes: number = 3;
+
   constructor(
     private authService: AuthService, 
     private sanitizer: DomSanitizer,
-    private caixabox: CaixaboxService
+    private caixabox: CaixaboxService,
+    private router: Router
   ) {
     this.userName$ = this.authService.userName$;
 
-    // Tratamos a string Base64 para ser aceita pelo Angular como uma URL segura
     this.userImage$ = this.authService.userImage$.pipe(
       map(base64 => {
         if (!base64) return null;
-        
-        // Verifica se a string já possui o prefixo, se não, adiciona
         const prefixo = base64.startsWith('data:image') ? '' : 'data:image/jpeg;base64,';
         return this.sanitizer.bypassSecurityTrustUrl(`${prefixo}${base64}`);
       })
     );
-
-    // Log de verificação no console
-    this.authService.userImage$.subscribe(img => {
-      if (img) {
-        console.log("Base64 carregado no MenuBar:", img.substring(0, 50) + "...");
-      } else {
-        console.log("Nenhuma imagem de usuário encontrada.");
-      }
-    });
   }
 
   abrirNotificacoes(origem: HTMLElement) {
+    this.quantidadeNotificacoes = 0; // Limpa ao abrir
     const opcoes: CaixaboxOption[] = [
       { label: 'Você tem uma nova venda', value: 'venda', icon: 'fa fa-cart-plus' },
       { label: 'Relatório mensal disponível', value: 'relatorio', icon: 'fa fa-file' },
@@ -62,6 +57,7 @@ export class MenuBarComponent {
   }
 
   abrirMensagens(origem: HTMLElement) {
+    this.temNovasMensagens = false; // Limpa ao abrir
     const opcoes: CaixaboxOption[] = [
       { label: 'Suporte Orion: Olá!', value: 'msg_1', icon: 'fa fa-comment' },
       { label: 'Nova mensagem do Admin', value: 'msg_2', icon: 'fa fa-comment' }
@@ -81,10 +77,15 @@ export class MenuBarComponent {
 
     this.caixabox.exibir(origem, opcoes).subscribe(acao => {
       if (acao === 'logout') {
-        this.authService.logout(); // Exemplo de ação real
+        this.executarLogout();
       } else if (acao === 'perfil') {
-        // redirecionar via router
+        this.router.navigate(['/perfil']);
       }
     });
+  }
+
+  private executarLogout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

@@ -22,25 +22,22 @@ export class LoginComponent {
     private cdr: ChangeDetectorRef 
   ) {}
   
-  entrar() {
-    this.authService.login(this.login, this.senha).subscribe({
-      next: (res) => {
-        console.log(">>> Resposta do Servidor:", res); // Isso vai nos mostrar se a foto veio no JSON
-        
-        if (res.token) {
-          // Passa os dados para o service (o campo deve ser 'foto' conforme seu Controller Java)
-          this.authService.setUserData(res.token, res.nome, res.foto);
+entrar() {
+  this.authService.login(this.login, this.senha).subscribe({
+    next: (res) => {
+      if (res.token) {
+        // Agora passamos também o 'this.login' (o que foi digitado no input)
+        this.authService.setUserData(res.token, res.nome, res.foto, this.login);
 
-          alert('Login realizado com sucesso!');
-          this.router.navigate(['/home']).then(() => {
-            this.cdr.detectChanges();
-          });
-        }
-      },
-      error: (err) => {
-        console.error('Erro no login', err);
-        alert('Credenciais inválidas');
+        alert('Login realizado com sucesso!');
+        this.router.navigate(['/home']).then(() => {
+          this.cdr.detectChanges();
+        });
       }
-    });
-  }
+    },
+    error: (err) => {
+      alert('Credenciais inválidas');
+    }
+  });
+}
 }

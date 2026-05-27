@@ -6,7 +6,6 @@
     <div class="conteiner_logo">
         <div class="img">
             <img src="assets/orion.png" alt="Logo">
-            
             <h1>
                 <span class="orion">Orion</span><span class="erp">ERP</span>
             </h1>
@@ -21,11 +20,18 @@
     </div>
 
     <div class="conteiner_notificacoes">
-        <li #notifRef (click)="abrirNotificacoes(notifRef)">
-            <img src="assets/sino.png" alt="notificações">
+        <li #notifRef (click)="abrirNotificacoes(notifRef)" class="icon-item">
+            <div class="icon-wrapper">
+                <img src="assets/sino.png" alt="notificações">
+                <span class="badge-count" *ngIf="quantidadeNotificacoes > 0">{{ quantidadeNotificacoes }}</span>
+            </div>
         </li>
-        <li #msgRef (click)="abrirMensagens(msgRef)">
-            <img src="assets/bater-papo.png" alt="mensagens">
+
+        <li #msgRef (click)="abrirMensagens(msgRef)" class="icon-item">
+            <div class="icon-wrapper">
+                <img src="assets/bater-papo.png" alt="mensagens">
+                <span class="badge-dot" *ngIf="temNovasMensagens"></span>
+            </div>
         </li>
     </div>
     
@@ -34,4 +40,3 @@
         <span class="perfil-nome">{{ (userName$ | async) || 'Usuário' }}</span>
     </div>
 </nav>
-

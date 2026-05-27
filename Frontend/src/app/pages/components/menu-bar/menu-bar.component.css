@@ -1,4 +1,7 @@
-.conteiner{
+/* ==========================================================================
+   1. CONTAINER PRINCIPAL (NAVBAR)
+   ========================================================================== */
+.conteiner {
     position: fixed;
     top: 0;
     left: 0;
@@ -8,17 +11,21 @@
     height: 7%;
     min-height: 60px;
     z-index: 10;
+    background-color: #000d1a;
     border-bottom: 4px solid #2B97FA;
     box-sizing: border-box;
 }
 
-.conteiner_menu{
+.conteiner_menu {
     height: 100%;
     width: 60px;
     flex-shrink: 0;
 }
 
-.conteiner_logo{
+/* ==========================================================================
+   2. LOGOTIPO
+   ========================================================================== */
+.conteiner_logo {
     flex: 1;
     height: 100%;
     display: flex;
@@ -26,12 +33,12 @@
     overflow: hidden;
 }
 
-.img{
-    display: flex;
-    align-items: center;
+.img { 
+    display: flex; 
+    align-items: center; 
 }
 
-.img h1{
+.img h1 {
     color: white;
     font-size: clamp(20px, 2vw, 45px);
     font-weight: bold;
@@ -40,131 +47,171 @@
     white-space: nowrap;
 }
 
-.erp{
-    color: #2B97FA;
+.erp { color: #2B97FA; }
+
+.img img { 
+    height: 80%; 
+    max-width: 50px; 
 }
 
-.img img{
-    height: 80%;
-    max-width: 50px;
-}
-
-/*Pesquisa*/
-
-.conteiner_pesquisa{
+/* ==========================================================================
+   3. PESQUISA (CORRIGIDO: LUPA E ALINHAMENTO)
+   ========================================================================== */
+.conteiner_pesquisa {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between; /* Garante espaço entre input e lupa */
     width: 250px;
     height: 60%;
     margin: 0 20px;
     box-sizing: border-box;
     cursor: pointer;
-    transition: 0.3s ease, transform 0.3s ease;
+    transition: 0.3s ease;
     border-bottom: 2px solid #2B97FA;
     border-left: 2px solid #2B97FA;
 }
 
-input{
+.conteiner_pesquisa input {
     height: 100%;
-    width: 100%;
+    width: 80%;
     color: #2B97FA;
     padding: 0 10px;
     background-color: transparent;
     border: none;
-}
-
-input::placeholder{
-    color: #2B97FA;
-    font-size: 20px;
-}
-
-input:hover,
-input:focus,
-input:active{
-    color: #fff;
-    font-weight: bolder;
     outline: none;
-    border-radius: 0;
 }
 
-button{
-    all: unset;
+.conteiner_pesquisa input::placeholder { 
+    color: #2B97FA; 
+    font-size: 18px; 
 }
 
-
-button img{
-    width: 45px;
-    height: auto;
+.conteiner_pesquisa input:focus { 
+    color: #fff; 
 }
 
-.conteiner_pesquisa:hover,
-.conteiner_pesquisa:focus,
-.conteiner_pesquisa:active{
-    transform: scale(1.10);
-    border-bottom: 4px solid #2B97FA;
-    border-left: 4px solid #2B97FA;
+/* Ajuste específico para o botão da lupa */
+.busca-btn {
+    all: unset; /* Remove estilos padrão de botão */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 8px;
+    cursor: pointer;
 }
 
-/*notificacoes*/
+.busca-btn img { 
+    width: 22px;   /* Tamanho corrigido para não quebrar o layout */
+    height: 22px; 
+    object-fit: contain;
+}
 
-.conteiner_notificacoes{
+.conteiner_pesquisa:hover {
+    transform: scale(1.05);
+    border-bottom: 3px solid #fff;
+}
+
+/* ==========================================================================
+   4. NOTIFICAÇÕES E ALERTAS (BADGES)
+   ========================================================================== */
+.conteiner_notificacoes {
     height: 100%;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 15px;
     margin-right: 15px;
-
 }
 
-.conteiner_notificacoes img{
+.icon-item {
+    list-style: none;
+}
+
+.icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.conteiner_notificacoes img {
     height: 35px;
     border-left: 2px solid #2B97FA;
     padding: 8px;
     cursor: pointer;
-    transition: 0.3s ease, transform 0.3s ease;
+    transition: 0.3s ease;
 }
 
-.conteiner_notificacoes img:hover{
-    transform: scale(1.10);
+.conteiner_notificacoes img:hover {
+    transform: scale(1.15);
 }
 
-/*perfil*/
+/* Bolinha de Alerta (Mensagens) */
+.badge-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    background-color: #FF3131;
+    border-radius: 50%;
+    border: 2px solid #000d1a;
+    box-shadow: 0 0 10px #FF3131;
+    animation: pulse 1.5s infinite;
+}
 
-.conteiner_perfil{
+/* Contador Numérico (Notificações) */
+.badge-count {
+    position: absolute;
+    top: -2px;
+    right: -5px;
+    background-color: #2B97FA;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 5px;
+    border-radius: 8px;
+    border: 1px solid #000d1a;
+    min-width: 12px;
+    text-align: center;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   5. PERFIL DO USUÁRIO
+   ========================================================================== */
+.conteiner_perfil {
     display: flex;
     align-items: center;
     height: 100%;
     padding: 0 15px;
-    box-sizing: border-box;
     cursor: pointer;
-    transition: 0.3s ease, transform 0.3s ease;
+    transition: 0.3s ease;
     border-left: 2px solid #2B97FA;
     max-width: 200px;
 }
 
-.conteiner_perfil img{
+.conteiner_perfil img {
     width: 40px;
-    padding: 10px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
     margin-right: 10px;
-    cursor: pointer;
-    transition: 0.3s ease, transform 0.3s ease;
+    border: 1px solid #2B97FA;
 }
 
-.conteiner_perfil span{
+.conteiner_perfil span {
     color: #fff;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bolder;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    cursor: pointer;
-    transition: 0.3s ease, transform 0.3s ease;
 }
 
-.conteiner_perfil img:hover,
-.conteiner_perfil span:hover{
-    transform: scale(1.10);
+.conteiner_perfil:hover {
+    background-color: rgba(43, 151, 250, 0.1);
 }

@@ -11,7 +11,7 @@ import { RouterModule } from '@angular/router';
   styleUrl: './card-flutuante.css',
 })
 export class CardFlutuante {
-  exibir: boolean = false; // Agora ela não precisa ser @Input obrigatoriamente
+  exibir: boolean = false;
   @Input() titulo: string = 'Aviso';
 
   abrir() {

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import backend.model.Colaborador;
+import backend.repository.ColaboradorRepository;
 import backend.service.TokenService;
 
 @RestController
@@ -29,34 +30,45 @@ public class LoginController {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private ColaboradorRepository colaboradorRepository;
+
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     @PostMapping("/login")
     public ResponseEntity<?> efetuarLogin(@RequestBody Map<String, String> dados) {
-        System.out.println(">>> [LoginController] Tentativa de login com usuário: " + dados.get("login"));
-
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.get("login"), dados.get("senha"));
         
         try {
             var authentication = manager.authenticate(authenticationToken);
             var colaborador = (Colaborador) authentication.getPrincipal();
-            System.out.println(">>> [DEBUG] Usuário: " + colaborador.getLogin());
-            System.out.println(">>> [DEBUG] Tem foto no banco? " + (colaborador.getFoto() != null));
-            if(colaborador.getFoto() != null) {
-                System.out.println(">>> [DEBUG] Tamanho da foto: " + colaborador.getFoto().length + " bytes");
-            }
-            var tokenJWT = tokenService.gerarToken((Colaborador) authentication.getPrincipal());
+            var tokenJWT = tokenService.gerarToken(colaborador);
 
-            System.out.println(">>> [LoginController] Login bem-sucedido para usuário: " + dados.get("login"));
-            
             Map<String, Object> resposta = new HashMap<>();
             resposta.put("token", tokenJWT);
             resposta.put("nome", colaborador.getNome());
             resposta.put("foto", colaborador.getFoto() != null ? Base64.getEncoder().encodeToString(colaborador.getFoto()) : null);
+            
+            // CORREÇÃO: Verifica se a role é nula antes de chamar .name()
+            String roleName = (colaborador.getRole() != null) ? colaborador.getRole().name() : "ADMIN_DEV";
+            resposta.put("role", roleName);
+            
             resposta.put("cargo", colaborador.getCargo());
 
             return ResponseEntity.ok(resposta);
         } catch (AuthenticationException e) {
-            System.out.println(">>> [LoginController] Falha na autenticação: " + e.getMessage());
             return ResponseEntity.status(403).body(Map.of("erro", "Credenciais inválidas"));
         }
+    }
+
+    @PostMapping("/registrar")
+    public ResponseEntity<?> registrar(@RequestBody Colaborador novo) {
+        if (colaboradorRepository.existsByLogin(novo.getLogin())) {
+            return ResponseEntity.badRequest().body(Map.of("erro", "Login já existe"));
+        }
+        novo.setSenha(passwordEncoder.encode(novo.getSenha()));
+        colaboradorRepository.save(novo);
+        return ResponseEntity.ok(Map.of("status", "Usuário registrado com sucesso"));
     }
 }

@@ -3,12 +3,26 @@
         {{ isMenuAberto ? '❮' : '❯' }}
     </button>
 
-    <div class="conteiner_mensagem" (click)="notificarCliqueCard()" style="cursor: pointer;">
-        <img src="assets/bater-papo.png" alt="config">
-        <h1 *ngIf="isMenuAberto">ola</h1>
+    <ng-container *ngIf="roleAtual">
+        <div class="item-menu" *ngIf="roleAtual === 'ADMIN_DEV'" (click)="notificarCliqueCadastro()">
+            <img src="assets/predio.png" alt="empresas">
+            <h1 *ngIf="isMenuAberto">Empresas</h1>
+        </div>
+
+        <div class="item-menu" *ngIf="roleAtual === 'MASTER'" (click)="notificarCliqueCadastro()">
+            <img src="assets/equipe.png" alt="equipe">
+            <h1 *ngIf="isMenuAberto">Minha Equipe</h1>
+        </div>
+    </ng-container>
+
+    <div class="spacer"></div>
+
+    <div class="item-menu" (click)="notificarCliqueChat()">
+        <img src="assets/bater-papo.png" alt="chat">
+        <h1 *ngIf="isMenuAberto">Chat</h1>
     </div>
 
-    <div class="conteiner_config">
+    <div class="item-menu">
         <img src="assets/configuracoes (2).png" alt="config">
         <h1 *ngIf="isMenuAberto">Configurações</h1>
     </div>

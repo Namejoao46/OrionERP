@@ -2,15 +2,19 @@ package backend.service;
 
 import java.io.IOException; 
 import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
 import backend.model.Colaborador;
+import backend.model.Empresa;
 import backend.model.UserRole;
 import backend.repository.ColaboradorRepository;
+import backend.repository.EmpresaRepository;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -19,31 +23,44 @@ public class DataInitializer implements CommandLineRunner {
     private ColaboradorRepository repository;
 
     @Autowired
+    private EmpresaRepository empresaRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
         
-        // --- ADMIN 1 ---
-        Colaborador admin = (Colaborador) repository.findByLogin("admin");
-        if (admin == null) {
-            admin = new Colaborador();
-            preencherDadosBase(admin, "admin", "123", "Leandro", "ORION-001");
+        // 1. Criar Empresa OrionERP se não existir
+        // Usando o campo correto: nomeFantasia
+        Empresa orion = empresaRepository.findByNomeFantasia("OrionERP").orElse(null);
+        if (orion == null) {
+            orion = new Empresa();
+            orion.setNomeFantasia("OrionERP"); // Campo correto
+            orion.setCnpj("00.000.000/0001-00");
+            orion.setPlano("Premium");
+            orion = empresaRepository.save(orion);
+            System.out.println(">>> Empresa OrionERP criada com sucesso.");
+        }
+
+        // 2. Criar Admin 1
+        if (repository.findByLogin("admin").isEmpty()) {
+            Colaborador admin = new Colaborador();
+            preencherDadosBase(admin, "admin", "123", "Leandro", "ORION-001", orion);
             carregarFoto(admin, "images/admin1.jpeg");
             repository.save(admin);
         }
 
-        // --- ADMIN 2 ---
-        Colaborador jp = (Colaborador) repository.findByLogin("admin2");
-        if (jp == null) {
-            jp = new Colaborador();
-            preencherDadosBase(jp, "admin2", "456", "João Paulo", "ORION-002");
+        // 3. Criar Admin 2
+        if (repository.findByLogin("admin2").isEmpty()) {
+            Colaborador jp = new Colaborador();
+            preencherDadosBase(jp, "admin2", "456", "João Paulo", "ORION-002", orion);
             carregarFoto(jp, "images/admin2.jpg");
             repository.save(jp);
         }
     }
 
-    private void preencherDadosBase(Colaborador c, String login, String senha, String nome, String mat) {
+    private void preencherDadosBase(Colaborador c, String login, String senha, String nome, String mat, Empresa empresa) {
         c.setLogin(login);
         c.setSenha(passwordEncoder.encode(senha));
         c.setRole(UserRole.ADMIN_DEV);
@@ -52,14 +69,15 @@ public class DataInitializer implements CommandLineRunner {
         c.setCargo("Administrador");
         c.setTipoColaborador("FULLSTACK");
         c.setDataNascimento(LocalDate.of(2000, 1, 1));
+        c.setEmpresa(empresa);
     }
 
     private void carregarFoto(Colaborador c, @NonNull String path) {
         try {
             byte[] foto = new ClassPathResource(path).getInputStream().readAllBytes();
             c.setFoto(foto);
-        } catch (IOException | IllegalArgumentException e) { // Aqui está o MULTICATCH sugerido
-            System.out.println(">>> Aviso: Não foi possível carregar a foto " + path);
+        } catch (IOException | IllegalArgumentException e) {
+            System.out.println(">>> Aviso: Foto não encontrada em " + path);
         }
     }
 }

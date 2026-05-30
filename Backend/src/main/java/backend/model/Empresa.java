@@ -1,11 +1,17 @@
 package backend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
 @Entity
-@Table(name = "EMPRESAS")
+@Table(name = "empresas")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Empresa {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -93,7 +93,7 @@ public class MensagemController {
             Long idMensagem = Long.valueOf(payload.get("id"));
             mensagemRepository.marcarComoLida(idMensagem);
             return ResponseEntity.ok(Map.of("status", "Mensagem marcada como lida"));
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body(Map.of("erro", "Erro ao atualizar"));
         }
     }

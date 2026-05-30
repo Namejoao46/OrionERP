@@ -8,8 +8,11 @@
     </div>
     
     <div class="conteiner_menuFixo">
-        <app-menu-fixo (onToggleMenu)="aoMudarMenu($event)"
-        (onAbrirCard)="meuCard.abrir()">]</app-menu-fixo>
+        <app-menu-fixo 
+            (onToggleMenu)="aoMudarMenu($event)"
+            (onAbrirChat)="cardChat.abrir()"
+            (onAbrirCadastro)="cardCadastro.abrir()">
+        </app-menu-fixo>
     </div>
 
     <div class="conteiner_conteudo" [class.expandido]="!menuAberto">
@@ -18,6 +21,10 @@
     </div>
 </div>
 
-<app-card-flutuante #meuCard titulo="Mensagens">
+<app-card-flutuante #cardChat titulo="Mensagens">
     <app-chat-component></app-chat-component>
+</app-card-flutuante>
+
+<app-card-flutuante #cardCadastro titulo="Cadastro">
+    <app-cadastro-geral></app-cadastro-geral>
 </app-card-flutuante>

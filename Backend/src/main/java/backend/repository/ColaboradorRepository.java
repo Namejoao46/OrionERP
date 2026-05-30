@@ -1,15 +1,16 @@
 package backend.repository;
 
 import backend.model.Colaborador;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
 
-@Repository
 public interface ColaboradorRepository extends JpaRepository<Colaborador, Long> {
-    UserDetails findByLogin(String login);
     
-    // Crucial para o isolamento:
+    // Adicione esta linha para resolver o erro do LoginController:
+    boolean existsByLogin(String login);
+
+    Optional<Colaborador> findByLogin(String login);
+    
     List<Colaborador> findAllByEmpresaId(Long empresaId);
 }

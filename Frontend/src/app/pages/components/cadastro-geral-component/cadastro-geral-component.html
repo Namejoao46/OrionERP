@@ -1,0 +1,20 @@
+<div class="cadastro-container">
+  
+  <div *ngIf="roleLogado === 'ADMIN_DEV'">
+    <h2>Dados da Nova Empresa</h2>
+    <div class="form-group">
+      <input [(ngModel)]="empresa.nomeFantasia" placeholder="Nome Fantasia">
+      <input [(ngModel)]="empresa.cnpj" placeholder="CNPJ">
+    </div>
+  </div>
+
+  <h2>Dados do {{ roleLogado === 'ADMIN_DEV' ? 'Usuário Master' : 'Novo Colaborador' }}</h2>
+  <div class="form-group">
+    <input [(ngModel)]="usuario.nome" placeholder="Nome Completo">
+    <input [(ngModel)]="usuario.login" placeholder="Login (E-mail)">
+    <input [(ngModel)]="usuario.senha" type="password" placeholder="Senha">
+    
+    <button class="btn-salvar" (click)="salvar()">Salvar Cadastro</button>
+  </div>
+
+</div>

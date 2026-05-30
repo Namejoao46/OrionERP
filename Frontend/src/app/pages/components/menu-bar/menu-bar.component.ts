@@ -3,11 +3,11 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MenuComponent } from "../menu/menu.component";
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { CaixaboxService } from '../../../services/caixabox.service';
+import { CaixaboxService } from '../../../core/services/caixabox.service';
 import { CaixaboxOption } from '../caixa-box/caixa-box';
 import { Router } from '@angular/router';
 

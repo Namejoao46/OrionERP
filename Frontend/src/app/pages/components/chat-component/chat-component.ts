@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MensagemService } from '../../../services/mensagem.service'; 
+import { MensagemService } from '../../../core/services/mensagem.service';
+import { ColaboradorService } from '../../../core/services/colaborador.service';
 
 @Component({
   selector: 'app-chat-component',
@@ -10,30 +11,43 @@ import { MensagemService } from '../../../services/mensagem.service';
   templateUrl: './chat-component.html',
   styleUrls: ['./chat-component.css']
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewChecked {
+  @ViewChild('scrollMe') private myScrollContainer!: ElementRef;
+
   usuarios: any[] = [];
   mensagens: any[] = [];
   usuarioSelecionado: any = null;
   novaMensagem: string = '';
-  meuUsername: string | null = localStorage.getItem('username'); // Pega seu login do storage
 
-  constructor(private mensagemService: MensagemService) {}
+  constructor(
+    private mensagemService: MensagemService,
+    private colaboradorService: ColaboradorService
+  ) {}
 
   ngOnInit(): void {
     this.carregarUsuarios();
   }
 
+  ngAfterViewChecked() {        
+    this.scrollToBottom();        
+  } 
+
+  get meuUsername(): string {
+    return localStorage.getItem('username') || '';
+  }
+
   carregarUsuarios(): void {
-    this.mensagemService.listarUsuarios().subscribe({
-      next: (logins: string[]) => {
-        // Mapeia os logins para objetos que o HTML entende
-        this.usuarios = logins.map(login => ({
-          username: login,
-          nome: login === 'admin' ? 'Leandro (Admin)' : (login === 'admin2' ? 'João Paulo' : login),
-          online: true // Você pode integrar com o status real depois
+    this.colaboradorService.listarTodos().subscribe({
+      next: (data: any[]) => {
+        this.usuarios = data.map(colab => ({
+          username: colab.login,
+          nome: colab.nome,
+          foto: colab.foto,
+          cargo: colab.cargo,
+          online: true 
         }));
       },
-      error: (err) => console.error('Erro ao listar usuários', err)
+      error: (err: any) => console.error('Erro ao listar colaboradores', err)
     });
   }
 
@@ -43,32 +57,24 @@ export class ChatComponent implements OnInit {
   }
 
   carregarMensagens(): void {
-  if (!this.usuarioSelecionado) return;
-
-  // Pegamos o login salvo (agora garantimos que ele existe)
-  const meuLogin = localStorage.getItem('username') || '';
-
-  this.mensagemService.buscarConversa(this.usuarioSelecionado.username).subscribe({
-    next: (historico: any[]) => {
-      this.mensagens = historico.map(msg => {
-        return {
+    if (!this.usuarioSelecionado) return;
+    this.mensagemService.buscarConversa(this.usuarioSelecionado.username).subscribe({
+      next: (historico: any[]) => {
+        this.mensagens = historico.map(msg => ({
           ...msg,
           mensagem: msg.conteudo,
           data: msg.dataEnvio,
-          // Compara o remetente do banco com o login salvo no storage
-          enviadaPorMim: String(msg.remetente).toLowerCase() === meuLogin.toLowerCase()
-        };
-      });
-    }
-  });
-}
+          enviadaPorMim: String(msg.remetente).toLowerCase() === this.meuUsername.toLowerCase()
+        }));
+      },
+      error: (err: any) => console.error('Erro ao buscar mensagens', err)
+    });
+  }
 
   enviar(): void {
     if (!this.novaMensagem.trim() || !this.usuarioSelecionado) return;
-
     this.mensagemService.enviarMensagem(this.usuarioSelecionado.username, this.novaMensagem).subscribe({
       next: () => {
-        // Adiciona a mensagem localmente para feedback instantâneo
         this.mensagens.push({
           remetente: this.meuUsername,
           conteudo: this.novaMensagem,
@@ -76,9 +82,15 @@ export class ChatComponent implements OnInit {
           enviadaPorMim: true,
           dataEnvio: new Date()
         });
-        this.novaMensagem = ''; // Limpa o input
+        this.novaMensagem = '';
       },
-      error: (err) => console.error('Erro ao enviar', err)
+      error: (err: any) => console.error('Erro ao enviar', err)
     });
+  }
+
+  private scrollToBottom(): void {
+    try {
+      this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
+    } catch(err) { }                 
   }
 }

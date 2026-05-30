@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Adicione ChangeDetectorRef
 import { CommonModule } from '@angular/common'; 
-import { NotificationService, Notification } from '../../../services/notification.service';
+import { NotificationService, Notification } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-notification-container',

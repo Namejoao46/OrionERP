@@ -1,7 +1,7 @@
 import { ApplicationRef, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NotificationContainerComponent } from "./pages/components/notification-container/notification-container";
-import { NotificationService } from './services/notification.service';
+import { NotificationService } from './core/services/notification.service';
 
 @Component({
   selector: 'app-root',

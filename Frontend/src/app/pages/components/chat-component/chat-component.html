@@ -6,12 +6,13 @@
            (click)="selecionarUsuario(user)" 
            [class.active]="usuarioSelecionado?.username === user.username">
         <div class="avatar-circle">
-          {{ user.username?.charAt(0)?.toUpperCase() || '' }}
+          <img *ngIf="user.foto" [src]="user.foto" class="avatar-img">
+          <span *ngIf="!user.foto">{{ user.nome?.charAt(0)?.toUpperCase() || '?' }}</span>
           <span class="status-dot" [style.background]="user.online ? '#00ff88' : '#666'"></span>
         </div>
         <div class="contato-info">
-          <span class="nome">{{ user.username }}</span>
-          <span class="preview">Clique para conversar...</span>
+          <span class="nome">{{ user.nome }}</span>
+          <span class="preview">{{ user.cargo || 'Equipe Orion' }}</span>
         </div>
       </div>
     </div>
@@ -21,16 +22,13 @@
     <header class="chat-header" *ngIf="usuarioSelecionado">
       <div class="header-user">
         <div class="avatar-small">
-          {{ usuarioSelecionado.username?.charAt(0)?.toUpperCase() }}
+          <img *ngIf="usuarioSelecionado.foto" [src]="usuarioSelecionado.foto" class="avatar-img">
+          <span *ngIf="!usuarioSelecionado.foto">{{ usuarioSelecionado.nome?.charAt(0)?.toUpperCase() }}</span>
         </div>
         <div>
-          <span class="header-name">{{ usuarioSelecionado.username }}</span>
+          <span class="header-name">{{ usuarioSelecionado.nome }}</span>
           <small class="header-status">Online</small>
         </div>
-      </div>
-      <div class="header-actions">
-        <span style="cursor: pointer; margin-right: 15px;">🔍</span>
-        <span style="cursor: pointer;">⋮</span>
       </div>
     </header>
 
@@ -47,13 +45,9 @@
       </div>
     </div>
 
-    <footer class="chat-input">
+    <footer class="chat-input" *ngIf="usuarioSelecionado">
       <div class="input-wrapper">
-        <span class="icon" style="color: #00aaff; cursor: pointer;">📎</span>
-        <input type="text" 
-               [(ngModel)]="novaMensagem" 
-               (keyup.enter)="enviar()" 
-               placeholder="Digite sua mensagem para a equipe...">
+        <input type="text" [(ngModel)]="novaMensagem" (keyup.enter)="enviar()" placeholder="Digite sua mensagem...">
         <button class="btn-send" (click)="enviar()">ENVIAR</button>
       </div>
     </footer>

@@ -7,11 +7,22 @@ import { OpcoesComponent } from "../components/opcoes/opcoes.component";
 import { MenuFixoComponent } from "../components/menu-fixo/menu-fixo.component";
 import { CardFlutuante } from "../components/card-flutuante/card-flutuante";
 import { ChatComponent } from "../components/chat-component/chat-component";
+import { CadastroGeralComponent } from '../components/cadastro-geral-component/cadastro-geral-component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, MenuBarComponent, OpcoesComponent, MenuFixoComponent, CardFlutuante, ChatComponent],
+  imports: [
+    RouterModule, 
+    CommonModule, 
+    FormsModule, 
+    MenuBarComponent, 
+    OpcoesComponent, 
+    MenuFixoComponent, 
+    CardFlutuante, 
+    ChatComponent, 
+    CadastroGeralComponent
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

@@ -1,0 +1,75 @@
+/* Container Principal do Formulário */
+.cadastro-container {
+    padding: 30px;
+    color: #ffffff;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+h2 {
+    color: #fff; /* Azul mais claro para destaque */
+    margin-bottom: 20px;
+    font-weight: 500;
+    border-left: 4px solid #4da3ff;
+    padding-left: 15px;
+    font-size: 1.2rem;
+}
+
+/* Agrupamento dos Campos */
+.form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 40px;
+    background: rgba(255, 255, 255, 0.03); /* Efeito sutil de fundo */
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Estilização dos Inputs */
+input {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px 15px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #4da3ff;
+    box-shadow: 0 0 8px rgba(77, 163, 255, 0.3);
+    background: #222;
+}
+
+input::placeholder {
+    color: #777;
+}
+
+/* Botão de Salvar */
+.btn-salvar {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background 0.3s, transform 0.2s;
+    display: block;
+    margin-top: 20px;
+}
+
+.btn-salvar:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.btn-salvar:active {
+    transform: translateY(0);
+}

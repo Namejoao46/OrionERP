@@ -1,84 +1,90 @@
-.conteiner{
-    height: 83%;
+/* Container Principal */
+.conteiner {
+    height: 74.5%;
     width: 15%;
     background-color: #050a30;
     position: fixed;
     bottom: 0;
     left: 0;
-    border-top: 2px solid #2B97FA ;
+    border-top: 2px solid #2B97FA;
     border-right: 2px solid #2B97FA;
     transition: width 0.3s ease;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* Ajustei o padding inicial para não colar no topo */
+    padding-top: 80px; 
+    z-index: 1000;
 }
 
 .conteiner.colapsado {
-    width: 60px; /* Largura apenas para o ícone */
+    width: 70px;
 }
 
-.conteiner_config{
-    position: absolute;
+/* Espaçador flexível para empurrar Chat e Config para baixo */
+.spacer {
+    flex-grow: 1;
+}
+
+/* PADRÃO PARA TODOS OS ITENS */
+.item-menu {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding-left: 10px;
-    gap: 10px;
-    bottom: 20px;
-    font-size: 14px;
+    padding: 15px 20px;
+    gap: 15px;
     color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-left: 5px solid transparent;
+    box-sizing: border-box;
+    /* ADICIONADO: Margem para os itens não ficarem grudados */
+    margin-bottom: 10px; 
+}
+
+/* EFEITO DE HOVER */
+.item-menu:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 5px solid #2B97FA;
+    /* Efeito sutil de brilho no hover */
+    box-shadow: inset 10px 0 20px -10px rgba(43, 151, 250, 0.5);
+}
+
+/* Ajuste dos ícones para ficarem centralizados no modo colapsado */
+.item-menu img {
+    height: 28px;
+    width: 28px;
+    min-width: 28px;
+    object-fit: contain;
+    /* Filtro opcional: deixa os ícones levemente azulados para combinar */
+    filter: brightness(1.1); 
+}
+
+/* Ajuste do Texto */
+.item-menu h1 {
+    font-size: 15px;
+    margin: 0;
+    font-weight: 400;
     white-space: nowrap;
+    letter-spacing: 0.5px;
 }
 
-.conteiner_config img{
-    height: 45px;
-    min-width: 40px;
-}
-
-.conteiner_mensagem{
-    position: absolute;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding-left: 10px;
-    gap: 10px;
-    bottom: 90px;
-    font-size: 14px;
-    color: #fff;
-    white-space: nowrap;
-}
-    
-.conteiner_mensagem img{
-    height: 45px;
-    min-width: 40px;
-}
-
+/* Botão de Toggle (Ajustado posição) */
 .btn-toggle {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
+    top: 20px;
+    right: 15px;
+    background: rgba(43, 151, 250, 0.1);
     border: 1px solid #2B97FA;
     color: white;
     cursor: pointer;
-    border-radius: 5px;
-    padding: 2px 8px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: 0.3s;
 }
 
-.item-menu {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    gap: 10px;
-    transition: background 0.3s;
-    border-radius: 8px;
-}
-
-.item-menu:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-}
-
-.item-menu img {
-    width: 24px;
-    height: 24px;
+.btn-toggle:hover {
+    background: #2B97FA;
+    box-shadow: 0 0 10px #2B97FA;
 }

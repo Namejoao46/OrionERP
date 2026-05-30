@@ -19,6 +19,9 @@ public class ColaboradorController {
     @Autowired
     private ColaboradorRepository repository;
 
+    @Autowired
+    private backend.service.GestaoService gestaoService;
+
     @GetMapping("/equipe")
     public List<Colaborador> listarEquipe(@AuthenticationPrincipal Colaborador logado) {
         // Usando Objects.requireNonNull ou verificação direta para silenciar o warning
@@ -63,5 +66,16 @@ public class ColaboradorController {
                     return ResponseEntity.notFound().<byte[]>build();
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/cadastrar")
+    public ResponseEntity<?> cadastrarComEmpresa(@RequestBody Colaborador novo, @AuthenticationPrincipal Colaborador logado) {
+        try {
+            // O GestaoService vai usar a empresa do Master logado para o novo funcionário
+            Colaborador salvo = gestaoService.cadastrarNovoFuncionario(novo, logado);
+            return ResponseEntity.ok(salvo);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

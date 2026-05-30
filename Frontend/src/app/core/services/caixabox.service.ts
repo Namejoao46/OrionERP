@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { CaixaboxComponent } from '../pages/components/caixa-box/caixa-box';
 import { Subject, Observable } from 'rxjs';
-import { CaixaboxOption } from '../pages/components/caixa-box/caixa-box';
+import { CaixaboxComponent, CaixaboxOption } from '../../pages/components/caixa-box/caixa-box';
+
 
 @Injectable({ providedIn: 'root' })
 export class CaixaboxService {

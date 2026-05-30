@@ -33,6 +33,6 @@ public class Fornecedor {
     private Integer leadTime; 
     private Double limiteCredito;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob
     private String observacoes;
 }

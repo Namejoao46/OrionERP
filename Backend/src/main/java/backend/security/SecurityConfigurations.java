@@ -1,7 +1,6 @@
 package backend.security;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,19 +32,16 @@ public class SecurityConfigurations {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) 
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll() 
-                
-                // --- ADICIONADO: LIBERAÇÃO DO WEBSOCKET ---
                 .requestMatchers("/ws/**").permitAll() 
-                // ------------------------------------------
 
-                .requestMatchers(HttpMethod.GET,  "/api/produtos/**").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/produtos/**").authenticated()
-                .requestMatchers(HttpMethod.PUT,  "/api/produtos/**").authenticated()
-                .requestMatchers(HttpMethod.PATCH,"/api/produtos/**").authenticated()
-                .requestMatchers(HttpMethod.GET,  "/api/notas-recebimento/**").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/notas-recebimento/**").authenticated()
+                // Nível 0: Só Admin Dev acessa gestão de empresas
+                .requestMatchers("/api/admin/**").hasRole("ADMIN_DEV")
+                
+                // Nível 1: Só Owner acessa gestão de equipe
+                .requestMatchers("/api/gestao/**").hasRole("OWNER")
+
+                // Geral: Logado acessa ERP
                 .anyRequest().authenticated() 
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
@@ -55,12 +51,10 @@ public class SecurityConfigurations {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Usando origin patterns para evitar problemas com credenciais
         configuration.setAllowedOriginPatterns(List.of("http://localhost:4200"));
         configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true); // Obrigatório para SockJS/WebSockets
-
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

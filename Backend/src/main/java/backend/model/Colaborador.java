@@ -3,21 +3,15 @@ package backend.model;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name = "COLABORADORES")
 public class Colaborador implements UserDetails {
@@ -41,57 +35,27 @@ public class Colaborador implements UserDetails {
     private String endereco;
     private String tipoColaborador;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
+    @ManyToOne
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresa;
+
     @Lob
     private byte[] foto;
 
-    public Colaborador() {}
-
-    public void setId(Long id) { this.id = id; }
-    public void setLogin(String login) { this.login = login; }
-    public void setSenha(String senha) { this.senha = senha; }
-    public void setNome(String nome) { this.nome = nome; }
-    public void setSobrenome(String sobrenome) { this.sobrenome = sobrenome; }
-    public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
-    public void setCpf(String cpf) { this.cpf = cpf; }
-    public void setMatricula(String matricula) { this.matricula = matricula; }
-    public void setCargo(String cargo) { this.cargo = cargo; }
-    public void setEndereco(String endereco) { this.endereco = endereco; }
-    public void setTipoColaborador(String tipoColaborador) { this.tipoColaborador = tipoColaborador; }
-    public void setFoto(byte[] foto) { this.foto = foto; }
-
-    public Long getId() { return id; }
-    public String getLogin() { return login; }
-    public String getNome() { return nome; }
-    public String getCargo() { return cargo; }
-    public String getSenha() { return senha; }
-    public String getSobrenome() { return sobrenome; }
-    public String getCpf() { return cpf; }
-    public String getMatricula() { return matricula; }
-    public String getEndereco() { return endereco; }
-    public String getTipoColaborador() { return tipoColaborador; }
-    public LocalDate getDataNascimento() { return dataNascimento; }
-    public byte[] getFoto() { return foto; }
-
+    // Métodos do UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        if (this.role == null) return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()), new SimpleGrantedAuthority("ROLE_USER"));
     }
 
-    @Override
-    public String getPassword() { return senha; }
-
-    @Override
-    public String getUsername() { return login; }
-
-    @Override
-    public boolean isAccountNonExpired() { return true; }
-
-    @Override
-    public boolean isAccountNonLocked() { return true; }
-
-    @Override
-    public boolean isCredentialsNonExpired() { return true; }
-
-    @Override
-    public boolean isEnabled() { return true; }
+    @Override public String getPassword() { return this.senha; }
+    @Override public String getUsername() { return this.login; }
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
 }

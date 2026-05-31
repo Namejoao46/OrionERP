@@ -48,12 +48,6 @@ export class AuthService {
 
   setUserData(token: string, nome: string, foto: string | null, login: string, role: string) {
 
-    console.log("--- DEBUG LOGIN ---");
-    console.log("Token recebido:", token);
-    console.log("Nome recebido:", nome);
-    console.log("ROLE RECEBIDA:", role);
-    console.log("-------------------");
-
     localStorage.setItem('token', token);
     localStorage.setItem('userName', nome);
     localStorage.setItem('username', login);

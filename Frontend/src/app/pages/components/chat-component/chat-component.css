@@ -1,7 +1,7 @@
-/*Estrutura de Layout (Containers)
-Esta parte define o "esqueleto" do chat. Se o chat sumir ou ficar torto, o problema está aqui.*/
+/* ==========================================================================
+   1. ESTRUTURA DE LAYOUT (CONTAINERS)
+   ========================================================================== */
 
-/* CONTAINER PRINCIPAL */
 .chat-container {
   display: flex;
   width: 100%;
@@ -11,10 +11,9 @@ Esta parte define o "esqueleto" do chat. Se o chat sumir ou ficar torto, o probl
   color: #ffffff;
   font-family: 'Segoe UI', Roboto, sans-serif;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: hidden; /* Garante que nada saia das bordas arredondadas */
 }
 
-/* COLUNA DA ESQUERDA */
 .sidebar {
   width: 300px;
   min-width: 300px;
@@ -24,16 +23,17 @@ Esta parte define o "esqueleto" do chat. Se o chat sumir ou ficar torto, o probl
   flex-direction: column;
 }
 
-/* COLUNA DA DIREITA (JANELA DE CHAT) */
 .chat-window {
   flex: 1;
   display: flex;
   flex-direction: column;
   background-color: #000d1a;
+  overflow: hidden;
 }
 
-/*2. Sidebar e Contatos
-Tudo relacionado à lista de pessoas e avatares.*/
+/* ==========================================================================
+   2. SIDEBAR E LISTA DE CONTATOS
+   ========================================================================== */
 
 .header-sidebar {
   padding: 20px;
@@ -60,17 +60,20 @@ Tudo relacionado à lista de pessoas e avatares.*/
   transition: all 0.2s ease;
 }
 
-.contato-item:hover { background-color: #00264d; }
+.contato-item:hover { 
+  background-color: #00264d; 
+}
 
 .contato-item.active {
   background: rgba(0, 170, 255, 0.1);
   border-left: 4px solid #00aaff;
 }
 
-/* AVATARES E STATUS */
+/* AVATARES (CORREÇÃO DA QUEBRA) */
 .avatar-circle {
   width: 42px;
   height: 42px;
+  min-width: 42px; /* Impede de amassar */
   border-radius: 50%;
   background: #001a33;
   border: 1px solid #00aaff;
@@ -81,6 +84,16 @@ Tudo relacionado à lista de pessoas e avatares.*/
   font-weight: bold;
   color: #00aaff;
   position: relative;
+  overflow: hidden; /* ESSENCIAL: Corta a imagem se for gigante */
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ajusta a foto sem esticar */
+  border-radius: 50%;
+  display: block;
 }
 
 .status-dot {
@@ -91,10 +104,73 @@ Tudo relacionado à lista de pessoas e avatares.*/
   bottom: 1px;
   right: 1px;
   border: 2px solid #001a33;
+  z-index: 2;
 }
 
-/*3. Área de Mensagens (Onde a conversa acontece)
-Aqui você controla o fundo pontilhado e o comportamento dos balões.*/
+.contato-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Evita que o texto empurre a sidebar */
+}
+
+.nome {
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adiciona "..." em nomes longos */
+}
+
+.preview {
+  font-size: 12px;
+  color: #8899a6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   3. HEADER DO CHAT (USUÁRIO SELECIONADO)
+   ========================================================================== */
+
+.chat-header {
+  padding: 15px 25px;
+  background-color: #001a33;
+  border-bottom: 1px solid #004080;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-small {
+  width: 35px;
+  height: 35px;
+  min-width: 35px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 12px;
+  border: 1px solid #00aaff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-name {
+  display: block;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.header-status {
+  font-size: 11px;
+  color: #00ff88;
+}
+
+/* ==========================================================================
+   4. MENSAGENS E BALÕES
+   ========================================================================== */
 
 .messages-container {
   flex: 1;
@@ -107,25 +183,18 @@ Aqui você controla o fundo pontilhado e o comportamento dos balões.*/
   background-size: 20px 20px;
 }
 
-/* BALÃO BASE */
 .bubble {
   max-width: 70%;
-  padding: 8px 12px;
+  padding: 10px 15px;
   border-radius: 12px;
   font-size: 14px;
   line-height: 1.4;
   position: relative;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   display: flex;
   flex-direction: column;
-  
-  /* QUEBRA DE TEXTO */
   word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: pre-wrap;
 }
 
-/* CORES DOS BALÕES */
 .msg-me {
   align-self: flex-end;
   background: linear-gradient(135deg, #005099, #00264d);
@@ -147,12 +216,11 @@ Aqui você controla o fundo pontilhado e o comportamento dos balões.*/
   color: rgba(255, 255, 255, 0.5);
   align-self: flex-end;
   margin-top: 4px;
-  margin-left: 15px;
-  font-style: italic;
 }
 
-/*4. Rodapé e Entrada de Dados
-Controle do input e do botão de envio.*/
+/* ==========================================================================
+   5. INPUT E RODAPÉ
+   ========================================================================== */
 
 .chat-input {
   background-color: #001a33;
@@ -177,7 +245,6 @@ Controle do input e do botão de envio.*/
   color: white;
   padding: 10px;
   outline: none;
-  font-size: 14px;
 }
 
 .btn-send {
@@ -188,19 +255,12 @@ Controle do input e do botão de envio.*/
   border-radius: 20px;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(0, 170, 255, 0.4);
-  transition: all 0.3s ease;
 }
 
-.btn-send:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
-}
+/* ==========================================================================
+   6. EXTRAS (SCROLLBAR E VAZIO)
+   ========================================================================== */
 
-/*5. Elementos Globais e Scrollbar
-Configurações que afetam vários lugares ao mesmo tempo.*/
-
-/* SCROLLBARS */
 .lista-contatos::-webkit-scrollbar, 
 .messages-container::-webkit-scrollbar {
   width: 6px;
@@ -212,12 +272,12 @@ Configurações que afetam vários lugares ao mesmo tempo.*/
   border-radius: 10px;
 }
 
-/* TELA VAZIA (Sem chat selecionado) */
 .no-chat {
   display: flex;
   height: 100%;
   align-items: center;
   justify-content: center;
   color: #4f5b66;
-  font-style: italic;
+  text-align: center;
+  padding: 20px;
 }

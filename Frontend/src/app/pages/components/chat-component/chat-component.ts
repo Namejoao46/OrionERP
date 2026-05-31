@@ -37,17 +37,18 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   carregarUsuarios(): void {
-    this.colaboradorService.listarTodos().subscribe({
+    this.mensagemService.listarUsuarios().subscribe({
       next: (data: any[]) => {
         this.usuarios = data.map(colab => ({
           username: colab.login,
           nome: colab.nome,
-          foto: colab.foto,
+          // Converte o array de bytes da foto para uma URL base64 que o <img> entende
+          foto: colab.foto ? 'data:image/jpeg;base64,' + colab.foto : null,
           cargo: colab.cargo,
           online: true 
         }));
       },
-      error: (err: any) => console.error('Erro ao listar colaboradores', err)
+      error: (err: any) => console.error('Erro ao listar contatos', err)
     });
   }
 

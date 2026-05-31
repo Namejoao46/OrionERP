@@ -103,11 +103,13 @@ public class MensagemController {
     public ResponseEntity<?> listarUsuarios(Principal principal) {
         String usuarioLogado = principal.getName();
         List<Colaborador> todos = colaboradorRepository.findAll();
-        List<String> logins = todos.stream()
-                .map(Colaborador::getLogin)
-                .filter(login -> !login.equals(usuarioLogado))
+        
+        // Filtra para remover você mesmo da lista, mas retorna o objeto Colaborador inteiro
+        List<Colaborador> filtrados = todos.stream()
+                .filter(c -> !c.getLogin().equals(usuarioLogado))
                 .toList();
-        return ResponseEntity.ok(logins);
+                
+        return ResponseEntity.ok(filtrados);
     }
 
     @GetMapping("/conversa/{contato}")

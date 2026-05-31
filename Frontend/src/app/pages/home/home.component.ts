@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, NgZone } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, NgZone, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MenuBarComponent } from "../components/menu-bar/menu-bar.component";
@@ -7,50 +7,39 @@ import { OpcoesComponent } from "../components/opcoes/opcoes.component";
 import { MenuFixoComponent } from "../components/menu-fixo/menu-fixo.component";
 import { CardFlutuante } from "../components/card-flutuante/card-flutuante";
 import { ChatComponent } from "../components/chat-component/chat-component";
-import { CadastroGeralComponent } from '../components/cadastro-geral-component/cadastro-geral-component';
+import { CadastroGeralComponent } from '../components/cadastros/cadastro-geral-component/cadastro-geral-component';
+import { ModalService } from '../../core/services/modal.service';
+import { CadastroFornecedorComponent } from '../components/cadastros/cadastro-fornecedor-component/cadastro-fornecedor-component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
-    RouterModule, 
-    CommonModule, 
-    FormsModule, 
-    MenuBarComponent, 
-    OpcoesComponent, 
-    MenuFixoComponent, 
-    CardFlutuante, 
-    ChatComponent, 
-    CadastroGeralComponent
+    RouterModule, CommonModule, FormsModule, MenuBarComponent, 
+    OpcoesComponent, MenuFixoComponent, CardFlutuante, 
+    ChatComponent, CadastroGeralComponent, CadastroFornecedorComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   menuAberto: boolean = true;
-
-  // Injetando ferramentas de diagnóstico
-  private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
-  
-  mostrarModal: boolean = false;
+  private modalService = inject(ModalService);
+
+  @ViewChild('cardFornecedor') cardFornecedor!: CardFlutuante;
 
   ngOnInit() {
-    console.log('HomeComponent carregado. Verificando estabilidade do Zone.js...');
-
-    // Este intervalo serve para testar se o Live Reload/Detecção de mudanças está vivo
-    setInterval(() => {
-      this.zone.run(() => {
+    // Escuta pedidos de abertura vindos de componentes filhos (como o Estoque)
+    this.modalService.abrirFornecedor$.subscribe(() => {
+      if (this.cardFornecedor) {
+        this.cardFornecedor.abrir();
         this.cdr.detectChanges();
-      });
-    }, 3000);
+      }
+    });
   }
 
   aoMudarMenu(estado: boolean) {
     this.menuAberto = estado;
-  }
-
-  abrirCard() {
-    this.mostrarModal = true;
   }
 }

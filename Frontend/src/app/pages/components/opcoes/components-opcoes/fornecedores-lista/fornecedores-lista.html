@@ -5,18 +5,29 @@
     <button class="arrow left" (click)="scrollLeft()">‹</button>
 
     <div class="scroll-horizontal" #scrollContainer>
+      
+      <div class="card-fornecedor btn-adicionar" (click)="abrirModalCriar()">
+        <div class="avatar-wrapper">
+          <div class="avatar novo">
+            <span class="plus-icon">+</span>
+          </div>
+        </div>
+        <span class="fornecedor-nome">Adicionar</span>
+      </div>
+
       <div class="card-fornecedor" *ngFor="let f of fornecedores">
         <div class="avatar-wrapper">
           <div class="avatar">
             <img *ngIf="f.foto; else noPhoto" [src]="f.foto" alt="Avatar">
             <ng-template #noPhoto>
-              <div class="sigla">{{ f.nome[0] }}</div>
+              <div class="sigla">{{ f.nomeFantasia ? f.nomeFantasia[0] : f.razaoSocial[0] }}</div>
             </ng-template>
           </div>
           <span class="status-indicator"></span>
         </div>
-        <span class="fornecedor-nome">{{ f.nome }}</span>
+        <span class="fornecedor-nome">{{ f.nomeFantasia || f.razaoSocial }}</span>
       </div>
+
     </div>
 
     <button class="arrow right" (click)="scrollRight()">›</button>

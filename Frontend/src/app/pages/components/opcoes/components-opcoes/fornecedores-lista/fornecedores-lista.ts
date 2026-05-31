@@ -1,32 +1,32 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { FornecedorService } from '../../../../../core/services/fornecedor.service';
+import { ModalService } from '../../../../../core/services/modal.service';
 
 @Component({
   selector: 'app-fornecedores-lista',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './fornecedores-lista.html',
   styleUrl: './fornecedores-lista.css',
 })
-export class FornecedoresLista {
-  fornecedores = [
-    { id: 1, nome: 'Tech World', foto: 'assets/test1.jpg' },
-    { id: 2, nome: 'Global Peças', foto: 'assets/teste2.webp' },
-    { id: 3, nome: 'Logística Express', foto: 'assets/teste3.jpg' },
-    { id: 4, nome: 'Fornecedor X', foto: null },
-    { id: 5, nome: 'Fornecedor Y', foto: null },
-    { id: 6, nome: 'Fornecedor Z', foto: null },
-    { id: 7, nome: 'Fornecedor Z', foto: null }
-  ];
+export class FornecedoresLista implements OnInit {
+  fornecedores: any[] = [];
+  private modalService = inject(ModalService);
+  private service = inject(FornecedorService);
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-  scrollLeft() {
-    this.scrollContainer.nativeElement.scrollBy({ left: -120, behavior: 'smooth' });
+  ngOnInit() { this.carregarFornecedores(); }
+
+  carregarFornecedores() {
+    this.service.listarTodos().subscribe(dados => this.fornecedores = dados);
   }
 
-  scrollRight() {
-    this.scrollContainer.nativeElement.scrollBy({ left: 120, behavior: 'smooth' });
+  abrirModalCriar() {
+    this.modalService.notificarAbrirFornecedor(); // Avisa a Home!
   }
+
+  scrollLeft() { this.scrollContainer.nativeElement.scrollBy({ left: -120, behavior: 'smooth' }); }
+  scrollRight() { this.scrollContainer.nativeElement.scrollBy({ left: 120, behavior: 'smooth' }); }
 }

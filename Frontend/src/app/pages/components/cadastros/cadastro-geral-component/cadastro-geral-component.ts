@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../../core/services/auth.service';
-import { EmpresaService } from '../../../core/services/empresa.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth.service';
+import { EmpresaService } from '../../../../core/services/empresa.service';
 
 @Component({
   selector: 'app-cadastro-geral',
@@ -39,10 +39,8 @@ export class CadastroGeralComponent implements OnInit {
   }
 
   private cadastrarEmpresaEMaster() {
-    // 1. Cria a empresa primeiro
     this.empresaService.cadastrar(this.empresa).subscribe({
       next: (empresaCriada: any) => {
-        // 2. Com o ID da empresa, registra o usuário como MASTER
         const payloadMaster = { 
           ...this.usuario, 
           role: 'MASTER', 
@@ -50,7 +48,7 @@ export class CadastroGeralComponent implements OnInit {
         };
         this.enviarRequisicaoAuth(payloadMaster, 'Empresa e Usuário Master criados com sucesso!');
       },
-      error: (err) => alert('Erro ao cadastrar empresa: ' + (err.error?.erro || err.message))
+      error: (err: any) => alert('Erro ao cadastrar empresa: ' + (err.error?.erro || err.message))
     });
   }
 

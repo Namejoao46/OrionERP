@@ -15,12 +15,9 @@ import { Metas } from './pages/components/opcoes/painel/interacao/metas/metas';
 import { Interacao } from './pages/components/opcoes/painel/interacao/interacao';
 import { Calendario } from './pages/components/opcoes/painel/interacao/calendario/calendario';
 import { Estoque } from './pages/components/opcoes/estoque/estoque';
-
-// IMPORT DO NOVO COMPONENTE (Ajuste o caminho se necessário)
-import { CadastroGeralComponent } from './pages/components/cadastro-geral-component/cadastro-geral-component';
-
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { CadastroGeralComponent } from './pages/components/cadastros/cadastro-geral-component/cadastro-geral-component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },

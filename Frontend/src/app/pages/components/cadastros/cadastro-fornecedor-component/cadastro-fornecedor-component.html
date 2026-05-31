@@ -1,0 +1,20 @@
+<div class="form-container">
+  <div class="upload-xml-wrapper">
+    <label for="xml-upload" class="btn-xml">
+      <i class="bi bi-file-earmark-arrow-up"></i> Importar via XML
+    </label>
+    <input id="xml-upload" type="file" (change)="onFileSelected($event)" accept=".xml" hidden>
+    <p class="hint">Os campos serão preenchidos automaticamente</p>
+  </div>
+
+  <div class="input-grid">
+    <input [(ngModel)]="fornecedor.cnpj" placeholder="CNPJ">
+    <input [(ngModel)]="fornecedor.razaoSocial" placeholder="Razão Social">
+    <input [(ngModel)]="fornecedor.nomeFantasia" placeholder="Nome Fantasia">
+    <input [(ngModel)]="fornecedor.telefone" placeholder="Telefone">
+    <input [(ngModel)]="fornecedor.email" placeholder="E-mail">
+    <input [(ngModel)]="fornecedor.cidade" placeholder="Cidade">
+  </div>
+
+  <button class="btn-confirmar" (click)="salvar()">Salvar Fornecedor</button>
+</div>

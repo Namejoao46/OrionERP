@@ -1,11 +1,7 @@
 <div class="conteiner"> 
-    <header class="conteiner_header">
-        <app-menu-bar></app-menu-bar>
-    </header>
+    <header class="conteiner_header"><app-menu-bar></app-menu-bar></header>
 
-    <div class="conteiner_opcoes">
-        <app-opcoes></app-opcoes>
-    </div>
+    <div class="conteiner_opcoes"><app-opcoes></app-opcoes></div>
     
     <div class="conteiner_menuFixo">
         <app-menu-fixo 
@@ -16,7 +12,6 @@
     </div>
 
     <div class="conteiner_conteudo" [class.expandido]="!menuAberto">
-        
         <router-outlet></router-outlet>
     </div>
 </div>
@@ -25,6 +20,10 @@
     <app-chat-component></app-chat-component>
 </app-card-flutuante>
 
-<app-card-flutuante #cardCadastro titulo="Cadastro">
+<app-card-flutuante #cardCadastro titulo="Cadastro Geral">
     <app-cadastro-geral></app-cadastro-geral>
+</app-card-flutuante>
+
+<app-card-flutuante #cardFornecedor titulo="Cadastrar Novo Fornecedor">
+    <app-cadastro-fornecedor-component (salvoComSucesso)="cardFornecedor.fechar()"></app-cadastro-fornecedor-component>
 </app-card-flutuante>

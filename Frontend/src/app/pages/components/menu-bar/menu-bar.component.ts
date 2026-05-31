@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { MenuComponent } from "../menu/menu.component";
 import { AuthService } from '../../../core/services/auth.service';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { MensagemService } from '../../../core/services/mensagem.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { CaixaboxService } from '../../../core/services/caixabox.service';
 import { CaixaboxOption } from '../caixa-box/caixa-box';
-import { Router } from '@angular/router';
+import { Observable, interval, Subscription } from 'rxjs';
+import { map, startWith, switchMap } from 'rxjs/operators';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-menu-bar',
@@ -18,22 +19,24 @@ import { Router } from '@angular/router';
   templateUrl: './menu-bar.component.html',
   styleUrl: './menu-bar.component.css'
 })
-export class MenuBarComponent {
+export class MenuBarComponent implements OnInit, OnDestroy {
   userName$: Observable<string | null>;
   userImage$: Observable<SafeUrl | null>;
-
-  // Variáveis para os alertas
-  temNovasMensagens: boolean = true; 
-  quantidadeNotificacoes: number = 3;
+  
+  temNovasMensagens: boolean = false;
+  quantidadeNotificacoes: number = 0;
+  private qteMensagensAnterior: number = 0;
+  private pollSub?: Subscription;
 
   constructor(
-    private authService: AuthService, 
+    private authService: AuthService,
     private sanitizer: DomSanitizer,
     private caixabox: CaixaboxService,
-    private router: Router
+    private router: Router,
+    private mensagemService: MensagemService,
+    private notificationService: NotificationService
   ) {
     this.userName$ = this.authService.userName$;
-
     this.userImage$ = this.authService.userImage$.pipe(
       map(base64 => {
         if (!base64) return null;
@@ -43,49 +46,84 @@ export class MenuBarComponent {
     );
   }
 
+  ngOnInit(): void {
+    this.monitorarMensagens();
+    this.atualizarBadgeNotificacoes();
+  }
+
+  ngOnDestroy(): void {
+    this.pollSub?.unsubscribe();
+  }
+
+  monitorarMensagens() {
+    // Checa o Java a cada 10 segundos
+    this.pollSub = interval(10000).pipe(
+      startWith(0),
+      switchMap(() => this.mensagemService.contarNaoLidas())
+    ).subscribe(total => {
+      if (total > this.qteMensagensAnterior) {
+        this.notificationService.show('Nova mensagem recebida!', 'info');
+      }
+      this.qteMensagensAnterior = total;
+      this.temNovasMensagens = total > 0;
+    });
+  }
+
+  atualizarBadgeNotificacoes() {
+    const lidas = JSON.parse(localStorage.getItem('notificacoes_lidas') || '[]');
+    const todas = [1, 2]; // IDs das notificações fixas
+    this.quantidadeNotificacoes = todas.filter(id => !lidas.includes(id)).length;
+  }
+
   abrirNotificacoes(origem: HTMLElement) {
-    this.quantidadeNotificacoes = 0; // Limpa ao abrir
-    const opcoes: CaixaboxOption[] = [
-      { label: 'Você tem uma nova venda', value: 'venda', icon: 'fa fa-cart-plus' },
-      { label: 'Relatório mensal disponível', value: 'relatorio', icon: 'fa fa-file' },
-      { label: 'Ver todas', value: 'todas' }
+    const lidas = JSON.parse(localStorage.getItem('notificacoes_lidas') || '[]');
+    const opcoesFixas = [
+      { id: 1, label: 'Você tem uma nova venda', value: 'venda', icon: 'fa fa-cart-plus' },
+      { id: 2, label: 'Relatório mensal disponível', value: 'relatorio', icon: 'fa fa-file' }
     ];
 
-    this.caixabox.exibir(origem, opcoes).subscribe(acao => {
-      if (acao) console.log('Notificação clicada:', acao);
+    const filtradas = opcoesFixas.filter(opt => !lidas.includes(opt.id));
+
+    this.caixabox.exibir(origem, filtradas).subscribe(acao => {
+      if (acao) {
+        const selecionada = filtradas.find(f => f.value === acao);
+        if (selecionada) {
+          lidas.push(selecionada.id);
+          localStorage.setItem('notificacoes_lidas', JSON.stringify(lidas));
+          this.atualizarBadgeNotificacoes();
+        }
+      }
     });
   }
 
   abrirMensagens(origem: HTMLElement) {
-    this.temNovasMensagens = false; // Limpa ao abrir
-    const opcoes: CaixaboxOption[] = [
-      { label: 'Suporte Orion: Olá!', value: 'msg_1', icon: 'fa fa-comment' },
-      { label: 'Nova mensagem do Admin', value: 'msg_2', icon: 'fa fa-comment' }
-    ];
+    this.mensagemService.buscarPendentes().subscribe(msgs => {
+      const opcoes: CaixaboxOption[] = msgs.map(m => ({
+        label: `${m.remetente}: ${m.conteudo}`,
+        value: m.remetente,
+        icon: 'fa fa-comment'
+      }));
 
-    this.caixabox.exibir(origem, opcoes).subscribe(acao => {
-      if (acao) console.log('Mensagem selecionada:', acao);
+      if (opcoes.length === 0) opcoes.push({ label: 'Nenhuma mensagem nova', value: '' });
+
+      this.caixabox.exibir(origem, opcoes).subscribe(remetente => {
+        if (remetente) {
+          // Redireciona para o chat com o parâmetro do usuário
+          this.router.navigate(['/chat'], { queryParams: { usuario: remetente } });
+          this.temNovasMensagens = false;
+        }
+      });
     });
   }
 
   abrirMenuPerfil(origem: HTMLElement) {
     const opcoes: CaixaboxOption[] = [
       { label: 'Meu Perfil', value: 'perfil', icon: 'fa fa-user' },
-      { label: 'Configurações', value: 'config', icon: 'fa fa-cog' },
-      { label: 'Sair do Sistema', value: 'logout', icon: 'fa fa-sign-out' }
+      { label: 'Sair', value: 'logout', icon: 'fa fa-sign-out' }
     ];
-
     this.caixabox.exibir(origem, opcoes).subscribe(acao => {
-      if (acao === 'logout') {
-        this.executarLogout();
-      } else if (acao === 'perfil') {
-        this.router.navigate(['/perfil']);
-      }
+      if (acao === 'logout') { this.authService.logout(); this.router.navigate(['/login']); }
+      else if (acao === 'perfil') this.router.navigate(['/perfil']);
     });
-  }
-
-  private executarLogout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

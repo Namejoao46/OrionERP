@@ -5,11 +5,13 @@
       <div class="contato-item" *ngFor="let user of usuarios" 
            (click)="selecionarUsuario(user)" 
            [class.active]="usuarioSelecionado?.username === user.username">
-        <div class="avatar-circle">
+        
+        <div class="avatar-circle" [class.offline-avatar]="!user.online">
           <img *ngIf="user.foto" [src]="user.foto" class="avatar-img">
           <span *ngIf="!user.foto">{{ user.nome?.charAt(0)?.toUpperCase() || '?' }}</span>
           <span class="status-dot" [style.background]="user.online ? '#00ff88' : '#666'"></span>
         </div>
+
         <div class="contato-info">
           <span class="nome">{{ user.nome }}</span>
           <span class="preview">{{ user.cargo || 'Equipe Orion' }}</span>
@@ -27,7 +29,9 @@
         </div>
         <div>
           <span class="header-name">{{ usuarioSelecionado.nome }}</span>
-          <small class="header-status">Online</small>
+          <small class="header-status" [ngClass]="usuarioSelecionado.online ? 'status-online' : 'status-offline'">
+            {{ usuarioSelecionado.online ? 'Online' : 'Offline' }}
+          </small>
         </div>
       </div>
     </header>

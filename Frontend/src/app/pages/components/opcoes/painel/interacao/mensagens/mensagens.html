@@ -1,21 +1,21 @@
 <div class="conteiner">
-    <div class="conteiner_mensagens">
-        <h2 class="mensagens-title">Ultimas mensagens</h2>
+  <div class="conteiner_mensagens">
+    <h2 class="mensagens-title">Últimas mensagens pendentes</h2>
 
-        <div class="card-pessoa">
-            <img src="/Frontend/src/assets/perfil.png" alt="João Paulo" class="avatar">
-            <div class="pessoa-text">
-                <span class="nome">João Paulo</span>
-                <p class="mensagem">Tivemos problemas na revisão de um app, mas ja estamos avaliando...</p>
-            </div>
+    <div class="card-pessoa" *ngFor="let item of ultimasMensagens" [routerLink]="['/chat', item.login]">
+      <img [src]="item.foto" [alt]="item.nome" class="avatar">
+      
+      <div class="pessoa-text">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="nome">{{ item.nome }}</span>
+            <small style="color: #888; font-size: 11px;">{{ item.data | date:'HH:mm' }}</small>
         </div>
-
-        <div class="card-pessoa">
-            <img src="/Frontend/src/assets/perfil.png" alt="Jenifer" class="avatar">
-            <div class="pessoa-text">
-                <span class="nome">Jenifer Montalvão</span>
-                <p class="mensagem">Tive problemas na hora de lançar as modificações, mas ja estou resolvendo.</p>
-            </div>
-        </div>
+        <p class="mensagem">{{ item.conteudo }}</p>
+      </div>
     </div>
+
+    <div *ngIf="ultimasMensagens.length === 0" style="color: #666; text-align: center; margin-top: 20px;">
+        Nenhuma nova mensagem por aqui.
+    </div>
+  </div>
 </div>

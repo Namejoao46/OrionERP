@@ -88,6 +88,18 @@
   flex-shrink: 0;
 }
 
+/* Deixa o avatar levemente escurecido se estiver offline na lista lateral */
+.offline-avatar {
+  filter: grayscale(0.8) opacity(0.7);
+  border-color: #444 !important;
+}
+
+/* Estilo para quando passar o mouse no contato offline (volta a cor) */
+.contato-item:hover .offline-avatar {
+  filter: none;
+  opacity: 1;
+}
+
 .avatar-img {
   width: 100%;
   height: 100%;
@@ -165,7 +177,15 @@
 
 .header-status {
   font-size: 11px;
-  color: #00ff88;
+font-weight: 500;
+}
+
+.status-online {
+  color: #00ff88 !important;
+}
+
+.status-offline {
+  color: #8899a6 !important;
 }
 
 /* ==========================================================================

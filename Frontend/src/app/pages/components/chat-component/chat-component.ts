@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router'; // Importante!
 import { MensagemService } from '../../../core/services/mensagem.service';
 import { ColaboradorService } from '../../../core/services/colaborador.service';
 
@@ -21,20 +22,29 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   constructor(
     private mensagemService: MensagemService,
-    private colaboradorService: ColaboradorService
+    private colaboradorService: ColaboradorService,
+    private route: ActivatedRoute // Injetado
   ) {}
 
   ngOnInit(): void {
     this.carregarUsuarios();
+    
+    // Captura o usuário da URL (ex: /chat?usuario=leandro)
+    this.route.queryParams.subscribe(params => {
+      const loginUrl = params['usuario'];
+      if (loginUrl) {
+        // Aguarda um pouco os usuários carregarem e seleciona
+        setTimeout(() => {
+          const user = this.usuarios.find(u => u.username === loginUrl);
+          if (user) this.selecionarUsuario(user);
+        }, 500);
+      }
+    });
   }
 
-  ngAfterViewChecked() {        
-    this.scrollToBottom();        
-  } 
+  ngAfterViewChecked() { this.scrollToBottom(); }
 
-  get meuUsername(): string {
-    return localStorage.getItem('username') || '';
-  }
+  get meuUsername(): string { return localStorage.getItem('username') || ''; }
 
   carregarUsuarios(): void {
     this.mensagemService.listarUsuarios().subscribe({
@@ -42,13 +52,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         this.usuarios = data.map(colab => ({
           username: colab.login,
           nome: colab.nome,
-          // Converte o array de bytes da foto para uma URL base64 que o <img> entende
           foto: colab.foto ? 'data:image/jpeg;base64,' + colab.foto : null,
           cargo: colab.cargo,
-          online: true 
+          online: colab.online || false 
         }));
-      },
-      error: (err: any) => console.error('Erro ao listar contatos', err)
+      }
     });
   }
 
@@ -67,8 +75,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
           data: msg.dataEnvio,
           enviadaPorMim: String(msg.remetente).toLowerCase() === this.meuUsername.toLowerCase()
         }));
-      },
-      error: (err: any) => console.error('Erro ao buscar mensagens', err)
+      }
     });
   }
 
@@ -78,20 +85,16 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       next: () => {
         this.mensagens.push({
           remetente: this.meuUsername,
-          conteudo: this.novaMensagem,
           mensagem: this.novaMensagem,
           enviadaPorMim: true,
-          dataEnvio: new Date()
+          data: new Date()
         });
         this.novaMensagem = '';
-      },
-      error: (err: any) => console.error('Erro ao enviar', err)
+      }
     });
   }
 
   private scrollToBottom(): void {
-    try {
-      this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
-    } catch(err) { }                 
+    try { this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight; } catch(err) { }
   }
 }

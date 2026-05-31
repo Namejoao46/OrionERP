@@ -97,14 +97,22 @@ public class MensagemController {
             return ResponseEntity.badRequest().body(Map.of("erro", "Erro ao atualizar"));
         }
     }
+    
+    @GetMapping("/contar-nao-lidas")
+    public ResponseEntity<Long> contarMensagensNaoLidas(Principal principal) {
+        if (principal == null) return ResponseEntity.status(401).build();
+        
+        String destinatario = principal.getName();
+        long totalNaoLidas = mensagemRepository.countByDestinatarioAndStatus(destinatario, "NAO_LIDA");
+        
+        return ResponseEntity.ok(totalNaoLidas);
+    }
 
-    // Listar todos os usuários exceto o logado
     @GetMapping("/usuarios")
     public ResponseEntity<?> listarUsuarios(Principal principal) {
         String usuarioLogado = principal.getName();
         List<Colaborador> todos = colaboradorRepository.findAll();
         
-        // Filtra para remover você mesmo da lista, mas retorna o objeto Colaborador inteiro
         List<Colaborador> filtrados = todos.stream()
                 .filter(c -> !c.getLogin().equals(usuarioLogado))
                 .toList();
@@ -119,6 +127,14 @@ public class MensagemController {
         conversa.addAll(mensagemRepository.findByRemetenteAndDestinatario(contato, usuarioLogado));
         conversa.sort(Comparator.comparing(Mensagem::getDataEnvio));
         return ResponseEntity.ok(conversa);
+    }
+
+    @GetMapping("/recentes")
+    public ResponseEntity<?> buscarTodasMensagens(Principal principal) {
+        String destinatario = principal.getName();
+        // Busca todas as mensagens para você, da mais nova para a mais antiga
+        List<Mensagem> historico = mensagemRepository.findByDestinatarioOrderByDataEnvioDesc(destinatario);
+        return ResponseEntity.ok(historico);
     }
 
 }

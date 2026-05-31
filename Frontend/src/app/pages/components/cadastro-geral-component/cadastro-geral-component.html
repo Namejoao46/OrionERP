@@ -3,17 +3,26 @@
   <div *ngIf="roleLogado === 'ADMIN_DEV'">
     <h2>Dados da Nova Empresa</h2>
     <div class="form-group">
-      <input [(ngModel)]="empresa.nomeFantasia" placeholder="Nome Fantasia">
-      <input [(ngModel)]="empresa.cnpj" placeholder="CNPJ">
+      <input [(ngModel)]="empresa.nomeFantasia" name="nomeFantasia" placeholder="Nome Fantasia">
+      <input [(ngModel)]="empresa.cnpj" name="cnpj" placeholder="CNPJ (apenas números)">
+      <select [(ngModel)]="empresa.plano" name="plano" class="custom-select">
+        <option value="Basico">Plano Básico</option>
+        <option value="Premium">Plano Premium</option>
+      </select>
     </div>
   </div>
 
   <h2>Dados do {{ roleLogado === 'ADMIN_DEV' ? 'Usuário Master' : 'Novo Colaborador' }}</h2>
   <div class="form-group">
-    <input [(ngModel)]="usuario.nome" placeholder="Nome Completo">
-    <input [(ngModel)]="usuario.login" placeholder="Login (E-mail)">
-    <input [(ngModel)]="usuario.senha" type="password" placeholder="Senha">
+    <input [(ngModel)]="usuario.nome" name="nome" placeholder="Nome Completo">
+    <input [(ngModel)]="usuario.login" name="login" placeholder="Login (E-mail)">
+    <input [(ngModel)]="usuario.senha" name="senha" type="password" placeholder="Senha">
     
+    <ng-container *ngIf="roleLogado === 'MASTER'">
+      <input [(ngModel)]="usuario.cargo" name="cargo" placeholder="Cargo">
+      <input [(ngModel)]="usuario.matricula" name="matricula" placeholder="Matrícula">
+    </ng-container>
+
     <button class="btn-salvar" (click)="salvar()">Salvar Cadastro</button>
   </div>
 

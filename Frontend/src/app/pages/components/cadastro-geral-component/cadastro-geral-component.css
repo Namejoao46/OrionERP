@@ -6,7 +6,7 @@
 }
 
 h2 {
-    color: #fff; /* Azul mais claro para destaque */
+    color: #fff;
     margin-bottom: 20px;
     font-weight: 500;
     border-left: 4px solid #4da3ff;
@@ -20,15 +20,15 @@ h2 {
     flex-wrap: wrap;
     gap: 15px;
     margin-bottom: 40px;
-    background: rgba(255, 255, 255, 0.03); /* Efeito sutil de fundo */
+    background: rgba(255, 255, 255, 0.03);
     padding: 20px;
     border-radius: 8px;
 }
 
-/* Estilização dos Inputs */
-input {
+/* Estilização dos Inputs e Select */
+input, .custom-select {
     flex: 1;
-    min-width: 200px;
+    min-width: 250px; /* Aumentado levemente para acomodar melhor os textos */
     padding: 12px 15px;
     background: #1a1a1a;
     border: 1px solid #333;
@@ -38,7 +38,7 @@ input {
     transition: all 0.3s ease;
 }
 
-input:focus {
+input:focus, .custom-select:focus {
     outline: none;
     border-color: #4da3ff;
     box-shadow: 0 0 8px rgba(77, 163, 255, 0.3);
@@ -54,7 +54,7 @@ input::placeholder {
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 12px 30px;
+    padding: 12px 40px; /* Um pouco mais largo */
     border-radius: 5px;
     font-weight: bold;
     cursor: pointer;
@@ -62,7 +62,8 @@ input::placeholder {
     letter-spacing: 1px;
     transition: background 0.3s, transform 0.2s;
     display: block;
-    margin-top: 20px;
+    margin-top: 10px;
+    width: 100%; /* Botão ocupa a largura total no mobile ou final da linha */
 }
 
 .btn-salvar:hover {
@@ -72,4 +73,13 @@ input::placeholder {
 
 .btn-salvar:active {
     transform: translateY(0);
+}
+
+/* Ajuste para o Select herdar cores */
+.custom-select {
+    cursor: pointer;
+}
+.custom-select option {
+    background: #1a1a1a;
+    color: #fff;
 }

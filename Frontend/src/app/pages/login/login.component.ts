@@ -21,24 +21,22 @@ export class LoginComponent {
     private cdr: ChangeDetectorRef 
   ) {}
   
-  entrar() {
+entrar() {
     this.authService.login(this.login, this.senha).subscribe({
       next: (res: any) => {
-        // ESTE LOG É A CHAVE DE TUDO
-        console.log('--- RESPOSTA DO SERVIDOR ---');
-        console.log(res); 
-        console.log('---------------------------');
+        console.log('--- RESPOSTA DO SERVIDOR ---', res);
 
         if (res.token) {
-          // Se no console o campo não for 'role', mude aqui embaixo:
-          this.authService.setUserData(res.token, res.nome, res.foto, this.login, res.role);
+          this.authService.setUserData(res);
 
           this.router.navigate(['/home']);
         }
       },
       error: (err: any) => {
         console.error('Erro no login:', err);
-        alert('Erro na conexão');
+
+        const mensagem = err.error?.erro || 'Usuário ou senha inválidos';
+        alert(mensagem);
       }
     });
   }

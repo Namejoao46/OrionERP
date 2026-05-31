@@ -11,25 +11,17 @@ export class ColaboradorService {
 
   constructor(private http: HttpClient) { }
 
-  /**
-   * Cria o cabeçalho com o Token para o SecurityFilter do Java aceitar a requisição
-   */
-  private getOptions() {
-    const token = localStorage.getItem('token');
-    return {
-      headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}`
-      })
-    };
+  listarEquipe(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/equipe`);
   }
 
-  listarTodos(): Observable<any[]> {
-    // Agora enviamos as opções com o cabeçalho de segurança
-    return this.http.get<any[]>(this.apiUrl, this.getOptions());
+  uploadFoto(id: number, foto: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('foto', foto);
+    return this.http.post(`${this.apiUrl}/${id}/upload-foto`, formData, { responseType: 'text' });
   }
 
-  // Útil para quando o Master for cadastrar um colaborador
   cadastrar(colaborador: any): Observable<any> {
-    return this.http.post(this.apiUrl, colaborador, this.getOptions());
+    return this.http.post(`${this.apiUrl}/cadastrar`, colaborador);
   }
 }

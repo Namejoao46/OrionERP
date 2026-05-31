@@ -14,9 +14,9 @@ import { RouterModule } from '@angular/router';
   styleUrl: './cadastro-geral-component.css',
 })
 export class CadastroGeralComponent implements OnInit {
-  // Modelos de dados
+  // Modelos de dados limpos para o binding
   empresa = { nomeFantasia: '', cnpj: '', plano: 'Basico' };
-  usuario = { login: '', senha: '', nome: '', role: '', cargo: '', matricula: '' };
+  usuario = { login: '', senha: '', nome: '', cargo: '', matricula: '' };
   
   roleLogado: string = '';
 
@@ -27,7 +27,6 @@ export class CadastroGeralComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Pega a role de quem está usando o sistema agora
     this.roleLogado = this.authService.getRole(); 
   }
 
@@ -39,35 +38,53 @@ export class CadastroGeralComponent implements OnInit {
     }
   }
 
-  // Lógica para o Super Admin
   private cadastrarEmpresaEMaster() {
+    // 1. Cria a empresa primeiro
     this.empresaService.cadastrar(this.empresa).subscribe({
       next: (empresaCriada: any) => {
+        // 2. Com o ID da empresa, registra o usuário como MASTER
         const payloadMaster = { 
           ...this.usuario, 
           role: 'MASTER', 
           empresa: { id: empresaCriada.id } 
         };
-        this.enviarRequisicao(payloadMaster, 'Empresa e Master criados!');
-      }
+        this.enviarRequisicaoAuth(payloadMaster, 'Empresa e Usuário Master criados com sucesso!');
+      },
+      error: (err) => alert('Erro ao cadastrar empresa: ' + (err.error?.erro || err.message))
     });
   }
 
-  // Lógica para o Master (Funcionário herda a empresa do Master)
   private cadastrarColaborador() {
-    const dadosMaster = this.authService.getUsuarioLogado(); // Pega dados do Master que está logado
+    const dadosLogado = this.authService.getUsuarioLogado();
+    
     const payloadColab = { 
       ...this.usuario, 
-      role: 'COLABORADOR', 
-      empresa: { id: dadosMaster.empresa.id } 
+      role: 'FUNCIONARIO', // Ou 'COLABORADOR' conforme seu Enum no Java
+      empresa: { id: dadosLogado.empresa.id } 
     };
-    this.enviarRequisicao(payloadColab, 'Colaborador cadastrado com sucesso!');
+
+    // Para gestão de equipe, usamos o endpoint de colaboradores (GestaoService no Java)
+    this.http.post('http://localhost:8080/api/colaboradores/cadastrar', payloadColab).subscribe({
+      next: () => {
+        alert('Colaborador adicionado à sua equipe!');
+        this.limparFormulario();
+      },
+      error: (err) => alert('Erro ao cadastrar colaborador: ' + (err.error || err.message))
+    });
   }
 
-  private enviarRequisicao(payload: any, mensagem: string) {
+  private enviarRequisicaoAuth(payload: any, mensagem: string) {
     this.http.post('http://localhost:8080/api/auth/registrar', payload).subscribe({
-      next: () => alert(mensagem),
-      error: (err) => console.error('Erro no cadastro:', err)
+      next: () => {
+        alert(mensagem);
+        this.limparFormulario();
+      },
+      error: (err) => alert('Erro no registro: ' + (err.error?.erro || 'Verifique os dados'))
     });
+  }
+
+  private limparFormulario() {
+    this.usuario = { login: '', senha: '', nome: '', cargo: '', matricula: '' };
+    this.empresa = { nomeFantasia: '', cnpj: '', plano: 'Basico' };
   }
 }

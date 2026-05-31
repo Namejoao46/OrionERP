@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,63 +8,67 @@ import { Observable, BehaviorSubject } from 'rxjs';
 export class AuthService {
   private apiUrl = 'http://localhost:8080/api/auth';
 
+  // Subjects para reagir a mudanças de estado em tempo real no app
   private tokenSubject = new BehaviorSubject<string | null>(localStorage.getItem('token'));
   private userNameSubject = new BehaviorSubject<string | null>(localStorage.getItem('userName'));
   private userImageSubject = new BehaviorSubject<string | null>(localStorage.getItem('userImage'));
   private userRoleSubject = new BehaviorSubject<string | null>(localStorage.getItem('userRole'));
 
+  // Observables para os componentes assinarem
   token$ = this.tokenSubject.asObservable();
   userName$ = this.userNameSubject.asObservable();
   userImage$ = this.userImageSubject.asObservable();
   userRole$ = this.userRoleSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    console.log('AuthService iniciado. Role carregada:', this.userRoleSubject.value);
+  constructor(private http: HttpClient) {}
+
+  login(login: string, senha: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, { login, senha }).pipe(
+      tap(res => {
+        // Ao logar, já salvamos os dados automaticamente
+        this.setUserData(res);
+      })
+    );
+  }
+
+  setUserData(dados: any) {
+    // Salva no LocalStorage para persistir após F5
+    localStorage.setItem('token', dados.token);
+    localStorage.setItem('userName', dados.nome);
+    localStorage.setItem('userRole', dados.role);
+    
+    // Importante: Salvando o ID da empresa vindo do back
+    if (dados.empresaId) {
+      localStorage.setItem('empresaId', dados.empresaId.toString());
+    }
+
+    if (dados.foto) {
+      const fotoLimpa = dados.foto.replace(/\s/g, '');
+      localStorage.setItem('userImage', fotoLimpa);
+      this.userImageSubject.next(fotoLimpa);
+    }
+
+    // Notifica todos os componentes interessados
+    this.tokenSubject.next(dados.token);
+    this.userNameSubject.next(dados.nome);
+    this.userRoleSubject.next(dados.role);
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.tokenSubject.value;
   }
 
   getRole(): string {
     return this.userRoleSubject.value || '';
   }
 
-  // Método que estava faltando no erro do terminal
   getUsuarioLogado(): any {
     return {
       token: this.tokenSubject.value,
       nome: this.userNameSubject.value,
       role: this.userRoleSubject.value,
-      empresa: { id: localStorage.getItem('empresaId') } 
+      empresaId: localStorage.getItem('empresaId')
     };
-  }
-
-  login(login: string, senha: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, { login, senha });
-  }
-
-  // ADICIONE ESTE MÉTODO AQUI:
-  isAuthenticated(): boolean {
-    // Retorna true se houver um token, false se não houver
-    return !!this.tokenSubject.value;
-  }
-
-  setUserData(token: string, nome: string, foto: string | null, login: string, role: string) {
-
-    localStorage.setItem('token', token);
-    localStorage.setItem('userName', nome);
-    localStorage.setItem('username', login);
-    localStorage.setItem('userRole', role);
-
-    if (foto) {
-      const fotoLimpa = foto.replace(/\s/g, '');
-      localStorage.setItem('userImage', fotoLimpa);
-      this.userImageSubject.next(fotoLimpa);
-    } else {
-      localStorage.removeItem('userImage');
-      this.userImageSubject.next(null);
-    }
-
-    this.tokenSubject.next(token);
-    this.userNameSubject.next(nome);
-    this.userRoleSubject.next(role);
   }
 
   logout() {

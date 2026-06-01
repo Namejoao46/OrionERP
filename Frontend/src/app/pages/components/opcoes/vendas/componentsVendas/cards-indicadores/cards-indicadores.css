@@ -1,0 +1,51 @@
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.card {
+  background: linear-gradient(135deg, #09172a 0%, #0e223d 100%);
+  border: 1px solid #162e4e;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.titulo {
+  font-size: 11px;
+  font-weight: 600;
+  color: #7a92b3;
+  letter-spacing: 0.5px;
+}
+
+.card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.card-body h2 {
+  font-size: 20px;
+  margin: 0;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.badge.positivo {
+  background-color: rgba(46, 213, 115, 0.15);
+  color: #2ed573;
+}
+
+.badge.negativo {
+  background-color: rgba(255, 71, 87, 0.15);
+  color: #ff4757;
+}

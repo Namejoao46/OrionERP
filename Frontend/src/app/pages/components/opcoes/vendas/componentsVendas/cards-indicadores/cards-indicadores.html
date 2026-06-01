@@ -1,0 +1,13 @@
+<div class="cards-container">
+  <div class="card" *ngFor="let card of cards">
+    <div class="card-header">
+      <span class="titulo">{{ card.titulo }}</span>
+    </div>
+    <div class="card-body">
+      <h2>{{ card.isCount ? card.valor : (card.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR') }}</h2>
+      <span class="badge" [ngClass]="card.positivo ? 'positivo' : 'negativo'">
+        {{ card.porcentagem }}
+      </span>
+    </div>
+  </div>
+</div>

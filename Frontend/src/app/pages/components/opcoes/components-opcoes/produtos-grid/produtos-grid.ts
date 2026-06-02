@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ProdutoService } from '../../../../../core/services/Produto.service';
 
 @Component({
   selector: 'app-produtos-grid',
@@ -9,14 +10,34 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './produtos-grid.html',
   styleUrl: './produtos-grid.css',
 })
-export class ProdutosGrid {
-  @Input() produtos: any[] = [];
-
+export class ProdutosGrid implements OnInit {
+  produtos: any[] = [];
   termoBusca: string = '';
 
+  private produtoService = inject(ProdutoService);
+
+  ngOnInit() {
+    this.carregarEstoque();
+  }
+
+  carregarEstoque() {
+    // Tipamos o subscribe para evitar o erro "Object is of type unknown"
+    this.produtoService.listarTodos().subscribe({
+      next: (dados: any[]) => {
+        this.produtos = dados;
+      },
+      error: (err: any) => {
+        console.error('Erro ao carregar produtos:', err);
+      }
+    });
+  }
+
   get produtosFiltrados() {
-    return this.produtos.filter(p => 
-      p.nome.toLowerCase().includes(this.termoBusca.toLowerCase())
+    if (!this.termoBusca) return this.produtos;
+    const termo = this.termoBusca.toLowerCase();
+    return this.produtos.filter((p: any) => 
+      p.nome.toLowerCase().includes(termo) || 
+      p.id.toString().includes(termo)
     );
   }
 }

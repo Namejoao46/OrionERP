@@ -3,7 +3,11 @@
     <h1>Estoque de Produtos</h1>
     <div class="busca-box">
       <span style="color: #00c3ff;">🔍</span>
-      <input type="text" [(ngModel)]="termoBusca" placeholder="Pesquisar por nome ou código...">
+      <input 
+        type="text" 
+        [(ngModel)]="termoBusca" 
+        placeholder="Pesquisar por nome ou código..."
+      >
     </div>
   </div>
 
@@ -31,4 +35,8 @@
       </tr>
     </tbody>
   </table>
+
+  <div *ngIf="produtosFiltrados.length === 0 && produtos.length > 0" style="color: gray; padding: 20px; text-align: center;">
+    Nenhum produto encontrado para "{{termoBusca}}"
+  </div>
 </div>

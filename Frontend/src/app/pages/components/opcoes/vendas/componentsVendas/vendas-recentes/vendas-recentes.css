@@ -1,0 +1,58 @@
+.tabela-box {
+  background: linear-gradient(135deg, #071324 0%, #0b192c 100%);
+  border: 1px solid #14253d;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.box-title {
+  font-size: 14px;
+  color: #ffffff;
+  margin: 0 0 15px 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th {
+  font-size: 11px;
+  color: #7a92b3;
+  padding: 10px;
+  border-bottom: 1px solid #14253d;
+  font-weight: 500;
+}
+
+td {
+  padding: 12px 10px;
+  font-size: 12px;
+  color: #ffffff;
+  border-bottom: 1px solid #0f1f35;
+}
+
+.id-pedido { color: #7a92b3; }
+.valor-td { font-weight: 600; }
+.data-td { color: #7a92b3; }
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-badge.fechada { background: #10ac84; color: #fff; }
+.status-badge.em-andamento { background: #2e86de; color: #fff; }
+.status-badge.em-negociação { background: #ff9f43; color: #fff; }
+.status-badge.atrasada { background: #ee5253; color: #fff; }
+
+.ver-todas {
+  text-align: center;
+  font-size: 11px;
+  color: #0088ff;
+  margin-top: 15px;
+  cursor: pointer;
+}

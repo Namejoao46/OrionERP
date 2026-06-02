@@ -1,1 +1,34 @@
-<p>vendas-recentes works!</p>
+<div class="tabela-box">
+  <h3 class="box-title">Vendas Recentes</h3>
+  <div class="responsive-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Nº Pedido</th>
+          <th>Cliente</th>
+          <th>Vendedor</th>
+          <th>Valor</th>
+          <th>Status</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let venda of vendas">
+          <td class="id-pedido">{{ venda.id }}</td>
+          <td>{{ venda.cliente }}</td>
+          <td>{{ venda.vendedor }}</td>
+          <td class="valor-td">{{ venda.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(venda.status)">
+              {{ venda.status }}
+            </span>
+          </td>
+          <td class="data-td">{{ venda.data }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ver-todas">
+    Ver todas as vendas ➔
+  </div>
+</div>

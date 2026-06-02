@@ -1,1 +1,24 @@
-<p>metas-vendas works!</p>
+<div class="meta-box">
+  <h3 class="box-title">Metas de Vendas</h3>
+  <div class="meta-content">
+    <div class="progress-circle">
+      <div class="circle-inner">
+        <span>{{ porcentagem }}%</span>
+      </div>
+    </div>
+    <div class="meta-dados">
+      <div class="dado-row">
+        <span class="label">Meta do mês</span>
+        <span class="valor font-destaque">{{ metaMes | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+      </div>
+      <div class="dado-row">
+        <span class="label">Realizados</span>
+        <span class="valor">{{ realizados | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+      </div>
+      <div class="dado-row">
+        <span class="label">Faltam</span>
+        <span class="valor color-alerta">{{ faltam | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+      </div>
+    </div>
+  </div>
+</div>

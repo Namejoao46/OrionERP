@@ -1,0 +1,49 @@
+.resumo-box {
+  background: linear-gradient(135deg, #071324 0%, #0b192c 100%);
+  border: 1px solid #14253d;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.box-title {
+  font-size: 14px;
+  color: #ffffff;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.grid-resumo {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.resumo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-placeholder {
+  font-size: 20px;
+  background: #14253d;
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.valor {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.label {
+  font-size: 12px;
+  color: #7a92b3;
+  margin-top: 2px;
+}

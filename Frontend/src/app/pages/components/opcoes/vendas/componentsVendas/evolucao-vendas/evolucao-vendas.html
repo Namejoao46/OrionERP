@@ -1,1 +1,38 @@
-<p>evolucao-vendas works!</p>
+<div class="grafico-box">
+  <div class="grafico-header">
+    <h3 class="box-title">Evolução das Vendas</h3>
+    <div class="toggle-periodo">
+      <button [class.active]="periodoSelecionado === 'diario'">Diário</button>
+      <button [class.active]="periodoSelecionado === 'semanal'">Semanal</button>
+      <button [class.active]="periodoSelecionado === 'mensal'">Mensal</button>
+    </div>
+  </div>
+  
+  <div class="chart-container">
+    <div class="eixo-y">
+      <span>R$ 30k</span>
+      <span>R$ 25k</span>
+      <span>R$ 20k</span>
+      <span>R$ 15k</span>
+      <span>R$ 10k</span>
+      <span>R$ 0</span>
+    </div>
+    <div class="svg-wrapper">
+      <svg viewBox="0 0 500 150" class="chart-svg">
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#0088ff" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#0088ff" stop-opacity="0.0"/>
+          </linearGradient>
+        </defs>
+        <line x1="0" y1="25" x2="500" y2="25" stroke="#14253d" stroke-width="1"/>
+        <line x1="0" y1="55" x2="500" y2="55" stroke="#14253d" stroke-width="1"/>
+        <line x1="0" y1="85" x2="500" y2="85" stroke="#14253d" stroke-width="1"/>
+        <line x1="0" y1="115" x2="500" y2="115" stroke="#14253d" stroke-width="1"/>
+        
+        <path d="M 0 150 L 0 120 Q 30 60 50 80 T 120 70 T 190 110 T 250 70 T 320 100 T 400 70 T 470 110 L 500 70 L 500 150 Z" fill="url(#gradient)"/>
+        <path d="M 0 120 Q 30 60 50 80 T 120 70 T 190 110 T 250 70 T 320 100 T 400 70 T 470 110 L 500 70" fill="none" stroke="#0088ff" stroke-width="3"/>
+      </svg>
+    </div>
+  </div>
+</div>

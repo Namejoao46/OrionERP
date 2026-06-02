@@ -1,0 +1,27 @@
+.dashboard-container {
+  background-color: #030a16; /* Cor escura de fundo do print */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.dashboard-section {
+  width: 100%;
+}
+
+.dashboard-grid-duplo {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Esquerda larga, direita estreita */
+  gap: 20px;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-grid-duplo {
+    grid-template-columns: 1fr; /* Responsivo para telas menores */
+  }
+}

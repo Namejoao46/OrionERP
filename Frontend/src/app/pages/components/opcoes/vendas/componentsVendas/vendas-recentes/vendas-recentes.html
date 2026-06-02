@@ -1,34 +1,37 @@
 <div class="tabela-box">
-  <h3 class="box-title">Vendas Recentes</h3>
+  <div class="tabela-header">
+    <h3 class="box-title">Vendas Recentes</h3>
+    <div class="busca-mock">
+      <input type="text" placeholder="Pesquisar por nome ou código..." class="input-busca">
+    </div>
+  </div>
+  
   <div class="responsive-table">
     <table>
       <thead>
         <tr>
-          <th>Nº Pedido</th>
-          <th>Cliente</th>
-          <th>Vendedor</th>
-          <th>Valor</th>
-          <th>Status</th>
-          <th>Data</th>
+          <th>CÓDIGO</th>
+          <th>CLIENTE</th>
+          <th>VENDEDOR</th>
+          <th>VALOR</th>
+          <th>STATUS</th>
+          <th>DATA</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let venda of vendas">
-          <td class="id-pedido">{{ venda.id }}</td>
-          <td>{{ venda.cliente }}</td>
+          <td class="txt-azul-link">{{ venda.id }}</td>
+          <td class="txt-branco">{{ venda.cliente }}</td>
           <td>{{ venda.vendedor }}</td>
-          <td class="valor-td">{{ venda.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+          <td class="txt-branco">{{ venda.valor | currency:'BRL' }}</td>
           <td>
             <span class="status-badge" [ngClass]="getStatusClass(venda.status)">
-              {{ venda.status }}
+              {{ venda.status | uppercase }}
             </span>
           </td>
-          <td class="data-td">{{ venda.data }}</td>
+          <td>{{ venda.data }}</td>
         </tr>
       </tbody>
     </table>
-  </div>
-  <div class="ver-todas">
-    Ver todas as vendas ➔
   </div>
 </div>

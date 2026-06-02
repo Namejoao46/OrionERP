@@ -1,58 +1,94 @@
 .tabela-box {
-  background: linear-gradient(135deg, #071324 0%, #0b192c 100%);
-  border: 1px solid #14253d;
-  border-radius: 12px;
-  padding: 20px;
+  background-color: #060b15;
+  border: 1px solid #101726;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.tabela-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .box-title {
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 600;
   color: #ffffff;
-  margin: 0 0 15px 0;
+  margin: 0;
+}
+
+.input-busca {
+  background-color: #0b1120;
+  border: 1px solid #141c2f;
+  border-radius: 20px;
+  padding: 6px 16px;
+  color: #ffffff;
+  font-size: 12px;
+  width: 220px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
 }
 
 th {
   font-size: 11px;
-  color: #7a92b3;
-  padding: 10px;
-  border-bottom: 1px solid #14253d;
-  font-weight: 500;
+  color: #566681;
+  font-weight: 600;
+  padding: 12px 8px;
+  text-align: left;
+  border-bottom: 1px solid #101726;
 }
 
 td {
-  padding: 12px 10px;
+  padding: 16px 8px;
   font-size: 12px;
-  color: #ffffff;
-  border-bottom: 1px solid #0f1f35;
+  color: #94a3b8;
+  border-bottom: 1px solid #101726;
 }
 
-.id-pedido { color: #7a92b3; }
-.valor-td { font-weight: 600; }
-.data-td { color: #7a92b3; }
+.txt-azul-link {
+  color: #0066ff;
+  font-weight: 600;
+}
+
+.txt-branco {
+  color: #ffffff;
+  font-weight: 500;
+}
 
 .status-badge {
+  font-size: 9px;
+  font-weight: 700;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 10px;
-  font-weight: 600;
   display: inline-block;
 }
 
-.status-badge.fechada { background: #10ac84; color: #fff; }
-.status-badge.em-andamento { background: #2e86de; color: #fff; }
-.status-badge.em-negociação { background: #ff9f43; color: #fff; }
-.status-badge.atrasada { background: #ee5253; color: #fff; }
+/* Batendo certinho com o "EM DIA", "BAIXO ESTOQUE" do seu print */
+.status-badge.fechada {
+  background-color: rgba(0, 191, 113, 0.1);
+  color: #00bf71;
+  border: 1px solid rgba(0, 191, 113, 0.2);
+}
 
-.ver-todas {
-  text-align: center;
-  font-size: 11px;
-  color: #0088ff;
-  margin-top: 15px;
-  cursor: pointer;
+.status-badge.em-andamento {
+  background-color: rgba(0, 102, 255, 0.1);
+  color: #0066ff;
+  border: 1px solid rgba(0, 102, 255, 0.2);
+}
+
+.status-badge.em-negociação {
+  background-color: rgba(255, 159, 67, 0.1);
+  color: #ff9f43;
+  border: 1px solid rgba(255, 159, 67, 0.2);
+}
+
+.status-badge.atrasada {
+  background-color: rgba(255, 51, 102, 0.1);
+  color: #ff3366;
+  border: 1px solid rgba(255, 51, 102, 0.2);
 }

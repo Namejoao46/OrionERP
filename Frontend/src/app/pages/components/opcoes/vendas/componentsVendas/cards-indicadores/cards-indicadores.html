@@ -1,13 +1,19 @@
 <div class="cards-container">
   <div class="card" *ngFor="let card of cards">
     <div class="card-header">
-      <span class="titulo">{{ card.titulo }}</span>
-    </div>
-    <div class="card-body">
-      <h2>{{ card.isCount ? card.valor : (card.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR') }}</h2>
-      <span class="badge" [ngClass]="card.positivo ? 'positivo' : 'negativo'">
+      <div class="header-info">
+        <h2 class="valor-principal">{{ card.valor }}</h2>
+        <span class="sub-label">{{ card.titulo }}</span>
+      </div>
+      <span class="porcentagem-badge" [ngClass]="card.positivo ? 'positivo' : 'negativo'">
         {{ card.porcentagem }}
       </span>
+    </div>
+    <div class="card-footer">
+      <span class="comparativo" [ngClass]="card.positivo ? 'txt-positivo' : 'txt-negativo'">
+        {{ card.positivo ? '+' : '' }}{{ card.variacao }}
+      </span>
+      <span class="txt-comparativo">comparado a semana anterior</span>
     </div>
   </div>
 </div>

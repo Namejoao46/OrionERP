@@ -54,10 +54,12 @@
     font-weight: 500;
 }
 
+/* Ajustado para comportar o container responsivo do ApexCharts */
 .container-canvas {
     width: 40%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }

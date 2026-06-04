@@ -6,11 +6,15 @@
     </div>
     
     <div class="container-canvas">
-      <app-sparkline 
-        [valorAtual]="card.valorNumerico" 
-        [sucesso]="card.corSucesso"
-        [maxPontosNaTela]="12">
-      </app-sparkline>
+      <apx-chart
+        [series]="card.chartOptions.series"
+        [chart]="card.chartOptions.chart"
+        [colors]="card.chartOptions.colors"
+        [stroke]="card.chartOptions.stroke"
+        [fill]="card.chartOptions.fill"
+        [tooltip]="card.chartOptions.tooltip"
+        style="width: 100%; height: 60px; display: block;">
+      </apx-chart>
     </div>
   </div>
 </div>

@@ -1,11 +1,16 @@
 <div class="meta-box">
   <h3 class="box-title">Metas de Vendas</h3>
   <div class="meta-content">
-    <div class="progress-circle">
-      <div class="circle-inner">
-        <span>{{ porcentagem }}%</span>
-      </div>
+    
+    <div class="progress-container">
+      <apx-chart
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [colors]="chartOptions.colors"
+        [plotOptions]="chartOptions.plotOptions">
+      </apx-chart>
     </div>
+
     <div class="meta-dados">
       <div class="dado-row">
         <span class="label">Meta do mês</span>

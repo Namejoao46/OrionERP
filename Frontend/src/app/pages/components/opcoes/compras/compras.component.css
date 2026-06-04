@@ -1,0 +1,31 @@
+.dashboard-wrapper {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: #040d21; /* Garante o fundo escuro da página */
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.row-kpis {
+  width: 100%;
+}
+
+.row-charts {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* O gráfico de linha ocupa o dobro do espaço do de rosca */
+  gap: 20px;
+  width: 100%;
+}
+
+.row-table {
+  width: 100%;
+}
+
+/* Responsividade básica para telas menores */
+@media (max-width: 1024px) {
+  .row-charts {
+    grid-template-columns: 1fr;
+  }
+}

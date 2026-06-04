@@ -4,9 +4,8 @@
 .tabela-box {
   background-color: #050a30;
   border: 1px solid #141c2f;
-  border-radius: 12px; /* Reduzido levemente de 16px para 12px para acompanhar o tamanho menor */
-  padding: 16px;       /* Reduzido de 24px para 16px */
-  overflow-x: auto;
+  border-radius: 12px;
+  padding: 16px;
   max-width: 100%;
 }
 

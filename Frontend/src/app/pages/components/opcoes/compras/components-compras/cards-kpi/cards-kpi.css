@@ -1,0 +1,138 @@
+/* ==========================================================================
+   GRID DE CARDS (Responsivo e Compacto)
+   ========================================================================== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Card estilo Glass/Neon com distribuição vertical perfeita */
+.kpi-card {
+  background-color: #050a30; /* Seu azul escuro padrão */
+  border: 2px solid #2b97fa;   /* Borda azul de destaque */
+  border-radius: 8px;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* CONTAINER SUPERIOR: Alinha ícone/título à esquerda e o badge à direita */
+.kpi-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.kpi-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kpi-icon-title .icon {
+  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;  /* Largura fixa para manter simetria entre imagem e emoji */
+  height: 24px; /* Altura fixa */
+}
+
+.kpi-icon-title .icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.kpi-icon-title .title {
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   ELEMENTOS DE VALOR E SUBTÍTULOS
+   ========================================================================== */
+.kpi-value {
+  width: max-content;
+  font-size: 1.5rem; /* Ajustado para 24px/28px equivalente de forma harmoniosa */
+  font-weight: 700;
+  color: #ffffff;
+  border-bottom: 3px solid #2b97fa; /* Linha neon abaixo do valor */
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.kpi-sub {
+  font-size: 11px;
+  color: #ffffff;
+  font-weight: 300;
+  margin-bottom: 14px;
+  opacity: 0.8; /* Suaviza o texto sem perder o white puro */
+}
+
+/* ==========================================================================
+   BADGES DE PORCENTAGEM (Estilo bloco do primeiro CSS)
+   ========================================================================== */
+.kpi-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.kpi-badge.up {
+  background-color: #2ef8a0; /* Verde menta vibrante */
+  color: #054d2b;
+}
+
+.kpi-badge.down {
+  background-color: #CF0060; /* Magenta escuro/Neon */
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   RODAPÉ COMPARATIVO (Texto corrido inferior)
+   ========================================================================== */
+.kpi-footer {
+  margin-top: auto; /* Força o rodapé a colar na base do card */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.kpi-trend {
+  font-weight: 700;
+}
+
+.kpi-trend.up { color: #2ef8a0; }
+.kpi-trend.down { color: #CF0060; }
+
+.trend-text {
+  color: #ffffff;
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE MANTIDA
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}

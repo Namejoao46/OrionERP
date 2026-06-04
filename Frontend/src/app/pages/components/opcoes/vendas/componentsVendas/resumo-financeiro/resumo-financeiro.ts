@@ -9,7 +9,7 @@ import { Component } from '@angular/core';
 })
 export class ResumoFinanceiro {
   resumos = [
-    { label: 'Receita Hoje', valor: 25256.88, icone: 'assets/23.jpeg' },
+    { label: 'Receita Hoje', valor: 25256.88, icone: 'assets/wallet.png' },
     { label: 'Receita no Mês', valor: 45543.05, icone: 'assets/money.png' },
     { label: 'Despesas do Mês', valor: 8478.36, icone: 'assets/money.png' },
     { label: 'Contas a Receber', valor: 10467.55, icone: 'assets/money.png' },

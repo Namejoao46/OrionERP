@@ -6,8 +6,8 @@
 }
 
 .card {
-  background-color: #0b1120; /* Tom exato do card escuro do print */
-  border: 1px solid #141c2f;
+  background-color: #050a30;
+  border: 2px solid #2b97fa;
   border-radius: 8px;
   padding: 20px;
   display: flex;
@@ -30,13 +30,15 @@
   font-size: 28px;
   font-weight: 700;
   color: #ffffff;
+  border-bottom: 3px solid #2b97fa;
   margin: 0;
   line-height: 1.2;
 }
 
 .sub-label {
   font-size: 11px;
-  color: #566681;
+  font-weight: 300;
+  color: #fff;
   margin-top: 4px;
 }
 
@@ -48,13 +50,13 @@
 }
 
 .porcentagem-badge.positivo {
-  background-color: #00bf71;
-  color: #041a12;
+  background-color: #2ef8a0;
+  color: #054d2b;
 }
 
 .porcentagem-badge.negativo {
-  background-color: #ff3366;
-  color: #fff;
+  background-color: #CF0060;
+  color: #3c2a00;
 }
 
 .card-footer {
@@ -69,6 +71,6 @@
   font-weight: 700;
 }
 
-.txt-positivo { color: #00bf71; }
-.txt-negativo { color: #ff3366; }
-.txt-comparativo { color: #566681; }
+.txt-positivo { color: #2ef8a0; }
+.txt-negativo { color: #CF0060; }
+.txt-comparativo { color: #fff; }

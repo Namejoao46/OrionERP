@@ -1,4 +1,4 @@
-.conteiner{
+.conteiner {
     height: auto;
     width: 100%;
     display: flex;
@@ -11,31 +11,53 @@
     overflow: hidden;
 }
 
-.conteiner_grafico{
+.conteiner_grafico {
     height: 7vw;
     min-height: 100px;
     width: 16%;
     min-width: 200px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-direction: column;
+    justify-content: space-between;
+    flex-direction: row;
     background-color: #050a30;
     border: 2px solid #2b97fa;
-    gap: 10px;
     box-sizing: border-box;
     overflow: hidden;
     border-radius: 20px;
+    padding: 0 15px;
 }
 
-.conteiner_grafico h1{
+.conteudo-card {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+    width: 55%;
+    z-index: 2;
+}
+
+.conteiner_grafico h1 {
     color: #fff;
-    font-size: clamp(16px, 1.5vw, 30px);
+    font-size: clamp(14px, 1.3vw, 22px);
     margin: 0;
+    font-weight: bold;
+    white-space: nowrap;
 }
 
-.conteiner_grafico h2{
+.conteiner_grafico h2 {
     color: gray;
-    font-size: clamp(12px, 1.2vw, 17px); 
+    font-size: clamp(9px, 0.9vw, 11px); 
     margin: 0;      
+    font-weight: 500;
+}
+
+.container-canvas {
+    width: 40%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

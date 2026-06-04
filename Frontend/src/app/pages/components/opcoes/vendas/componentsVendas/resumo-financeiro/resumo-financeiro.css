@@ -1,66 +1,92 @@
+/* ==========================================================================
+   CONTAINER DO RESUMO (Estilo Card Compacto)
+   ========================================================================== */
 .resumo-box {
-  background-color: #060b15;
-  border: 1px solid #101726;
-  border-radius: 8px;
-  padding: 24px;
+  background-color: #050a30;
+  border: 1px solid #141c2f;
+  border-radius: 12px;
+  padding: 16px; /* Espaçamento reduzido para ficar mais elegante */
 }
 
 .box-title {
-  font-size: 16px;
-  font-weight: 600;
   color: #ffffff;
-  margin: 0 0 20px 0;
-  position: relative;
-}
-
-/* Linha decorativa abaixo do título, comum em ERPs */
-.box-title::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background-color: #0066ff;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 16px 0; /* Margens limpas e alinhadas */
+  border-bottom: 2px solid #00c3ff;
+  padding-bottom: 3px;
+  display: inline-block;
 }
 
 .grid-resumo {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 12px; /* Espaço entre os cards reduzido */
 }
 
+/* ==========================================================================
+   ITEMS DO GRID (Com efeito de Hover Magnético)
+   ========================================================================== */
 .resumo-item {
-  background-color: #0b1120;
+  background-color: rgba(10, 14, 41, 0.3);
   border: 1px solid #141c2f;
-  border-radius: 6px;
-  padding: 16px;
+  border-left: 3px solid transparent; /* Preparado para o efeito hover */
+  border-radius: 8px;
+  padding: 12px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
+  transition: all 0.2s ease;
 }
 
+/* Efeito Hover: Linha flutua e acende em Ciano Neon */
+.resumo-item:hover {
+  transform: translateY(-1.5px);
+  background: rgba(255, 255, 255, 0.04);
+  border-left-color: #00c3ff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   ALINHAMENTO DAS IMAGENS / ÍCONES
+   ========================================================================== */
 .icon-placeholder {
-  font-size: 18px;
-  color: #0066ff;
-  background-color: rgba(0, 102, 255, 0.1);
-  padding: 8px;
+  width: 32px;  /* Tamanho fixo para garantir simetria */
+  height: 32px; /* Tamanho fixo para garantir simetria */
+  background-color: rgba(0, 195, 255, 0.1);
   border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* Impede o ícone de amassar se o texto for grande */
 }
 
+/* Força a imagem a se ajustar perfeitamente dentro do quadrado do ícone */
+.icon-placeholder img {
+  width: 18px;  /* Ajuste aqui se quiser o ícone interno maior ou menor */
+  height: 18px;
+  object-fit: contain;
+}
+
+/* ==========================================================================
+   TEXTOS E LABELS SINCRONIZADOS
+   ========================================================================== */
 .info {
   display: flex;
   flex-direction: column;
 }
 
 .valor {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: #ffffff;
+  line-height: 1.2;
 }
 
 .label {
   font-size: 11px;
-  color: #566681;
+  font-weight: 500;
+  color: #566681; /* Mudado para o cinza azulado discreto do card principal */
   margin-top: 2px;
 }

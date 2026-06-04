@@ -1,6 +1,6 @@
 .meta-box {
-  background-color: #060b15;
-  border: 1px solid #101726;
+  background-color: #050a30;
+  border: 1px solid #141c2f; /* Atualizado */
   border-radius: 8px;
   padding: 24px;
   height: 100%;
@@ -23,7 +23,8 @@
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  background: conic-gradient(#0066ff 270deg, #141c2f 0deg);
+  /* Gradiente atualizado para a cor de destaque do ERP */
+  background: conic-gradient(#00c3ff 270deg, #141c2f 0deg); 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,7 +33,7 @@
 .circle-inner {
   width: 90px;
   height: 90px;
-  background-color: #060b15;
+  background-color: #050a30;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -53,13 +54,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #101726;
+  border-bottom: 1px solid #141c2f; /* Atualizado */
   padding-bottom: 6px;
 }
 
 .label {
   font-size: 12px;
-  color: #566681;
+  color: #566681; /* Sincronizado */
 }
 
 .valor {
@@ -69,5 +70,5 @@
 }
 
 .font-destaque {
-  color: #0066ff;
+  color: #00c3ff; /* Cor de link ativa */
 }

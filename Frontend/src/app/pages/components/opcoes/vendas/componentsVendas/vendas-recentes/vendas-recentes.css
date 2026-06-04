@@ -1,58 +1,128 @@
+/* ==========================================================================
+   CONTAINER DA TABELA (Mais compacto)
+   ========================================================================== */
 .tabela-box {
-  background-color: #060b15;
-  border: 1px solid #101726;
-  border-radius: 8px;
-  padding: 24px;
+  background-color: #050a30;
+  border: 1px solid #141c2f;
+  border-radius: 12px; /* Reduzido levemente de 16px para 12px para acompanhar o tamanho menor */
+  padding: 16px;       /* Reduzido de 24px para 16px */
+  overflow-x: auto;
+  max-width: 100%;
 }
 
+/* Header superior */
 .tabela-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 20px; 
 }
 
 .box-title {
-  font-size: 16px;
-  font-weight: 600;
   color: #ffffff;
+  font-size: 16px;     /* Reduzido de 16px para 14px */
+  font-weight: 700;
   margin: 0;
+  border-bottom: 2px solid #00c3ff;
+  padding-bottom: 3px;
+  display: inline-block;
 }
 
+/* Input de busca mais discreto */
 .input-busca {
-  background-color: #0b1120;
-  border: 1px solid #141c2f;
-  border-radius: 20px;
-  padding: 6px 16px;
+  background-color: #0a0e29;
+  border: 1px solid #1a2245;
+  border-radius: 8px;  
+  padding: 6px 12px;   
   color: #ffffff;
-  font-size: 12px;
-  width: 220px;
+  font-size: 0.85rem;  
+  width: 200px;        
+  outline: none;
+  transition: all 0.3s ease;
 }
 
+.input-busca:hover {
+  border-color: rgba(0, 195, 255, 0.5); /* Sutil destaque ao passar o mouse */
+}
+
+.input-busca:focus {
+  border-color: #00c3ff;
+  box-shadow: 0 0 8px rgba(0, 195, 255, 0.2);
+}
+
+/* ==========================================================================
+   ESTRUTURA DA TABELA FLUTUANTE COMPACTA
+   ========================================================================== */
 table {
-  width: 100%;
-  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;    /* Reduzido o espaço entre as linhas de 12px para 6px */
+  margin-top: -6px;
 }
 
 th {
-  font-size: 11px;
-  color: #566681;
-  font-weight: 600;
-  padding: 12px 8px;
+  color: #FFF;
   text-align: left;
-  border-bottom: 1px solid #101726;
+  font-size: 0.7rem;        /* Fonte reduzida */
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 10px 12px;       /* Menos padding no cabeçalho */
+  border-bottom: 2px solid #2b97fa;
+}
+
+table tr {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 td {
-  padding: 16px 8px;
-  font-size: 12px;
+  padding: 10px 12px;       /* Reduzido drasticamente de 18px/15px para 10px/12px */
   color: #94a3b8;
-  border-bottom: 1px solid #101726;
+  font-size: 0.82rem;       /* Fonte das células menor para ler mais dados de uma vez */
+  background-color: rgba(10, 14, 41, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  transition: all 0.2s ease;
+}
+
+/* Cantos arredondados das linhas */
+table tr td:first-child {
+  border-radius: 8px 0 0 8px; /* Cantos levemente menores */
+  border-left: 3px solid transparent;
+}
+
+table tr td:last-child {
+  border-radius: 0 8px 8px 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+/* ==========================================================================
+   EFEITOS DE HOVER E BADGES (Proporcionais ao tamanho menor)
+   ========================================================================== */
+table tr:hover {
+  transform: translateY(-1.5px); /* Faz a linha flutuar sutilmente para cima */
+}
+
+table tr:hover td {
+  background: rgba(255, 255, 255, 0.05); /* Fundo levemente mais claro */
+  color: #ffffff;
+  cursor: pointer;
+  /* Sombra cirúrgica para dar profundidade ao card flutuante */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); 
+}
+
+table tr:hover td:first-child {
+  border-left-color: #00c3ff; /* Acende a barra lateral em ciano */
 }
 
 .txt-azul-link {
-  color: #0066ff;
+  color: #00c3ff;
   font-weight: 600;
+  text-decoration: none;
+}
+
+.txt-azul-link:hover {
+  color: #ffffff; /* Link acende em branco no hover */
 }
 
 .txt-branco {
@@ -61,34 +131,51 @@ td {
 }
 
 .status-badge {
-  font-size: 9px;
+  padding: 4px 8px;         
+  border-radius: 6px;
+  font-size: 0.65rem;       
   font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 4px;
+  text-transform: uppercase;
   display: inline-block;
+  transition: all 0.2s ease;
 }
 
-/* Batendo certinho com o "EM DIA", "BAIXO ESTOQUE" do seu print */
 .status-badge.fechada {
-  background-color: rgba(0, 191, 113, 0.1);
+  background-color: rgba(0, 191, 113, 0.15);
   color: #00bf71;
-  border: 1px solid rgba(0, 191, 113, 0.2);
+  border: 1px solid rgba(0, 191, 113, 0.3);
+}
+.status-badge.fechada:hover {
+  background-color: rgba(0, 191, 113, 0.25);
+  box-shadow: 0 0 8px rgba(0, 191, 113, 0.2);
 }
 
 .status-badge.em-andamento {
-  background-color: rgba(0, 102, 255, 0.1);
-  color: #0066ff;
-  border: 1px solid rgba(0, 102, 255, 0.2);
+  background-color: rgba(0, 195, 255, 0.15);
+  color: #00c3ff;
+  border: 1px solid rgba(0, 195, 255, 0.3);
+}
+.status-badge.em-andamento:hover {
+  background-color: rgba(0, 195, 255, 0.25);
+  box-shadow: 0 0 8px rgba(0, 195, 255, 0.2);
 }
 
 .status-badge.em-negociação {
-  background-color: rgba(255, 159, 67, 0.1);
+  background-color: rgba(255, 159, 67, 0.15);
   color: #ff9f43;
-  border: 1px solid rgba(255, 159, 67, 0.2);
+  border: 1px solid rgba(255, 159, 67, 0.3);
+}
+.status-badge.em-negociação:hover {
+  background-color: rgba(255, 159, 67, 0.25);
+  box-shadow: 0 0 8px rgba(255, 159, 67, 0.2);
 }
 
 .status-badge.atrasada {
-  background-color: rgba(255, 51, 102, 0.1);
+  background-color: rgba(255, 51, 102, 0.15);
   color: #ff3366;
-  border: 1px solid rgba(255, 51, 102, 0.2);
+  border: 1px solid rgba(255, 51, 102, 0.3);
+}
+.status-badge.atrasada:hover {
+  background-color: rgba(255, 51, 102, 0.25);
+  box-shadow: 0 0 8px rgba(255, 51, 102, 0.2);
 }

@@ -1,7 +1,7 @@
 .grafico-box {
-  background: linear-gradient(135deg, #071324 0%, #0b192c 100%);
-  border: 1px solid #14253d;
-  border-radius: 12px;
+  background-color: #050a30;
+  border: 1px solid #2b97fa; /* Atualizado para o padrão do card */
+  border-radius: 8px;        /* Sincronizado para 8px */
   padding: 20px;
   height: 100%;
   box-sizing: border-box;
@@ -16,26 +16,28 @@
 
 .box-title {
   font-size: 14px;
+  font-weight: 600;
   color: #ffffff;
   margin: 0;
 }
 
 .toggle-periodo button {
-  background: #102238;
-  border: 1px solid #1c3554;
-  color: #7a92b3;
+  background: #0a0e29;      /* Fundo mais escuro combinando com o ERP */
+  border: 1px solid #141c2f; /* Borda padrão */
+  color: #566681;           /* Cor das labels padrão */
   padding: 4px 10px;
   font-size: 11px;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .toggle-periodo button:first-child { border-radius: 4px 0 0 4px; }
 .toggle-periodo button:last-child { border-radius: 0 4px 4px 0; }
 
 .toggle-periodo button.active {
-  background: #0088ff;
-  color: #ffffff;
-  border-color: #0088ff;
+  background: #00c3ff;       /* Azul elétrico/ciano brilhante */
+  color: #050a30;            /* Texto escuro para contraste */
+  border-color: #00c3ff;
 }
 
 .chart-container {
@@ -49,7 +51,7 @@
   flex-direction: column;
   justify-content: space-between;
   font-size: 10px;
-  color: #536c8e;
+  color: #566681;            /* Atualizado */
   text-align: right;
   width: 40px;
 }

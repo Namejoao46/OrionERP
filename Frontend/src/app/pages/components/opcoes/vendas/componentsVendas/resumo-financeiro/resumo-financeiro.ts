@@ -9,11 +9,11 @@ import { Component } from '@angular/core';
 })
 export class ResumoFinanceiro {
   resumos = [
-    { label: 'Receita Hoje', valor: 25256.88 },
-    { label: 'Receita no Mês', valor: 45543.05 },
-    { label: 'Despesas do Mês', valor: 8478.36 },
-    { label: 'Contas a Receber', valor: 10467.55 },
-    { label: 'Contas a Pagar', valor: 18544.24 },
-    { label: 'Saldo Previsto', valor: 12564.31 }
+    { label: 'Receita Hoje', valor: 25256.88, icone: 'assets/23.jpeg' },
+    { label: 'Receita no Mês', valor: 45543.05, icone: 'assets/money.png' },
+    { label: 'Despesas do Mês', valor: 8478.36, icone: 'assets/money.png' },
+    { label: 'Contas a Receber', valor: 10467.55, icone: 'assets/money.png' },
+    { label: 'Contas a Pagar', valor: 18544.24, icone: 'assets/money.png' },
+    { label: 'Saldo Previsto', valor: 12564.31, icone: 'assets/money.png' }
   ];
 }

@@ -11,6 +11,7 @@ import { CaixaboxOption } from '../caixa-box/caixa-box';
 import { Observable, interval, Subscription } from 'rxjs';
 import { map, startWith, switchMap } from 'rxjs/operators';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ModalService } from '../../../core/services/modal.service';
 
 @Component({
   selector: 'app-menu-bar',
@@ -38,7 +39,8 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     private caixabox: CaixaboxService,
     private router: Router,
     private mensagemService: MensagemService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService, 
+    private modalService: ModalService
   ) {
     // Escuta ativa do usuário logado
     this.userName$ = this.authService.userName$;
@@ -128,7 +130,6 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   }
 
   abrirMenuPerfil(origem: HTMLElement) {
-    // 🛠️ Removido o 'id' para respeitar estritamente o tipo CaixaboxOption
     const opcoes: CaixaboxOption[] = [
       { label: 'Meu Perfil', value: 'perfil', icon: 'fa fa-user' },
       { label: 'Sair', value: 'logout', icon: 'fa fa-sign-out' }
@@ -139,7 +140,9 @@ export class MenuBarComponent implements OnInit, OnDestroy {
         this.authService.logout(); 
         this.router.navigate(['/login']); 
       } else if (acao === 'perfil') {
-        this.router.navigate(['/perfil']);
+        // ─── ALTERADO AQUI ──────────────────────────────────────────
+        // Notifica o ModalService em vez de mudar de página
+        this.modalService.notificarAbrirPerfil();
       }
     });
   }

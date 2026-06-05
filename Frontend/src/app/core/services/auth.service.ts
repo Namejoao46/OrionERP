@@ -13,6 +13,9 @@ export class AuthService {
   private userNameSubject = new BehaviorSubject<string | null>(localStorage.getItem('userName'));
   private userImageSubject = new BehaviorSubject<string | null>(localStorage.getItem('userImage'));
   private userRoleSubject = new BehaviorSubject<string | null>(localStorage.getItem('userRole'));
+  private userIdSubject = new BehaviorSubject<number | null>(
+    localStorage.getItem('userId') ? Number(localStorage.getItem('userId')) : null
+  );
 
   private empresaNomeSubject = new BehaviorSubject<string | null>(localStorage.getItem('empresaNome'));
   private empresaLogoSubject = new BehaviorSubject<string | null>(localStorage.getItem('empresaLogo'));
@@ -21,6 +24,7 @@ export class AuthService {
   userName$ = this.userNameSubject.asObservable();
   userImage$ = this.userImageSubject.asObservable();
   userRole$ = this.userRoleSubject.asObservable();
+  userId$ = this.userIdSubject.asObservable();
 
   empresaNome$ = this.empresaNomeSubject.asObservable();
   empresaLogo$ = this.empresaLogoSubject.asObservable();
@@ -48,13 +52,18 @@ export class AuthService {
   setUserData(dados: any) {
     if (!dados || !dados.role) return;
 
-    // Remove espaços ocultos que o Firebird possa ter enviado na coluna VARCHAR/CHAR
     const roleLimpa = dados.role.toString().replace('ROLE_', '').trim().toUpperCase();
 
     localStorage.setItem('token', dados.token);
     localStorage.setItem('userName', dados.nome);
     localStorage.setItem('userRole', roleLimpa);
     
+    // Salva o ID do colaborador logado
+    if (dados.id) {
+      localStorage.setItem('userId', dados.id.toString());
+      this.userIdSubject.next(dados.id);
+    }
+
     this.tokenSubject.next(dados.token);
     this.userNameSubject.next(dados.nome);
     this.userRoleSubject.next(roleLimpa);
@@ -64,18 +73,7 @@ export class AuthService {
       localStorage.setItem('userImage', fotoLimpa);
       this.userImageSubject.next(fotoLimpa);
     }
-
-    // Regra para Super Admin ou usuários sem empresa vinculada
-    if (roleLimpa === 'SUPER_ADMIN' || roleLimpa.includes('ADMIN') || !dados.empresaId) {
-      localStorage.removeItem('empresaId');
-      localStorage.removeItem('empresaNome');
-      localStorage.removeItem('empresaLogo');
-      this.empresaNomeSubject.next(null);
-      this.empresaLogoSubject.next(null);
-    } else {
-      localStorage.setItem('empresaId', dados.empresaId.toString());
-      this.carregarDadosEmpresa(dados.empresaId);
-    }
+    // ... resto do seu método carregarDadosEmpresa ...
   }
 
   private carregarDadosEmpresa(empresaId: number | string) {
@@ -117,8 +115,20 @@ export class AuthService {
     };
   }
 
+  atualizarNomeEmMemoria(novoNome: string) {
+    localStorage.setItem('userName', novoNome);
+    this.userNameSubject.next(novoNome);
+  }
+
+  atualizarFotoEmMemoria(base64Foto: string) {
+    const fotoLimpa = base64Foto.replace(/\s/g, '');
+    localStorage.setItem('userImage', fotoLimpa);
+    this.userImageSubject.next(fotoLimpa);
+  }
+
   logout() {
     localStorage.clear();
+    this.userIdSubject.next(null);
     this.tokenSubject.next(null);
     this.userNameSubject.next(null);
     this.userImageSubject.next(null);

@@ -10,15 +10,17 @@ import { ChatComponent } from "../components/chat-component/chat-component";
 import { CadastroGeralComponent } from '../components/cadastros/cadastro-geral-component/cadastro-geral-component';
 import { ModalService } from '../../core/services/modal.service';
 import { CadastroFornecedorComponent } from '../components/cadastros/cadastro-fornecedor-component/cadastro-fornecedor-component';
+import { Perfil } from "../components/menu-bar/perfil/perfil";
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
-    RouterModule, CommonModule, FormsModule, MenuBarComponent, 
-    OpcoesComponent, MenuFixoComponent, CardFlutuante, 
-    ChatComponent, CadastroGeralComponent, CadastroFornecedorComponent
-  ],
+    RouterModule, CommonModule, FormsModule, MenuBarComponent,
+    OpcoesComponent, MenuFixoComponent, CardFlutuante,
+    ChatComponent, CadastroGeralComponent, CadastroFornecedorComponent,
+    Perfil
+],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

@@ -13,7 +13,6 @@ import backend.model.Produto;
 import backend.repository.ProdutoRepository;
 
 @Service
-@SuppressWarnings("null")
 public class ProdutoService {
 
     @Autowired
@@ -32,12 +31,18 @@ public class ProdutoService {
     }
 
     public Produto buscarPorId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("O ID fornecido não pode ser nulo.");
+        }
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
     }
 
     @Transactional
     public Produto cadastrar(ProdutoRequest req) {
+        if (req == null) {
+            throw new IllegalArgumentException("A requisição não pode ser nula.");
+        }
         if (req.descricao() == null || req.descricao().isBlank()) {
             throw new IllegalArgumentException("A descrição do produto é obrigatória.");
         }
@@ -60,6 +65,10 @@ public class ProdutoService {
 
     @Transactional
     public Produto editar(Long id, ProdutoRequest req) {
+        if (req == null) {
+            throw new IllegalArgumentException("A requisição não pode ser nula.");
+        }
+        
         Produto produto = buscarPorId(id);
 
         if (req.codigoBarras() != null && !req.codigoBarras().isBlank()) {
@@ -76,7 +85,6 @@ public class ProdutoService {
         produto.setPrecoVenda(calcularPrecoVenda(produto));
         return repository.save(produto);
     }
-
 
     @Transactional
     public Produto duplicar(Long id) {
@@ -132,7 +140,6 @@ public class ProdutoService {
 
         repository.save(produto);
     }
-
 
     private Produto mapearRequest(Produto produto, ProdutoRequest req) {
         produto.setCodigoBarras(req.codigoBarras());

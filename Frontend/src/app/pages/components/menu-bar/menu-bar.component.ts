@@ -23,6 +23,10 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   userName$: Observable<string | null>;
   userImage$: Observable<SafeUrl | null>;
   
+  // Tipagem assíncrona alinhada às streams do AuthService
+  empresaNome$: Observable<string | null>;
+  empresaLogo$: Observable<SafeUrl | null>;
+  
   temNovasMensagens: boolean = false;
   quantidadeNotificacoes: number = 0;
   private qteMensagensAnterior: number = 0;
@@ -36,14 +40,23 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     private mensagemService: MensagemService,
     private notificationService: NotificationService
   ) {
+    // Escuta ativa do usuário logado
     this.userName$ = this.authService.userName$;
     this.userImage$ = this.authService.userImage$.pipe(
-      map(base64 => {
-        if (!base64) return null;
-        const prefixo = base64.startsWith('data:image') ? '' : 'data:image/jpeg;base64,';
-        return this.sanitizer.bypassSecurityTrustUrl(`${prefixo}${base64}`);
-      })
+      map((base64: any) => this.sanitizarImagem(base64))
     );
+
+    // Escuta ativa da empresa (Exibe dinamicamente com base no papel/role de quem logou)
+    this.empresaNome$ = this.authService.empresaNome$; 
+    this.empresaLogo$ = this.authService.empresaLogo$.pipe(
+      map((base64: any) => this.sanitizarImagem(base64))
+    );
+  }
+
+  private sanitizarImagem(base64: string | null): SafeUrl | null {
+    if (!base64) return null;
+    const prefixo = base64.startsWith('data:image') ? '' : 'data:image/jpeg;base64,';
+    return this.sanitizer.bypassSecurityTrustUrl(`${prefixo}${base64}`);
   }
 
   ngOnInit(): void {
@@ -56,7 +69,6 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   }
 
   monitorarMensagens() {
-    // Checa o Java a cada 10 segundos
     this.pollSub = interval(10000).pipe(
       startWith(0),
       switchMap(() => this.mensagemService.contarNaoLidas())
@@ -71,7 +83,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
 
   atualizarBadgeNotificacoes() {
     const lidas = JSON.parse(localStorage.getItem('notificacoes_lidas') || '[]');
-    const todas = [1, 2]; // IDs das notificações fixas
+    const todas = [1, 2]; 
     this.quantidadeNotificacoes = todas.filter(id => !lidas.includes(id)).length;
   }
 
@@ -108,7 +120,6 @@ export class MenuBarComponent implements OnInit, OnDestroy {
 
       this.caixabox.exibir(origem, opcoes).subscribe(remetente => {
         if (remetente) {
-          // Redireciona para o chat com o parâmetro do usuário
           this.router.navigate(['/chat'], { queryParams: { usuario: remetente } });
           this.temNovasMensagens = false;
         }
@@ -117,13 +128,19 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   }
 
   abrirMenuPerfil(origem: HTMLElement) {
+    // 🛠️ Removido o 'id' para respeitar estritamente o tipo CaixaboxOption
     const opcoes: CaixaboxOption[] = [
       { label: 'Meu Perfil', value: 'perfil', icon: 'fa fa-user' },
       { label: 'Sair', value: 'logout', icon: 'fa fa-sign-out' }
     ];
+    
     this.caixabox.exibir(origem, opcoes).subscribe(acao => {
-      if (acao === 'logout') { this.authService.logout(); this.router.navigate(['/login']); }
-      else if (acao === 'perfil') this.router.navigate(['/perfil']);
+      if (acao === 'logout') { 
+        this.authService.logout(); 
+        this.router.navigate(['/login']); 
+      } else if (acao === 'perfil') {
+        this.router.navigate(['/perfil']);
+      }
     });
   }
 }

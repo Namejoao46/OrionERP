@@ -8,7 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999999; /* Acima de TUDO */
+  z-index: 999998; /* Acima de TUDO */
   backdrop-filter: blur(8px);
 }
 

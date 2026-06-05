@@ -14,6 +14,7 @@
     background-color: #000d1a;
     border-bottom: 4px solid #2B97FA;
     box-sizing: border-box;
+    padding-right: 20px; /* Garante uma folga no final da barra */
 }
 
 .conteiner_menu {
@@ -26,11 +27,16 @@
    2. LOGOTIPO
    ========================================================================== */
 .conteiner_logo {
-    flex: 1;
-    height: 100%;
     display: flex;
-    padding-left: 15px;
-    overflow: hidden;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0; /* IMPEDE que a logo encolha se a tela diminuir */
+    margin-right: auto; /* ❤️ O SEGREDO: Empurra todo o resto (busca, perfil) para a direita automaticamente */
+}
+
+.conteiner_logo .img {
+    display: flex;
+    align-items: center;
 }
 
 .img { 
@@ -40,7 +46,7 @@
 
 .img h1 {
     color: white;
-    font-size: clamp(20px, 2vw, 45px);
+    font-size: clamp(18px, 1.8vw, 32px); /* Ajustado o máximo para não ficar gigante e quebrar */
     font-weight: bold;
     font-family: 'Iceberg', sans-serif;
     border-bottom: 2px solid #2B97FA;
@@ -50,8 +56,43 @@
 .erp { color: #2B97FA; }
 
 .img img { 
-    height: 80%; 
+    height: 35px; /* Definição de altura fixa mais segura para alinhar com a sublogo */
     max-width: 50px; 
+    object-fit: contain;
+}
+
+/* Estrutura da Sub Logo da Empresa */
+.sub_logo_empresa {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* O pauzinho azul vertical */
+.divisor_azul {
+    width: 2px;
+    height: 24px; /* Altura equilibrada com os textos */
+    background-color: #2B97FA; /* Usando o mesmo azul padrão do seu ERP */
+    border-radius: 2px;
+}
+
+/* Forçando a logo da empresa parceira a ser menor que a do Orion */
+.sub_logo_empresa img {
+    height: 22px; /* Menor que a logo do Orion */
+    width: auto;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+/* Estilo para o texto do nome fantasia */
+.nome_empresa {
+    color: #ffffff; 
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    max-width: 140px; /* Evita que nomes de empresas gigantescos quebrem o layout */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ==========================================================================

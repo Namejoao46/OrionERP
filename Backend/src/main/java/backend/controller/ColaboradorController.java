@@ -2,12 +2,21 @@ package backend.controller;
 
 import java.io.IOException;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import backend.model.Colaborador;
 import backend.repository.ColaboradorRepository;
 
@@ -24,7 +33,6 @@ public class ColaboradorController {
 
     @GetMapping("/equipe")
     public List<Colaborador> listarEquipe(@AuthenticationPrincipal Colaborador logado) {
-        // Usando Objects.requireNonNull ou verificação direta para silenciar o warning
         if (logado != null && logado.getEmpresa() != null) {
             Long empresaId = logado.getEmpresa().getId();
             if (empresaId != null) {
@@ -36,7 +44,6 @@ public class ColaboradorController {
 
     @PostMapping("/{id}/upload-foto")
     public ResponseEntity<String> uploadFoto(@PathVariable Long id, @RequestParam("foto") MultipartFile arquivo) {
-        // Garantindo que o ID não é nulo logo no início
         if (id == null) return ResponseEntity.badRequest().body("ID inválido");
 
         try {
@@ -44,13 +51,12 @@ public class ColaboradorController {
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
             colaborador.setFoto(arquivo.getBytes());
             repository.save(colaborador);
-            return ResponseEntity.ok("Foto atualizada com sucesso!");
+            return ResponseEntity.ok("Foto updated com sucesso!");
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Erro ao processar arquivo: " + e.getMessage());
         }
     }
 
-    @SuppressWarnings("null")
     @GetMapping("/{id}/foto")
     public ResponseEntity<byte[]> getFoto(@PathVariable Long id) {
         if (id == null) return ResponseEntity.notFound().build();
@@ -65,13 +71,13 @@ public class ColaboradorController {
                     }
                     return ResponseEntity.notFound().<byte[]>build();
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build()); 
+                // Alterado orElse por orElseGet para evitar execução desnecessária de build()
     }
 
     @PostMapping("/cadastrar")
     public ResponseEntity<?> cadastrarComEmpresa(@RequestBody Colaborador novo, @AuthenticationPrincipal Colaborador logado) {
         try {
-            // O GestaoService vai usar a empresa do Master logado para o novo funcionário
             Colaborador salvo = gestaoService.cadastrarNovoFuncionario(novo, logado);
             return ResponseEntity.ok(salvo);
         } catch (Exception e) {

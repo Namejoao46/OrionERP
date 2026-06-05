@@ -3,10 +3,22 @@ package backend.model;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -43,13 +55,21 @@ public class Colaborador implements UserDetails {
     private Empresa empresa;
 
     @Lob
+    // Garantindo compatibilidade com o Firebird para salvar os bytes da foto
+    @Column(name = "foto", columnDefinition = "BLOB")
     private byte[] foto;
 
     // Métodos do UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Se a role for nula, define um acesso básico padrão
         if (this.role == null) return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()), new SimpleGrantedAuthority("ROLE_USER"));
+        
+        // Dinamicamente vira ROLE_MASTER, ROLE_COLABORADOR ou ROLE_ADMIN_DEV
+        return List.of(
+            new SimpleGrantedAuthority("ROLE_" + this.role.name()), 
+            new SimpleGrantedAuthority("ROLE_USER")
+        );
     }
 
     @Override public String getPassword() { return this.senha; }

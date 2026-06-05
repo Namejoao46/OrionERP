@@ -21,7 +21,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import backend.dto.NotaImportadaResponse;
-import backend.dto.NotaImportadaResponse.*;
+import backend.dto.NotaImportadaResponse.DuplicataResponse;
+import backend.dto.NotaImportadaResponse.FornecedorResumo;
+import backend.dto.NotaImportadaResponse.ItemImportadoResponse;
 import backend.model.DuplicataNota;
 import backend.model.Fornecedor;
 import backend.model.ItemNotaRecebimento;
@@ -34,7 +36,6 @@ import backend.repository.NotaRecebimentoRepository;
 import backend.repository.ProdutoFornecedorRepository;
 import backend.repository.ProdutoRepository;
 
-@SuppressWarnings("null")
 @Service
 public class NotaRecebimentoService {
 
@@ -204,7 +205,6 @@ public class NotaRecebimentoService {
         notaRepository.save(nota);
     }
 
-
     public List<NotaRecebimento> listarTodas() {
         return notaRepository.findAllByOrderByDataEntradaDesc();
     }
@@ -236,7 +236,8 @@ public class NotaRecebimentoService {
 
         String crtStr = getTagValue("CRT", emit);
         if (crtStr != null && !crtStr.isBlank()) {
-            try { f.setCrt(Integer.parseInt(crtStr)); } catch (NumberFormatException ignored) {}
+            // CORREÇÃO: Usando Integer.valueOf para evitar a criação desnecessária de um tipo primitivo/temporário complexo
+            try { f.setCrt(Integer.valueOf(crtStr.trim())); } catch (NumberFormatException ignored) {}
         }
 
         Element ender = (Element) emit.getElementsByTagName("enderEmit").item(0);
@@ -316,6 +317,8 @@ public class NotaRecebimentoService {
 
     private NotaImportadaResponse montarResposta(NotaRecebimento nota) {
         Fornecedor f = nota.getFornecedor();
+        if (f == null) return null; // Prevenção contra NullPointer sem precisar de anotações agressivas
+
         FornecedorResumo fornResumo = new FornecedorResumo(
                 f.getId(), f.getCnpj(), f.getRazaoSocial(), f.getNomeFantasia(),
                 f.getInscricaoEstadual(), f.getCidade(), f.getUf()

@@ -9,19 +9,34 @@
         <option value="Basico">Plano Básico</option>
         <option value="Premium">Plano Premium</option>
       </select>
+      
+      <div class="file-upload">
+        <label for="logoInput">Logo da Empresa:</label>
+        <input id="logoInput" type="file" (change)="onFileSelected($event)" accept="image/*">
+      </div>
     </div>
   </div>
 
   <h2>Dados do {{ roleLogado === 'ADMIN_DEV' ? 'Usuário Master' : 'Novo Colaborador' }}</h2>
   <div class="form-group">
-    <input [(ngModel)]="usuario.nome" name="nome" placeholder="Nome Completo">
+    <div class="row-inputs">
+      <input [(ngModel)]="usuario.nome" name="nome" placeholder="Nome">
+      <input [(ngModel)]="usuario.sobrenome" name="sobrenome" placeholder="Sobrenome">
+    </div>
+
     <input [(ngModel)]="usuario.login" name="login" placeholder="Login (E-mail)">
     <input [(ngModel)]="usuario.senha" name="senha" type="password" placeholder="Senha">
     
-    <ng-container *ngIf="roleLogado === 'MASTER'">
-      <input [(ngModel)]="usuario.cargo" name="cargo" placeholder="Cargo">
-      <input [(ngModel)]="usuario.matricula" name="matricula" placeholder="Matrícula">
-    </ng-container>
+    <div class="row-inputs">
+      <input [(ngModel)]="usuario.cpf" name="cpf" placeholder="CPF (Ex: 000.000.000-00)">
+      <input [(ngModel)]="usuario.dataNascimento" name="dataNascimento" type="date" placeholder="Data de Nascimento">
+    </div>
+
+    <input [(ngModel)]="usuario.endereco" name="endereco" placeholder="Endereço Completo">
+    <input [(ngModel)]="usuario.cargo" name="cargo" placeholder="Cargo">
+    <input [(ngModel)]="usuario.matricula" name="matricula" placeholder="Matrícula">
+
+    <input *ngIf="roleLogado === 'MASTER'" [(ngModel)]="usuario.tipoColaborador" name="tipoColaborador" placeholder="Tipo do Colaborador (Ex: CLT, Estágio)">
 
     <button class="btn-salvar" (click)="salvar()">Salvar Cadastro</button>
   </div>

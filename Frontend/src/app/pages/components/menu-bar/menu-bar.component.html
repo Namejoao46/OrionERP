@@ -5,10 +5,15 @@
 
     <div class="conteiner_logo">
         <div class="img">
-            <img src="assets/orion.png" alt="Logo">
-            <h1>
-                <span class="orion">Orion</span><span class="erp">ERP</span>
-            </h1>
+            <img src="assets/orion.png" alt="Orion Logo"> <h1>Orion<span class="erp">ERP</span></h1>
+        </div>
+
+        <div class="sub_logo_empresa" *ngIf="(empresaNome$ | async) || (empresaLogo$ | async)">
+            <div class="divisor_azul"></div>
+                
+            <img *ngIf="empresaLogo$ | async as logoUrl" [src]="logoUrl" alt="Logo Empresa">
+            
+            <span class="nome_empresa" *ngIf="empresaNome$ | async as nome">{{ nome }}</span>
         </div>
     </div>
 

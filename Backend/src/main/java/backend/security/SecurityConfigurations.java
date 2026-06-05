@@ -38,8 +38,8 @@ public class SecurityConfigurations {
                 // Nível 0: Só Admin Dev acessa gestão de empresas
                 .requestMatchers("/api/admin/**").hasRole("ADMIN_DEV")
                 
-                // Nível 1: Só Owner acessa gestão de equipe
-                .requestMatchers("/api/gestao/**").hasRole("OWNER")
+                // Nível 1: Só Master acessa gestão de equipe
+                .requestMatchers("/api/gestao/**").hasRole("MASTER")
 
                 // Geral: Logado acessa ERP
                 .anyRequest().authenticated() 

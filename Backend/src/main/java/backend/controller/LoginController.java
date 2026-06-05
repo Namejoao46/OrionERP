@@ -37,7 +37,10 @@ public class LoginController {
     private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
+    @SuppressWarnings("CallToPrintStackTrace")
     public ResponseEntity<?> efetuarLogin(@RequestBody Map<String, String> dados) {
+        System.out.println("HASH GERADO PELO APP PARA '123456': " + passwordEncoder.encode("123456"));
+        System.out.println(">>> [LoginController] Tentativa de login para: " + dados.get("login"));
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.get("login"), dados.get("senha"));
         
         try {
@@ -48,27 +51,59 @@ public class LoginController {
             Map<String, Object> resposta = new HashMap<>();
             resposta.put("token", tokenJWT);
             resposta.put("nome", colaborador.getNome());
+            resposta.put("role", colaborador.getRole() != null ? colaborador.getRole().toString() : "USER");
             resposta.put("foto", colaborador.getFoto() != null ? Base64.getEncoder().encodeToString(colaborador.getFoto()) : null);
             
-            // CORREÇÃO: Verifica se a role é nula antes de chamar .name()
-            String roleName = (colaborador.getRole() != null) ? colaborador.getRole().name() : "ADMIN_DEV";
-            resposta.put("role", roleName);
+            // Verifica se o colaborador tem uma empresa associada (Super Admins não têm)
+            if (colaborador.getEmpresa() != null) {
+                resposta.put("empresaId", colaborador.getEmpresa().getId());
+            } else {
+                resposta.put("empresaId", null);
+            }
             
-            resposta.put("cargo", colaborador.getCargo());
-
             return ResponseEntity.ok(resposta);
+            
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(403).body(Map.of("erro", "Credenciais inválidas"));
+            System.out.println(">>> [LoginController] ERRO DE AUTENTICAÇÃO: " + e.getMessage());
+            e.printStackTrace(); 
+            return ResponseEntity.status(403).body("Erro na autenticação: " + e.getMessage());
         }
     }
 
     @PostMapping("/registrar")
+    @SuppressWarnings("CallToPrintStackTrace")
     public ResponseEntity<?> registrar(@RequestBody Colaborador novo) {
-        if (colaboradorRepository.existsByLogin(novo.getLogin())) {
-            return ResponseEntity.badRequest().body(Map.of("erro", "Login já existe"));
+        // 1. Validação de segurança de e-mail
+        if (novo.getLogin() != null && colaboradorRepository.existsByLogin(novo.getLogin())) {
+            return ResponseEntity.badRequest().body(Map.of("erro", "Login já existe", "detalhe", "Este e-mail já está em uso."));
         }
+
+        // 2. HIGIENIZAÇÃO COMPATÍVEL COM O FIREBIRD
+        // Força a role a ser MASTER caso venha em branco do front
+        if (novo.getRole() == null) {
+            novo.setRole(backend.model.UserRole.MASTER);
+        }
+        
+        // Alinha o tipo de colaborador com o modelo de negócio 'MASTER'
+        if (novo.getTipoColaborador() == null || novo.getTipoColaborador().isEmpty()) {
+            novo.setTipoColaborador("MASTER");
+        }
+        
+        // Evita valores nulos em campos obrigatórios do banco
+        if (novo.getSobrenome() == null) novo.setSobrenome("");
+        if (novo.getEndereco() == null) novo.setEndereco("");
+        if (novo.getMatricula() == null) novo.setMatricula("0000");
+        if (novo.getCargo() == null) novo.setCargo("Gestor Master");
+
+        // 3. Criptografa e Salva
         novo.setSenha(passwordEncoder.encode(novo.getSenha()));
-        colaboradorRepository.save(novo);
-        return ResponseEntity.ok(Map.of("status", "Usuário registrado com sucesso"));
+        
+        try {
+            Colaborador salvo = colaboradorRepository.save(novo);
+            return ResponseEntity.ok(salvo);
+        } catch (Exception e) {
+            e.printStackTrace(); 
+            return ResponseEntity.badRequest().body(Map.of("erro", "Erro no banco", "detalhe", e.getMessage()));
+        }
     }
 }

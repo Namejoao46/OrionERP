@@ -38,7 +38,7 @@ public class LoginController {
 
     @PostMapping("/login")
     @SuppressWarnings("CallToPrintStackTrace")
-    public ResponseEntity<?> efetuarLogin(@RequestBody Map<String, String> dados) {
+    public ResponseEntity<?> efetuarligin(@RequestBody Map<String, String> dados) {
         System.out.println("HASH GERADO PELO APP PARA '123456': " + passwordEncoder.encode("123456"));
         System.out.println(">>> [LoginController] Tentativa de login para: " + dados.get("login"));
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.get("login"), dados.get("senha"));
@@ -51,7 +51,23 @@ public class LoginController {
             Map<String, Object> resposta = new HashMap<>();
             resposta.put("token", tokenJWT);
             resposta.put("nome", colaborador.getNome());
-            resposta.put("role", colaborador.getRole() != null ? colaborador.getRole().toString() : "USER");
+            
+            // 🔎 RASTREIO 1: O que o Firebird/Hibernate extraiu para o objeto Java?
+            if (colaborador.getRole() != null) {
+                System.out.println(">>> [Java Rastreio] .getRole() original: \"" + colaborador.getRole() + "\"");
+                System.out.println(">>> [Java Rastreio] .getRole().name(): \"" + colaborador.getRole().name() + "\"");
+            } else {
+                System.out.println(">>> [Java Rastreio] A role retornou NULA do banco!");
+            }
+            
+            // Tratamento rigoroso para limpar qualquer string vinda do Enum ou do DB
+            String roleNome = colaborador.getRole() != null ? colaborador.getRole().name() : "USER";
+            String roleFinal = roleNome.replace("ROLE_", "").trim().toUpperCase();
+            
+            // 🔎 RASTREIO 2: Veredito final do que vai no pacote JSON enviado para o Angular
+            System.out.println(">>> [Java Rastreio] Role final inserida no JSON: \"" + roleFinal + "\"");
+            
+            resposta.put("role", roleFinal);
             resposta.put("foto", colaborador.getFoto() != null ? Base64.getEncoder().encodeToString(colaborador.getFoto()) : null);
             
             // Verifica se o colaborador tem uma empresa associada (Super Admins não têm)
@@ -73,29 +89,23 @@ public class LoginController {
     @PostMapping("/registrar")
     @SuppressWarnings("CallToPrintStackTrace")
     public ResponseEntity<?> registrar(@RequestBody Colaborador novo) {
-        // 1. Validação de segurança de e-mail
         if (novo.getLogin() != null && colaboradorRepository.existsByLogin(novo.getLogin())) {
             return ResponseEntity.badRequest().body(Map.of("erro", "Login já existe", "detalhe", "Este e-mail já está em uso."));
         }
 
-        // 2. HIGIENIZAÇÃO COMPATÍVEL COM O FIREBIRD
-        // Força a role a ser MASTER caso venha em branco do front
         if (novo.getRole() == null) {
             novo.setRole(backend.model.UserRole.MASTER);
         }
         
-        // Alinha o tipo de colaborador com o modelo de negócio 'MASTER'
         if (novo.getTipoColaborador() == null || novo.getTipoColaborador().isEmpty()) {
             novo.setTipoColaborador("MASTER");
         }
         
-        // Evita valores nulos em campos obrigatórios do banco
         if (novo.getSobrenome() == null) novo.setSobrenome("");
         if (novo.getEndereco() == null) novo.setEndereco("");
         if (novo.getMatricula() == null) novo.setMatricula("0000");
         if (novo.getCargo() == null) novo.setCargo("Gestor Master");
 
-        // 3. Criptografa e Salva
         novo.setSenha(passwordEncoder.encode(novo.getSenha()));
         
         try {

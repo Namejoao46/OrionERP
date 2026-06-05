@@ -4,13 +4,13 @@
     </button>
 
     <ng-container *ngIf="roleAtual">
-        <div class="item-menu" *ngIf="roleAtual === 'ADMIN_DEV'" (click)="notificarCliqueCadastro()">
+        <div class="item-menu" *ngIf="roleAtual === 'SUPER_ADMIN' || roleAtual === 'ADMIN_DEV'" (click)="notificarCliqueCadastro()">
             <img src="assets/predio.png" alt="empresas">
             <h1 *ngIf="isMenuAberto">Empresas</h1>
         </div>
 
         <div class="item-menu" *ngIf="roleAtual === 'MASTER'" (click)="notificarCliqueCadastro()">
-            <img src="assets/equipe.png" alt="equipe">
+            <img src="assets/predio.png" alt="equipe">
             <h1 *ngIf="isMenuAberto">Minha Equipe</h1>
         </div>
     </ng-container>

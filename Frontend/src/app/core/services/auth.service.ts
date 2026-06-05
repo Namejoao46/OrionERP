@@ -32,7 +32,6 @@ export class AuthService {
     const idSalvo = localStorage.getItem('empresaId');
     const roleSalva = localStorage.getItem('userRole');
     
-    // Se não for Super Admin e tiver ID salvo no LocalStorage (F5), restaura os dados da empresa
     if (idSalvo && roleSalva !== 'SUPER_ADMIN') {
       this.carregarDadosEmpresa(idSalvo);
     }
@@ -47,13 +46,18 @@ export class AuthService {
   }
 
   setUserData(dados: any) {
+    if (!dados || !dados.role) return;
+
+    // Remove espaços ocultos que o Firebird possa ter enviado na coluna VARCHAR/CHAR
+    const roleLimpa = dados.role.toString().replace('ROLE_', '').trim().toUpperCase();
+
     localStorage.setItem('token', dados.token);
     localStorage.setItem('userName', dados.nome);
-    localStorage.setItem('userRole', dados.role);
+    localStorage.setItem('userRole', roleLimpa);
     
     this.tokenSubject.next(dados.token);
     this.userNameSubject.next(dados.nome);
-    this.userRoleSubject.next(dados.role);
+    this.userRoleSubject.next(roleLimpa);
 
     if (dados.foto) {
       const fotoLimpa = dados.foto.replace(/\s/g, '');
@@ -61,16 +65,14 @@ export class AuthService {
       this.userImageSubject.next(fotoLimpa);
     }
 
-    // 🚀 Validação Estratégica da Empresa e Regra do Super Admin
-    if (dados.role === 'SUPER_ADMIN' || !dados.empresaId) {
-      // É Administrador Orion global: Limpa os registros locais para herdar o padrão visual neutro
+    // Regra para Super Admin ou usuários sem empresa vinculada
+    if (roleLimpa === 'SUPER_ADMIN' || roleLimpa.includes('ADMIN') || !dados.empresaId) {
       localStorage.removeItem('empresaId');
       localStorage.removeItem('empresaNome');
       localStorage.removeItem('empresaLogo');
       this.empresaNomeSubject.next(null);
       this.empresaLogoSubject.next(null);
     } else {
-      // É Empresa Cliente / Master normal: Salva o vínculo e solicita carga ao EmpresaService
       localStorage.setItem('empresaId', dados.empresaId.toString());
       this.carregarDadosEmpresa(dados.empresaId);
     }
@@ -92,7 +94,7 @@ export class AuthService {
           this.empresaLogoSubject.next(logoLimpa);
         }
       },
-      error: (err) => console.error('Erro ao buscar dados complementares da empresa parceira:', err)
+      error: (err) => console.error('Erro ao buscar dados da empresa parceira:', err)
     });
   }
 
@@ -121,8 +123,6 @@ export class AuthService {
     this.userNameSubject.next(null);
     this.userImageSubject.next(null);
     this.userRoleSubject.next(null);
-    
-    // 🔥 Reseta o estado reativo corporativo no encerramento da sessão
     this.empresaNomeSubject.next(null);
     this.empresaLogoSubject.next(null);
   }

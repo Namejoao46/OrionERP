@@ -21,20 +21,26 @@ export class LoginComponent {
     private cdr: ChangeDetectorRef 
   ) {}
   
-entrar() {
+  entrar() {
     this.authService.login(this.login, this.senha).subscribe({
       next: (res: any) => {
         console.log('--- RESPOSTA DO SERVIDOR ---', res);
 
         if (res.token) {
+          // Passa os dados para o serviço configurar os Subjects e o LocalStorage
           this.authService.setUserData(res);
 
-          this.router.navigate(['/home']);
+          // Força o ciclo de detecção do Angular a atualizar a árvore de componentes antes de mudar de rota
+          this.cdr.detectChanges();
+
+          this.router.navigate(['/home']).then(() => {
+            // Garante um reload limpo na rota inicial para remontar o layout do menu com a nova Role
+            window.location.reload();
+          });
         }
       },
       error: (err: any) => {
         console.error('Erro no login:', err);
-
         const mensagem = err.error?.erro || 'Usuário ou senha inválidos';
         alert(mensagem);
       }

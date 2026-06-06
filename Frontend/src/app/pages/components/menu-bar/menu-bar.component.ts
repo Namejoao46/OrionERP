@@ -3,15 +3,15 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { MenuComponent } from "../menu/menu.component";
-import { AuthService } from '../../../core/services/auth.service';
-import { MensagemService } from '../../../core/services/mensagem.service';
-import { NotificationService } from '../../../core/services/notification.service';
-import { CaixaboxService } from '../../../core/services/caixabox.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { MensagemService } from '../../../core/services/ui/mensagem.service';
+import { NotificationService } from '../../../core/services/ui/notification.service';
+import { CaixaboxService } from '../../../core/services/ui/caixabox.service';
 import { CaixaboxOption } from '../caixa-box/caixa-box';
 import { Observable, interval, Subscription } from 'rxjs';
 import { map, startWith, switchMap } from 'rxjs/operators';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { ModalService } from '../../../core/services/modal.service';
+import { ModalService } from '../../../core/services/ui/modal.service';
 
 @Component({
   selector: 'app-menu-bar',

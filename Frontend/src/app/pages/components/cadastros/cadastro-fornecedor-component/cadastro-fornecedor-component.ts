@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { FornecedorService } from '../../../../core/services/fornecedor.service';
+import { FornecedorService } from '../../../../core/services/erp/fornecedor.service';
 
 @Component({
   selector: 'app-cadastro-fornecedor-component',

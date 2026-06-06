@@ -3,9 +3,9 @@ import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectorRef } from '@ang
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Observable, Subscription, map, take } from 'rxjs';
-import { AuthService } from '../../../../core/services/auth.service';
-import { ModalService } from '../../../../core/services/modal.service';
-import { ColaboradorService } from '../../../../core/services/colaborador.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { ModalService } from '../../../../core/services/ui/modal.service';
+import { ColaboradorService } from '../../../../core/services/core/colaborador.service';
 import { CardFlutuante } from '../../card-flutuante/card-flutuante';
 
 @Component({

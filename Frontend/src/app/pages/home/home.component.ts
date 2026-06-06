@@ -8,7 +8,7 @@ import { MenuFixoComponent } from "../components/menu-fixo/menu-fixo.component";
 import { CardFlutuante } from "../components/card-flutuante/card-flutuante";
 import { ChatComponent } from "../components/chat-component/chat-component";
 import { CadastroGeralComponent } from '../components/cadastros/cadastro-geral-component/cadastro-geral-component';
-import { ModalService } from '../../core/services/modal.service';
+import { ModalService } from '../../core/services/ui/modal.service';
 import { CadastroFornecedorComponent } from '../components/cadastros/cadastro-fornecedor-component/cadastro-fornecedor-component';
 import { Perfil } from "../components/menu-bar/perfil/perfil";
 

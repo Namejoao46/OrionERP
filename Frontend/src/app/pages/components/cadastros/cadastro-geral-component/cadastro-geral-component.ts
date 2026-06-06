@@ -3,9 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { AuthService } from '../../../../core/services/auth.service';
-import { EmpresaService } from '../../../../core/services/empresa.service';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { EmpresaService } from '../../../../core/services/core/empresa.service';
+import { NotificationService } from '../../../../core/services/ui/notification.service';
 
 @Component({
   selector: 'app-cadastro-geral',

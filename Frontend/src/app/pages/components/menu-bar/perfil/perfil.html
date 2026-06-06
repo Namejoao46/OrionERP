@@ -4,7 +4,7 @@
     <aside class="coluna-perfil">
       
       <div class="avatar-container animate-fade">
-        <img [src]="(userImage$ | async) || 'assets/perfil.png'" alt="Foto de Perfil" class="avatar-principal">
+        <img [src]="(userImage$ | async) || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" alt="Foto de Perfil" class="avatar-principal">
         
         <label for="upload-avatar" class="overlay-upload-foto">
           <span class="icone-camera">📷</span>
@@ -14,46 +14,69 @@
         <span class="badge-verificado">✓ Verificado</span>
       </div>
 
-      <div class="bloco-nome-usuario">
-        <ng-container *ngIf="!editandoNome; else inputNomeTpl">
+      <div class="bloco-info-cadastral">
+        
+        <ng-container *ngIf="!editandoPerfil">
           <h2 class="nome-usuario">
-            {{ (userName$ | async) || 'Não informado' }}
-            <button class="btn-editar-icone" (click)="alternarEdicaoNome()">✏️</button>
+            {{ (userName$ | async) || 'Não informado' }} 
+            {{ colaboradorForm.sobrenome || '' }}
           </h2>
-        </ng-container>
-        <ng-template #inputNomeTpl>
-          <div class="input-inline-container">
-            <input type="text" [(ngModel)]="nomeEditado" class="input-nome-edicao" />
-            <button class="btn-salvar-nome" (click)="salvarNome()">✓</button>
+          <p class="cargo-tag">{{ colaboradorForm.cargo || 'Não informado' }}</p>
+          
+          <div class="dados-adicionais-usuario">
+            <div class="item-dado">
+              <span class="label-dado">Matrícula</span>
+              <span class="valor-dado">{{ colaboradorForm.matricula || 'Não informada' }}</span>
+            </div>
+            <div class="item-dado">
+              <span class="label-dado">CPF</span>
+              <span class="valor-dado">{{ colaboradorForm.cpf || 'Não informado' }}</span>
+            </div>
           </div>
-        </ng-template>
+          
+          <button class="btn-editar-perfil" (click)="alternarEdicao()">Editar Meus Dados ✏️</button>
+        </ng-container>
+
+        <ng-container *ngIf="editandoPerfil">
+          <div class="formulario-edicao-colaborador">
+            <label class="label-input-ajuste">Nome:</label>
+            <input type="text" [(ngModel)]="colaboradorForm.nome" placeholder="Nome" class="input-perfil-edicao">
+            
+            <label class="label-input-ajuste">Sobrenome:</label>
+            <input type="text" [(ngModel)]="colaboradorForm.sobrenome" placeholder="Sobrenome" class="input-perfil-edicao">
+            
+            <label class="label-input-ajuste">Cargo:</label>
+            <input type="text" [(ngModel)]="colaboradorForm.cargo" placeholder="Cargo" class="input-perfil-edicao">
+            
+            <label class="label-input-ajuste">Matrícula:</label>
+            <input type="text" [(ngModel)]="colaboradorForm.matricula" placeholder="Matrícula" class="input-perfil-edicao">
+            
+            <label class="label-input-ajuste">CPF:</label>
+            <input type="text" [(ngModel)]="colaboradorForm.cpf" placeholder="CPF" class="input-perfil-edicao">
+            
+            <div class="botoes-acoes-form">
+              <button class="btn-salvar-perfil" (click)="salvarPerfilCompleto()">Gravar ✓</button>
+              <button class="btn-cancelar-perfil" (click)="alternarEdicao()">Voltar ✕</button>
+            </div>
+          </div>
+        </ng-container>
+
       </div>
 
-      <p class="cargo-tag">{{ userCargo }}</p>
-
-      <div class="tags-skills">
+      <div class="tags-skills" *ngIf="!editandoPerfil">
         <span class="skill-tag">Angular</span>
         <span class="skill-tag">TypeScript</span>
         <span class="skill-tag">CSS/Tailwind</span>
       </div>
 
-      <hr class="divisor">
-
-      <div class="dados-adicionais-usuario">
-        <div class="item-dado">
-          <span class="label-dado">Matrícula</span>
-          <span class="valor-dado">{{ userMatricula }}</span>
-        </div>
-        <div class="item-dado">
-          <span class="label-dado">CPF</span>
-          <span class="valor-dado">{{ userCpf }}</span>
-        </div>
-      </div>
-
       <hr class="divisor" *ngIf="(empresaNome$ | async) || (empresaLogo$ | async)">
 
       <div class="dados-empresa-sidebar" *ngIf="(empresaNome$ | async) || (empresaLogo$ | async)">
-        <h3>Empresa Vinculada</h3>
+        <div class="topo-empresa-sidebar">
+          <h3>Empresa Vinculada</h3>
+          <button *ngIf="isMaster" class="btn-empresa-master" title="Configurações da Empresa (Acesso Master)">⚙️</button>
+        </div>
+        
         <div class="empresa-info-bloco">
           <img *ngIf="empresaLogo$ | async as logoUrl" [src]="logoUrl" alt="Logo Empresa" class="logo-sidebar">
           <p>{{ (empresaNome$ | async) || 'Não informada' }}</p>
@@ -62,6 +85,7 @@
     </aside>
 
     <main class="conteudo-principal">
+      
       <section class="grid-metricas">
         <div class="card-metrica">
           <span class="porcentagem">91%</span>
@@ -110,6 +134,7 @@
           </div>
         </div>
       </section>
+      
     </main>
 
   </div>

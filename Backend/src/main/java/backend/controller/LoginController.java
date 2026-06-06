@@ -39,68 +39,90 @@ public class LoginController {
     @PostMapping("/login")
     @SuppressWarnings("CallToPrintStackTrace")
     public ResponseEntity<?> efetuarligin(@RequestBody Map<String, String> dados) {
-        System.out.println("HASH GERADO PELO APP PARA '123456': " + passwordEncoder.encode("123456"));
-        System.out.println(">>> [LoginController] Tentativa de login para: " + dados.get("login"));
+        System.out.println(">>> [LoginController] Inicializando fluxo POST /login");
+        System.out.println(">>> [LoginController] Login enviado: " + dados.get("login"));
+        
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.get("login"), dados.get("senha"));
         
         try {
+            System.out.println(">>> [LoginController] Chamando manager.authenticate()...");
             var authentication = manager.authenticate(authenticationToken);
+            System.out.println(">>> [LoginController] Autenticação gerenciada aprovada!");
+            
             var colaborador = (Colaborador) authentication.getPrincipal();
+            System.out.println(">>> [LoginController] Carregado do Principal: ID " + colaborador.getId() + " - " + colaborador.getLogin());
+            
+            System.out.println(">>> [LoginController] Invocando TokenService para assinatura...");
             var tokenJWT = tokenService.gerarToken(colaborador);
+            System.out.println(">>> [LoginController] Token JWT gerado com sucesso.");
 
             Map<String, Object> resposta = new HashMap<>();
+            
+            // CORREÇÃO CRÍTICA: Enviando o ID do usuário para o Angular!
+            resposta.put("id", colaborador.getId()); 
             resposta.put("token", tokenJWT);
             resposta.put("nome", colaborador.getNome());
+            resposta.put("login", colaborador.getLogin());
             
-            // 🔎 RASTREIO 1: O que o Firebird/Hibernate extraiu para o objeto Java?
+            // Enviando os dados complementares do perfil para evitar LocalStorage em branco
+            resposta.put("sobrenome", colaborador.getSobrenome());
+            resposta.put("cargo", colaborador.getCargo());
+            resposta.put("cpf", colaborador.getCpf());
+            resposta.put("matricula", colaborador.getMatricula());
+            resposta.put("endereco", colaborador.getEndereco());
+            resposta.put("tipoColaborador", colaborador.getTipoColaborador());
+            resposta.put("dataNascimento", colaborador.getDataNascimento() != null ? colaborador.getDataNascimento().toString() : null);
+            
             if (colaborador.getRole() != null) {
-                System.out.println(">>> [Java Rastreio] .getRole() original: \"" + colaborador.getRole() + "\"");
-                System.out.println(">>> [Java Rastreio] .getRole().name(): \"" + colaborador.getRole().name() + "\"");
+                System.out.println(">>> [LoginController Rastreio] Role mapeada na entidade: " + colaborador.getRole().name());
             } else {
-                System.out.println(">>> [Java Rastreio] A role retornou NULA do banco!");
+                System.out.println(">>> [LoginController Rastreio] Role está NULA no banco de dados!");
             }
             
-            // Tratamento rigoroso para limpar qualquer string vinda do Enum ou do DB
             String roleNome = colaborador.getRole() != null ? colaborador.getRole().name() : "USER";
             String roleFinal = roleNome.replace("ROLE_", "").trim().toUpperCase();
             
-            // 🔎 RASTREIO 2: Veredito final do que vai no pacote JSON enviado para o Angular
-            System.out.println(">>> [Java Rastreio] Role final inserida no JSON: \"" + roleFinal + "\"");
+            System.out.println(">>> [LoginController Rastreio] String final enviada no JSON ao Angular: \"" + roleFinal + "\"");
             
             resposta.put("role", roleFinal);
             resposta.put("foto", colaborador.getFoto() != null ? Base64.getEncoder().encodeToString(colaborador.getFoto()) : null);
             
-            // Verifica se o colaborador tem uma empresa associada (Super Admins não têm)
             if (colaborador.getEmpresa() != null) {
+                System.out.println(">>> [LoginController] Vinculo Empresarial Detectado ID: " + colaborador.getEmpresa().getId());
                 resposta.put("empresaId", colaborador.getEmpresa().getId());
             } else {
+                System.out.println(">>> [LoginController] Vinculo Empresarial NULO (Provável Super Admin)");
                 resposta.put("empresaId", null);
             }
             
+            System.out.println(">>> [LoginController] Despachando resposta HTTP 200 OK");
             return ResponseEntity.ok(resposta);
             
         } catch (AuthenticationException e) {
-            System.out.println(">>> [LoginController] ERRO DE AUTENTICAÇÃO: " + e.getMessage());
-            e.printStackTrace(); 
+            System.err.println(">>> [LoginController] ERRO DE AUTENTICAÇÃO BLOQUEANTE: " + e.getMessage());
             return ResponseEntity.status(403).body("Erro na autenticação: " + e.getMessage());
         }
     }
 
     @PostMapping("/registrar")
-    @SuppressWarnings("CallToPrintStackTrace")
     public ResponseEntity<?> registrar(@RequestBody Colaborador novo) {
+        System.out.println(">>> [LoginController] Inicializando auto-cadastro de conta master");
+        
+        // CORREÇÃO: Adicionado bloqueio se o RequestBody vier nulo
+        if (novo == null) {
+            System.out.println(">>> [LoginController] Recusado: Objeto do colaborador veio nulo.");
+            return ResponseEntity.badRequest().body(Map.of("erro", "Dados inválidos", "detalhe", "O corpo da requisição não pode ser vazio."));
+        }
+
+        System.out.println(">>> [LoginController] Login desejado: " + novo.getLogin());
+
         if (novo.getLogin() != null && colaboradorRepository.existsByLogin(novo.getLogin())) {
+            System.out.println(">>> [LoginController] Recusado: Login já ocupado no banco.");
             return ResponseEntity.badRequest().body(Map.of("erro", "Login já existe", "detalhe", "Este e-mail já está em uso."));
         }
 
-        if (novo.getRole() == null) {
-            novo.setRole(backend.model.UserRole.MASTER);
-        }
-        
-        if (novo.getTipoColaborador() == null || novo.getTipoColaborador().isEmpty()) {
-            novo.setTipoColaborador("MASTER");
-        }
-        
+        if (novo.getRole() == null) novo.setRole(backend.model.UserRole.MASTER);
+        if (novo.getTipoColaborador() == null || novo.getTipoColaborador().isEmpty()) novo.setTipoColaborador("MASTER");
         if (novo.getSobrenome() == null) novo.setSobrenome("");
         if (novo.getEndereco() == null) novo.setEndereco("");
         if (novo.getMatricula() == null) novo.setMatricula("0000");
@@ -109,10 +131,12 @@ public class LoginController {
         novo.setSenha(passwordEncoder.encode(novo.getSenha()));
         
         try {
+            System.out.println(">>> [LoginController] Gravando dados criptografados do novo Colaborador...");
             Colaborador salvo = colaboradorRepository.save(novo);
+            System.out.println(">>> [LoginController] Auto-cadastro finalizado com ID: " + salvo.getId());
             return ResponseEntity.ok(salvo);
         } catch (Exception e) {
-            e.printStackTrace(); 
+            System.err.println(">>> [LoginController] Erro inesperado na persistência do cadastro: " + e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("erro", "Erro no banco", "detalhe", e.getMessage()));
         }
     }

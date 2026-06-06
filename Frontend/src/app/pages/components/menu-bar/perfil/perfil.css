@@ -27,11 +27,11 @@
 }
 
 /* ==========================================
-   2. CONTAINER PRINCIPAL (FORÇANDO O GRID LADO A LADO)
+   2. CONTAINER PRINCIPAL (GRID LADO A LADO)
    ========================================== */
 .dashboard-container {
   display: grid;
-  grid-template-columns: 260px 1fr; /* Garante que fiquem duas colunas na mesma linha */
+  grid-template-columns: 260px 1fr; /* Duas colunas fixas na mesma linha */
   gap: 20px;
   background-color: #000117;
   color: #ffffff;
@@ -44,7 +44,7 @@
   overflow-y: auto;
 }
 
-/* Força o modal do Angular original a aceitar a largura do nosso painel */
+/* Força o modal do Angular original a aceitar a largura correta do painel */
 :host ::v-deep .perfil-modal-conteudo,
 :host ::v-deep app-card-flutuante {
   width: 100% !important;
@@ -54,7 +54,7 @@
 }
 
 /* ==========================================
-   3. COLUNA DA ESQUERDA (FIXANDO O AVATAR E SKILLS)
+   3. COLUNA DA ESQUERDA (PERFIL DO COLABORADOR)
    ========================================== */
 .coluna-perfil {
   background-color: #050a30;
@@ -70,7 +70,7 @@
   height: fit-content;
 }
 
-/* Avatar interativo com efeito de upload */
+/* Container do Avatar e efeito Hover de foto */
 .avatar-container {
   position: relative;
   width: 120px;  
@@ -90,7 +90,7 @@
   display: block;
 }
 
-/* Cortina escura que surge ao passar o mouse para trocar a foto */
+/* Cortina escura com a câmera para troca de foto */
 .overlay-upload-foto {
   position: absolute;
   top: 0;
@@ -125,13 +125,14 @@
   padding: 4px 10px;
   border-radius: 20px;
   white-space: nowrap;
+  z-index: 2;
 }
 
-/* Controle de Edição de Nome Inline */
-.bloco-nome-usuario {
+/* Dados Textuais do Bloco do Usuário */
+.bloco-info-cadastral {
   width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
 }
 
@@ -139,86 +140,12 @@
   font-size: 18px;
   margin: 10px 0 5px 0;
   font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-editar-icone {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  opacity: 0.6;
-  transition: opacity 0.2s;
-  padding: 0;
-}
-
-.btn-editar-icone:hover {
-  opacity: 1;
-}
-
-.input-inline-container {
-  display: flex;
-  gap: 6px;
-  width: 100%;
-  padding: 0 10px;
-  box-sizing: border-box;
-  margin: 10px 0 5px 0;
-}
-
-.input-nome-edicao {
-  flex: 1;
-  background-color: #000117;
-  border: 1px solid #2b97fa;
-  border-radius: 6px;
-  color: white;
-  padding: 6px 10px;
-  font-size: 14px;
-  outline: none;
-}
-
-.btn-salvar-nome {
-  background-color: #2563eb;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  padding: 0 12px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.btn-salvar-nome:hover {
-  background-color: #2b97fa;
 }
 
 .cargo-tag {
   color: #94a3b8;
   font-size: 14px;
   margin-bottom: 15px;
-}
-
-.tags-skills {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-.skill-tag {
-  background-color: #2a2a35;
-  font-size: 11px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid #2b97fa;
-}
-
-.divisor {
-  border: 0;
-  border-top: 1px solid #2a2a35;
-  width: 100%;
-  margin: 10px 0;
 }
 
 /* Bloco de Informações Adicionais (CPF, Matrícula) */
@@ -254,8 +181,114 @@
   margin-top: 2px;
 }
 
+/* Formulário de Edição do Perfil do Colaborador */
+.formulario-edicao-colaborador {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 0;
+}
+
+.input-perfil-edicao {
+  background-color: #000117;
+  border: 1px solid #2b97fa;
+  border-radius: 6px;
+  color: #ffffff;
+  padding: 8px 12px;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-perfil-edicao:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.botoes-acoes-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.btn-salvar-perfil {
+  flex: 2;
+  background-color: #2563eb;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.btn-salvar-perfil:hover {
+  background-color: #2b97fa;
+}
+
+.btn-cancelar-perfil {
+  flex: 1;
+  background-color: #3f3f46;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-cancelar-perfil:hover {
+  background-color: #52525b;
+}
+
+.btn-editar-perfil {
+  background-color: transparent;
+  border: 1px solid #2b97fa;
+  color: #2b97fa;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-editar-perfil:hover {
+  background-color: #2b97fa;
+  color: #ffffff;
+}
+
+/* Skills Tags */
+.tags-skills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.skill-tag {
+  background-color: #2a2a35;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #2b97fa;
+}
+
+.divisor {
+  border: 0;
+  border-top: 1px solid #2a2a35;
+  width: 100%;
+  margin: 15px 0;
+}
+
 /* ==========================================
-   4. DOMANDO A IMAGEM DA EMPRESA (FIM DA QUEBRA)
+   4. SEÇÃO DA EMPRESA VINCULADA (PROTEÇÃO MASTER)
    ========================================== */
 .dados-empresa-sidebar {
   width: 100%;
@@ -263,10 +296,31 @@
   text-align: left;
 }
 
+.topo-empresa-sidebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
 .dados-empresa-sidebar h3 {
   font-size: 14px;
   color: #94a3b8;
-  margin-bottom: 8px;
+  margin: 0;
+}
+
+.btn-empresa-master {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.btn-empresa-master:hover {
+  opacity: 1;
 }
 
 .empresa-info-bloco {
@@ -409,7 +463,7 @@
   margin-left: 4px;
 }
 
-/* Animação suave para renderização inicial */
+/* Animações de Transição de Entrada */
 .animate-fade {
   animation: fadeIn 0.4s ease-out;
 }

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ProdutoService } from '../../../../../core/services/erp/Produto.service';
+import { ProdutoService } from '../../../../core/services/erp/Produto.service';
 
 @Component({
   selector: 'app-produtos-grid',

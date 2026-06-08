@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import backend.dto.fiscal.NotaImportadaResponse;
@@ -46,14 +47,27 @@ public class NotaRecebimentoService {
     @Autowired private ProdutoFornecedorRepository produtoFornecedorRepository;
     @Autowired private ItemNotaRecebimentoRepository itemRepository;
     @Autowired private ProdutoService produtoService;
+    
+    @Autowired private FornecedorXmlService fornecedorXmlService;
 
     private static final DateTimeFormatter DT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Transactional
     public NotaImportadaResponse importarXml(InputStream xmlInputStream) throws Exception {
+        System.out.println("[LOG NOTA-RECEBIMENTO] Iniciando parseamento do XML da Nota.");
         Document doc = parsearXml(xmlInputStream);
+        
         String chave = getTagValue("chNFe", doc.getDocumentElement());
+        if (chave == null || chave.isBlank()) {
+            // Caso a tag chNFe esteja dentro de infNFe como atributo Id
+            Element infNFeAttr = (Element) doc.getElementsByTagName("infNFe").item(0);
+            if (infNFeAttr != null && infNFeAttr.hasAttribute("Id")) {
+                chave = infNFeAttr.getAttribute("Id").replace("NFe", "");
+            }
+        }
+
+        System.out.println("[LOG NOTA-RECEBIMENTO] Chave de acesso identificada: " + chave);
         if (chave != null && !chave.isBlank() && notaRepository.existsByChaveAcesso(chave)) {
             throw new IllegalStateException("Esta NF-e (chave " + chave + ") já foi importada anteriormente.");
         }
@@ -76,7 +90,8 @@ public class NotaRecebimentoService {
 
         Element emit = (Element) infNFe.getElementsByTagName("emit").item(0);
         String[] statusForn = new String[1];
-        Fornecedor fornecedor = processarFornecedor(emit, statusForn);
+        
+        Fornecedor fornecedor = processarFornecedorUnificado(emit, statusForn);
         nota.setFornecedor(fornecedor);
         nota.setStatusFornecedor(statusForn[0]);
 
@@ -99,6 +114,7 @@ public class NotaRecebimentoService {
 
         NodeList detList = infNFe.getElementsByTagName("det");
         List<ItemNotaRecebimento> itens = new ArrayList<>();
+        System.out.println("[LOG NOTA-RECEBIMENTO] Detectados " + detList.getLength() + " itens no XML.");
         for (int i = 0; i < detList.getLength(); i++) {
             Element det = (Element) detList.item(i);
             ItemNotaRecebimento item = processarItem(det, nota, fornecedor.getCnpj());
@@ -130,9 +146,92 @@ public class NotaRecebimentoService {
         nota.setDuplicatas(duplicatas);
         nota.setStatus("RASCUNHO");
 
+        System.out.println("[LOG NOTA-RECEBIMENTO] Salvando Nota Fiscal temporária no banco de dados.");
         NotaRecebimento notaSalva = notaRepository.save(nota);
 
         return montarResposta(notaSalva);
+    }
+
+    private Fornecedor processarFornecedorUnificado(Element emit, String[] statusOut) {
+        String cnpj = getTagValue("CNPJ", emit);
+        System.out.println("[LOG NOTA-RECEBIMENTO] Processando emitente CNPJ: " + cnpj);
+        Optional<Fornecedor> existente = fornecedorRepository.findByCnpj(cnpj);
+
+        Fornecedor fXml = fornecedorXmlService.converterElementParaFornecedor(emit);
+        
+        Fornecedor fFinal = existente.orElse(new Fornecedor());
+        statusOut[0] = existente.isPresent() ? "ATUALIZADO" : "NOVO";
+
+        fFinal.setCnpj(cnpj);
+        fFinal.setRazaoSocial(fXml.getRazaoSocial());
+        fFinal.setNomeFantasia(fXml.getNomeFantasia());
+        fFinal.setInscricaoEstadual(fXml.getInscricaoEstadual());
+        fFinal.setInscricaoMunicipal(fXml.getInscricaoMunicipal());
+        fFinal.setCnaePrincipal(fXml.getCnaePrincipal());
+        fFinal.setCrt(fXml.getCrt());
+        fFinal.setLogradouro(fXml.getLogradouro());
+        fFinal.setNumero(fXml.getNumero());
+        fFinal.setComplemento(fXml.getComplemento());
+        fFinal.setBairro(fXml.getBairro());
+        fFinal.setCep(fXml.getCep());
+        fFinal.setCidade(fXml.getCidade());
+        fFinal.setUf(fXml.getUf());
+        fFinal.setCMun(fXml.getCMun());
+        fFinal.setTelefone(fXml.getTelefone());
+
+        return fornecedorRepository.save(fFinal);
+    }
+
+    private ItemNotaRecebimento processarItem(Element det, NotaRecebimento nota, String cnpjFornecedor) {
+        Element prod = (Element) det.getElementsByTagName("prod").item(0);
+        Element imposto = (Element) det.getElementsByTagName("imposto").item(0);
+
+        ItemNotaRecebimento item = new ItemNotaRecebimento();
+        item.setNota(nota);
+
+        String cProd = getTagValue("cProd", prod);
+        item.setCodigoProdutoFornecedor(cProd);
+        item.setDescricaoNota(getTagValue("xProd", prod));
+        item.setNcm(getTagValue("NCM", prod));
+        item.setCfop(getTagValue("CFOP", prod));
+        item.setUnidadeComercial(getTagValue("uCom", prod));
+        item.setQuantidadeFaturada(parseBigDecimal(getTagValue("qCom", prod)));
+        item.setQuantidadeRecebida(item.getQuantidadeFaturada()); 
+        item.setValorUnitario(parseBigDecimal(getTagValue("vUnCom", prod)));
+        item.setValorTotal(parseBigDecimal(getTagValue("vProd", prod)));
+
+        if (imposto != null) {
+            Element icms = primeiroFilho(imposto, "ICMS");
+            if (icms != null) {
+                // Corrige o bug do item(0) buscando dinamicamente o primeiro nó do tipo ELEMENT
+                Element icmsGrupo = obterPrimeiroElementoFilho(icms);
+                if (icmsGrupo != null) {
+                    item.setCst(getTagValue("CST", icmsGrupo));
+                    if (item.getCst() == null || item.getCst().isBlank()) {
+                        item.setCst(getTagValue("CSOSN", icmsGrupo));
+                    }
+                    item.setAliquotaIcms(parseBigDecimal(getTagValue("pICMS", icmsGrupo)));
+                    item.setValorIcmsItem(parseBigDecimal(getTagValue("vICMS", icmsGrupo)));
+                }
+            }
+            Element ipi = primeiroFilho(imposto, "IPI");
+            if (ipi != null) {
+                Element ipiGrupo = primeiroFilho(ipi, "IPITrib");
+                if (ipiGrupo != null) {
+                    item.setAliquotaIpi(parseBigDecimal(getTagValue("pIPI", ipiGrupo)));
+                    item.setValorIpiItem(parseBigDecimal(getTagValue("vIPI", ipiGrupo)));
+                }
+            }
+        }
+
+        produtoFornecedorRepository
+                .findByCnpjFornecedorAndCodigoFornecedor(cnpjFornecedor, cProd)
+                .ifPresent(vinculo -> {
+                    System.out.println("[LOG NOTA-RECEBIMENTO] Vínculo De-Para encontrado automaticamente para o item: " + cProd);
+                    item.setProduto(vinculo.getProduto());
+                });
+
+        return item;
     }
 
     @Transactional
@@ -151,6 +250,7 @@ public class NotaRecebimentoService {
 
     @Transactional
     public void confirmarEntrada(Long notaId) {
+        System.out.println("[LOG NOTA-RECEBIMENTO] Confirmando entrada física e financeira da nota ID: " + notaId);
         NotaRecebimento nota = notaRepository.findById(notaId)
                 .orElseThrow(() -> new RuntimeException("Nota não encontrada: " + notaId));
 
@@ -193,6 +293,7 @@ public class NotaRecebimentoService {
 
         nota.setStatus("CONFIRMADO");
         notaRepository.save(nota);
+        System.out.println("[LOG NOTA-RECEBIMENTO] Nota Fiscal de Entrada confirmada com sucesso!");
     }
 
     @Transactional
@@ -223,83 +324,6 @@ public class NotaRecebimentoService {
         return builder.parse(is);
     }
 
-    private Fornecedor processarFornecedor(Element emit, String[] statusOut) {
-        String cnpj = getTagValue("CNPJ", emit);
-        Optional<Fornecedor> existente = fornecedorRepository.findByCnpj(cnpj);
-
-        Fornecedor f = existente.orElse(new Fornecedor());
-        statusOut[0] = existente.isPresent() ? "ATUALIZADO" : "NOVO";
-
-        f.setCnpj(cnpj);
-        f.setRazaoSocial(getTagValue("xNome", emit));
-        f.setNomeFantasia(getTagValue("xFant", emit));
-        f.setInscricaoEstadual(getTagValue("IE", emit));
-
-        String crtStr = getTagValue("CRT", emit);
-        if (crtStr != null && !crtStr.isBlank()) {
-            // CORREÇÃO: Usando Integer.valueOf para evitar a criação desnecessária de um tipo primitivo/temporário complexo
-            try { f.setCrt(Integer.valueOf(crtStr.trim())); } catch (NumberFormatException ignored) {}
-        }
-
-        Element ender = (Element) emit.getElementsByTagName("enderEmit").item(0);
-        if (ender != null) {
-            f.setLogradouro(getTagValue("xLgr", ender));
-            f.setNumero(getTagValue("nro", ender));
-            f.setBairro(getTagValue("xBairro", ender));
-            f.setCep(getTagValue("CEP", ender));
-            f.setCidade(getTagValue("xMun", ender));
-            f.setUf(getTagValue("UF", ender));
-        }
-
-        return fornecedorRepository.save(f);
-    }
-
-    private ItemNotaRecebimento processarItem(Element det, NotaRecebimento nota, String cnpjFornecedor) {
-        Element prod = (Element) det.getElementsByTagName("prod").item(0);
-        Element imposto = (Element) det.getElementsByTagName("imposto").item(0);
-
-        ItemNotaRecebimento item = new ItemNotaRecebimento();
-        item.setNota(nota);
-
-        String cProd = getTagValue("cProd", prod);
-        item.setCodigoProdutoFornecedor(cProd);
-        item.setDescricaoNota(getTagValue("xProd", prod));
-        item.setNcm(getTagValue("NCM", prod));
-        item.setCfop(getTagValue("CFOP", prod));
-        item.setUnidadeComercial(getTagValue("uCom", prod));
-        item.setQuantidadeFaturada(parseBigDecimal(getTagValue("qCom", prod)));
-        item.setQuantidadeRecebida(item.getQuantidadeFaturada()); 
-        item.setValorUnitario(parseBigDecimal(getTagValue("vUnCom", prod)));
-        item.setValorTotal(parseBigDecimal(getTagValue("vProd", prod)));
-
-        if (imposto != null) {
-            Element icms = primeiroFilho(imposto, "ICMS");
-            if (icms != null && icms.getChildNodes().getLength() > 0) {
-                Element icmsGrupo = (Element) icms.getChildNodes().item(0);
-                item.setCst(getTagValue("CST", icmsGrupo));
-                if (item.getCst() == null || item.getCst().isBlank()) {
-                    item.setCst(getTagValue("CSOSN", icmsGrupo));
-                }
-                item.setAliquotaIcms(parseBigDecimal(getTagValue("pICMS", icmsGrupo)));
-                item.setValorIcmsItem(parseBigDecimal(getTagValue("vICMS", icmsGrupo)));
-            }
-            Element ipi = primeiroFilho(imposto, "IPI");
-            if (ipi != null) {
-                Element ipiGrupo = primeiroFilho(ipi, "IPITrib");
-                if (ipiGrupo != null) {
-                    item.setAliquotaIpi(parseBigDecimal(getTagValue("pIPI", ipiGrupo)));
-                    item.setValorIpiItem(parseBigDecimal(getTagValue("vIPI", ipiGrupo)));
-                }
-            }
-        }
-
-        produtoFornecedorRepository
-                .findByCnpjFornecedorAndCodigoFornecedor(cnpjFornecedor, cProd)
-                .ifPresent(vinculo -> item.setProduto(vinculo.getProduto()));
-
-        return item;
-    }
-
     private void gravarVinculoDePara(Fornecedor fornecedor, String codigoFornecedor, Produto produto, BigDecimal ultimoPreco) {
         if (fornecedor == null || codigoFornecedor == null || produto == null) return;
 
@@ -318,7 +342,7 @@ public class NotaRecebimentoService {
 
     private NotaImportadaResponse montarResposta(NotaRecebimento nota) {
         Fornecedor f = nota.getFornecedor();
-        if (f == null) return null; // Prevenção contra NullPointer sem precisar de anotações agressivas
+        if (f == null) return null;
 
         FornecedorResumo fornResumo = new FornecedorResumo(
                 f.getId(), f.getCnpj(), f.getRazaoSocial(), f.getNomeFantasia(),
@@ -327,21 +351,10 @@ public class NotaRecebimentoService {
 
         List<ItemImportadoResponse> itensResp = nota.getItens().stream().map(i ->
             new ItemImportadoResponse(
-                i.getId(),
-                i.getCodigoProdutoFornecedor(),
-                i.getDescricaoNota(),
-                i.getNcm(),
-                i.getCfop(),
-                i.getUnidadeComercial(),
-                i.getCst(),
-                i.getQuantidadeFaturada(),
-                i.getQuantidadeRecebida(),
-                i.getValorUnitario(),
-                i.getValorTotal(),
-                i.getAliquotaIcms(),
-                i.getValorIcmsItem(),
-                i.getAliquotaIpi(),
-                i.getValorIpiItem(),
+                i.getId(), i.getCodigoProdutoFornecedor(), i.getDescricaoNota(), i.getNcm(), i.getCfop(),
+                i.getUnidadeComercial(), i.getCst(), i.getQuantidadeFaturada(), i.getQuantidadeRecebida(),
+                i.getValorUnitario(), i.getValorTotal(), i.getAliquotaIcms(), i.getValorIcmsItem(),
+                i.getAliquotaIpi(), i.getValorIpiItem(),
                 i.getProduto() != null ? i.getProduto().getId() : null,
                 i.getProduto() != null ? i.getProduto().getDescricao() : null
             )
@@ -361,9 +374,7 @@ public class NotaRecebimentoService {
                 nota.getBaseCalculoIcms(), nota.getValorIcms(),
                 nota.getValorSt(), nota.getValorIpi(),
                 nota.getValorPis(), nota.getValorCofins(),
-                itensResp,
-                nota.getFormaPagamento(), dupsResp,
-                nota.getId()
+                itensResp, nota.getFormaPagamento(), dupsResp, nota.getId()
         );
     }
 
@@ -385,11 +396,13 @@ public class NotaRecebimentoService {
         };
     }
 
+    // Método utilitário otimizado para evitar problemas com quebras de linhas do XML
     private String getTagValue(String tag, Element element) {
         if (element == null) return null;
         NodeList nl = element.getElementsByTagName(tag);
-        if (nl.getLength() > 0 && nl.item(0).getChildNodes().getLength() > 0) {
-            return nl.item(0).getChildNodes().item(0).getNodeValue();
+        if (nl.getLength() > 0) {
+            String txt = nl.item(0).getTextContent();
+            return txt != null ? txt.trim() : null;
         }
         return null;
     }
@@ -397,6 +410,17 @@ public class NotaRecebimentoService {
     private Element primeiroFilho(Element parent, String tagName) {
         NodeList nl = parent.getElementsByTagName(tagName);
         return nl.getLength() > 0 ? (Element) nl.item(0) : null;
+    }
+
+    // Auxiliar estratégico para pular nós de texto invisíveis do XML (\n\t)
+    private Element obterPrimeiroElementoFilho(Element parent) {
+        NodeList filhos = parent.getChildNodes();
+        for (int i = 0; i < filhos.getLength(); i++) {
+            if (filhos.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                return (Element) filhos.item(i);
+            }
+        }
+        return null;
     }
 
     private BigDecimal parseBigDecimal(String valor) {

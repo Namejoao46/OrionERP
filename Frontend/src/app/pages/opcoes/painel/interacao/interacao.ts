@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Metas } from "./metas/metas";
-import { Mensagens } from "./mensagens/mensagens";
+import { Mensagens } from "././mensagens/mensagens";
 import { Calendario } from "./calendario/calendario";
 
 @Component({

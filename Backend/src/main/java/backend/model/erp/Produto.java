@@ -11,6 +11,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -25,6 +27,10 @@ public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "fornecedor_id", nullable = false) // Vínculo obrigatório no banco de dados
+    private Fornecedor fornecedor;
     
     @Column(unique = true)
     private String codigoBarras;
@@ -37,6 +43,7 @@ public class Produto {
 
     @Column(nullable = false)
     private String status = "ATIVO"; 
+
     @Column(nullable = false)
     private BigDecimal estoqueAtual = BigDecimal.ZERO;
 

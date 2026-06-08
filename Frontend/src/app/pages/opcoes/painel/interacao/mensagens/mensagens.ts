@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { ColaboradorService } from '../../../../../../core/services/core/colaborador.service';
-import { MensagemService } from '../../../../../../core/services/ui/mensagem.service';
+import { ColaboradorService } from '../../../../../core/services/core/colaborador.service';
+import { MensagemService } from '../../../../../core/services/ui/mensagem.service';
 
 @Component({
   selector: 'app-mensagens',

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core'; // Adicionado OnInit e inject
 import { FormsModule } from '@angular/forms';
-import { ProdutoService } from '../../../../../core/services/erp/Produto.service'; // Ajuste o caminho do serviço se necessário
+import { ProdutoService } from '../../../../core/services/erp/Produto.service'; // Ajuste o caminho do serviço se necessário
 
 @Component({
   selector: 'app-ultimos-produtos',

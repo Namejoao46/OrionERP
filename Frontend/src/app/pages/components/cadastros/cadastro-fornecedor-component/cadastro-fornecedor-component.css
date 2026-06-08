@@ -1,15 +1,67 @@
+/* Container Principal Remodelado para Scroll Seguro dentro de Modais */
 .form-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 75vh; /* Limita a altura para não sumir com o cabeçalho nem estourar a janela */
+  overflow-y: auto !important;
+  margin: 0 auto;
+  padding: 15px 25px;
+  background: #121212;
+  border-radius: 8px;
+  box-sizing: border-box;
+  position: relative;
+
+  scrollbar-width: thin;
+  scrollbar-color: #2b97fa #121212;
 }
 
+/* --- Estilização do Scroll para Chrome, Edge e Safari --- */
+.form-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.form-container::-webkit-scrollbar-track {
+  background: #121212;
+  border-radius: 0 8px 8px 0;
+}
+
+.form-container::-webkit-scrollbar-thumb {
+  background: #2b97fa;
+  border-radius: 4px;
+  border: 1px solid #121212;
+}
+
+.form-container::-webkit-scrollbar-thumb:hover {
+  background: #007bff;
+}
+
+/* Distribuição do Topo: XML na Esquerda e Foto na Direita */
+.top-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+/* Upload Inteligente de XML */
 .upload-xml-wrapper {
   background: rgba(77, 163, 255, 0.05);
   border: 1px dashed #4da3ff;
   border-radius: 8px;
   padding: 20px;
   text-align: center;
+  transition: background 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.upload-xml-wrapper:hover {
+  background: rgba(77, 163, 255, 0.1);
 }
 
 .btn-xml {
@@ -17,28 +69,139 @@
   font-weight: bold;
   cursor: pointer;
   font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Componente de Upload da Foto */
+.photo-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #1a1a1a;
+  padding: 15px 20px;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+}
+
+.avatar-preview {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #2b97fa;
+  background: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.btn-photo-label {
+  color: #fff;
+  background: #333;
+  padding: 8px 14px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.btn-photo-label:hover {
+  background: #444;
+  color: #2b97fa;
 }
 
 .hint {
-  font-size: 11px;
-  color: #777;
-  margin-top: 5px;
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
 }
 
+/* Agrupamentos (Fieldset e Legend) */
+.form-section {
+  border: 1px solid #2d2d2d;
+  border-radius: 6px;
+  padding: 15px 20px;
+  margin: 0;
+  background: #161616;
+}
+
+.form-section legend {
+  color: #4da3ff;
+  font-weight: bold;
+  font-size: 0.95rem;
+  padding: 0 10px;
+}
+
+/* Grid de Inputs Interno */
 .input-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px 20px;
+  margin-top: 10px;
 }
 
-.input-grid input {
+/* Estrutura de cada Campo (Label + Input) */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 13px;
+  color: #aaa;
+  font-weight: 500;
+}
+
+/* Customização de Inputs, Selects e Textarea */
+.input-grid input,
+.input-grid select,
+.field textarea {
   background: #1a1a1a;
   border: 1px solid #333;
-  padding: 10px;
+  padding: 10px 12px;
   border-radius: 5px;
   color: #fff;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Estados de Foco */
+.input-grid input:focus,
+.input-grid select:focus,
+.field textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Regra para ocupar a linha inteira (Observações) */
+.full-width {
+  grid-column: span 2;
+}
+
+/* Botão de Confirmação */
 .btn-confirmar {
   background: #007bff;
   color: white;
@@ -46,10 +209,22 @@
   padding: 15px;
   border-radius: 5px;
   font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.3s ease, transform 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  width: 100%;
+  flex-shrink: 0; /* Impede o botão de sumir na base da rolagem */
 }
 
 .btn-confirmar:hover {
   background: #0056b3;
+}
+
+.btn-confirmar:active {
+  transform: scale(0.98);
 }

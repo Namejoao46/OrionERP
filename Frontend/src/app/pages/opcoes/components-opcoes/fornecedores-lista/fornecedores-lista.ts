@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
-import { FornecedorService } from '../../../../../core/services/erp/fornecedor.service';
-import { ModalService } from '../../../../../core/services/ui/modal.service';
+import { FornecedorService } from '../../../../core/services/erp/fornecedor.service';
+import { ModalService } from '../../../../core/services/ui/modal.service';
 
 @Component({
   selector: 'app-fornecedores-lista',

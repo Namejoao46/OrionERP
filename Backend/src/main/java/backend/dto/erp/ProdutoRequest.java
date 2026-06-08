@@ -3,22 +3,19 @@ package backend.dto.erp;
 import java.math.BigDecimal;
 
 public record ProdutoRequest(
+    Long fornecedorId, // Adicionado para garantir o vínculo
     String codigoBarras,
-    String descricao,         
+    String descricao,
     String unidadeMedida,
     String categoria,
     String status,
-
-    BigDecimal estoqueAtual,
     BigDecimal estoqueMinimo,
     BigDecimal estoqueMaximo,
     String localizacaoFisica,
-
     BigDecimal precoCusto,
     BigDecimal margemLucro,
     BigDecimal precoVenda,
-
-    String ncm,               
+    String ncm,
     String cest,
     String origemProduto,
     String cstIcms,

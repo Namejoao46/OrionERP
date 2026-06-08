@@ -1,20 +1,134 @@
 <div class="form-container">
-  <div class="upload-xml-wrapper">
-    <label for="xml-upload" class="btn-xml">
-      <i class="bi bi-file-earmark-arrow-up"></i> Importar via XML
-    </label>
-    <input id="xml-upload" type="file" (change)="onFileSelected($event)" accept=".xml" hidden>
-    <p class="hint">Os campos serão preenchidos automaticamente</p>
+  
+  <div class="top-actions-grid">
+    <div class="upload-xml-wrapper">
+      <label for="xml-upload" class="btn-xml">
+        <i class="bi bi-file-earmark-arrow-up"></i> Importar via XML
+      </label>
+      <input id="xml-upload" type="file" (change)="onFileSelected($event)" accept=".xml" hidden>
+      <p class="hint">Os campos serão preenchidos automaticamente com a leitura do arquivo</p>
+    </div>
+
+    <div class="photo-upload-wrapper">
+      <div class="avatar-preview">
+        <img [src]="fornecedor.foto || 'assets/images/default-avatar.png'" alt="Foto Fornecedor">
+      </div>
+      <div class="photo-inputs">
+        <label for="foto-upload" class="btn-photo-label">
+          <i class="bi bi-camera"></i> Selecionar Foto
+        </label>
+        <input id="foto-upload" type="file" (change)="onFotoSelected($event)" accept="image/*" hidden>
+        <p class="hint">Formatos aceitos: JPG, PNG</p>
+      </div>
+    </div>
   </div>
 
-  <div class="input-grid">
-    <input [(ngModel)]="fornecedor.cnpj" placeholder="CNPJ">
-    <input [(ngModel)]="fornecedor.razaoSocial" placeholder="Razão Social">
-    <input [(ngModel)]="fornecedor.nomeFantasia" placeholder="Nome Fantasia">
-    <input [(ngModel)]="fornecedor.telefone" placeholder="Telefone">
-    <input [(ngModel)]="fornecedor.email" placeholder="E-mail">
-    <input [(ngModel)]="fornecedor.cidade" placeholder="Cidade">
-  </div>
+  <fieldset class="form-section">
+    <legend>Identificação & Informações Fiscais</legend>
+    <div class="input-grid">
+      <div class="field">
+        <label>CNPJ *</label>
+        <input [(ngModel)]="fornecedor.cnpj" placeholder="CNPJ">
+      </div>
+      <div class="field">
+        <label>Razão Social *</label>
+        <input [(ngModel)]="fornecedor.razaoSocial" placeholder="Razão Social">
+      </div>
+      <div class="field">
+        <label>Nome Fantasia</label>
+        <input [(ngModel)]="fornecedor.nomeFantasia" placeholder="Nome Fantasia">
+      </div>
+      <div class="field">
+        <label>Inscrição Estadual</label>
+        <input [(ngModel)]="fornecedor.inscricaoEstadual" placeholder="Inscrição Estadual">
+      </div>
+      <div class="field">
+        <label>Inscrição Municipal</label>
+        <input [(ngModel)]="fornecedor.inscricaoMunicipal" placeholder="Inscrição Municipal">
+      </div>
+      <div class="field">
+        <label>CNAE Principal</label>
+        <input [(ngModel)]="fornecedor.cnaePrincipal" placeholder="CNAE">
+      </div>
+      <div class="field">
+        <label>CRT (Regime Tributário)</label>
+        <select [(ngModel)]="fornecedor.crt">
+          <option [ngValue]="null">Selecione o Regime...</option>
+          <option [ngValue]="1">Simples Nacional</option>
+          <option [ngValue]="2">Simples Nacional - excesso de sublimite</option>
+          <option [ngValue]="3">Regime Normal</option>
+        </select>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-section">
+    <legend>Endereço e Localização</legend>
+    <div class="input-grid">
+      <div class="field">
+        <label>Logradouro</label>
+        <input [(ngModel)]="fornecedor.logradouro" placeholder="Rua, Av, etc...">
+      </div>
+      <div class="field">
+        <label>Número</label>
+        <input [(ngModel)]="fornecedor.numero" placeholder="Número">
+      </div>
+      <div class="field">
+        <label>Complemento</label>
+        <input [(ngModel)]="fornecedor.complemento" placeholder="Sala, Bloco, Apt...">
+      </div>
+      <div class="field">
+        <label>Bairro</label>
+        <input [(ngModel)]="fornecedor.bairro" placeholder="Bairro">
+      </div>
+      <div class="field">
+        <label>Cidade</label>
+        <input [(ngModel)]="fornecedor.cidade" placeholder="Cidade">
+      </div>
+      <div class="field">
+        <label>Código Município (IBGE)</label>
+        <input [(ngModel)]="fornecedor.cMun" placeholder="Código IBGE">
+      </div>
+      <div class="field">
+        <label>UF</label>
+        <input [(ngModel)]="fornecedor.uf" placeholder="UF" maxlength="2">
+      </div>
+      <div class="field">
+        <label>CEP</label>
+        <input [(ngModel)]="fornecedor.cep" placeholder="CEP">
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-section">
+    <legend>Contato & Informações Comerciais</legend>
+    <div class="input-grid">
+      <div class="field">
+        <label>Telefone</label>
+        <input [(ngModel)]="fornecedor.telefone" placeholder="Telefone">
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input [(ngModel)]="fornecedor.email" placeholder="E-mail">
+      </div>
+      <div class="field">
+        <label>Chave PIX</label>
+        <input [(ngModel)]="fornecedor.chavePix" placeholder="Chave PIX">
+      </div>
+      <div class="field">
+        <label>Lead Time (Prazo de entrega em dias)</label>
+        <input type="number" [(ngModel)]="fornecedor.leadTime" placeholder="Dias">
+      </div>
+      <div class="field">
+        <label>Limite de Crédito (R$)</label>
+        <input type="number" [(ngModel)]="fornecedor.limiteCredito" placeholder="0.00" step="0.01">
+      </div>
+    </div>
+    <div class="field full-width" style="margin-top: 10px;">
+      <label>Observações</label>
+      <textarea [(ngModel)]="fornecedor.observacoes" rows="3" placeholder="Informações adicionais do fornecedor..."></textarea>
+    </div>
+  </fieldset>
 
   <button class="btn-confirmar" (click)="salvar()">Salvar Fornecedor</button>
 </div>

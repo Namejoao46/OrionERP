@@ -1,34 +1,112 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ProdutoService {
   private apiUrl = 'http://localhost:8080/api/produtos';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    console.log('[TRACKING-SERVICE] ProdutoService instanciado e monitorado via Logs.');
+  }
 
   listarTodos(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+    const startTime = performance.now();
+    console.log(`[TRACKING-SERVICE] [GET] Listando catálogo geral de produtos.`);
+
+    return this.http.get<any[]>(this.apiUrl).pipe(
+      tap((res) => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Catálogo carregado. Total: ${res.length} itens | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error('[TRACKING-SERVICE] [ERROR] Falha ao carregar catálogo global de produtos.', err);
+        return throwError(() => err);
+      })
+    );
   }
 
   listarAtivos(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/ativos`);
+    const startTime = performance.now();
+    console.log(`[TRACKING-SERVICE] [GET] Filtrando apenas produtos ativos para operação comercial.`);
+
+    return this.http.get<any[]>(`${this.apiUrl}/ativos`).pipe(
+      tap((res) => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Lista de produtos ativos pronta. Quantidade: ${res.length} | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error('[TRACKING-SERVICE] [ERROR] Erro ao recuperar produtos ativos.', err);
+        return throwError(() => err);
+      })
+    );
   }
 
   buscar(termo: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/buscar`, { params: { termo } });
+    const startTime = performance.now();
+    console.log(`[TRACKING-SERVICE] [GET] Executando query de busca incremental por string. Termo pesquisado: "${termo}"`);
+
+    const params = new HttpParams().set('termo', termo);
+
+    return this.http.get<any[]>(`${this.apiUrl}/buscar`, { params }).pipe(
+      tap((res) => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Busca refinada concluída. Correspondências encontradas para "${termo}": ${res.length} | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error(`[TRACKING-SERVICE] [ERROR] Falha ao tentar pesquisar termo: "${termo}"`, err);
+        return throwError(() => err);
+      })
+    );
   }
 
   cadastrar(produto: any): Observable<any> {
-    return this.http.post(this.apiUrl, produto);
+    const startTime = performance.now();
+    console.log(`[TRACKING-SERVICE] [POST] Cadastrando novo SKU no sistema. Rota base: ${this.apiUrl}`, { payload: produto });
+
+    return this.http.post(this.apiUrl, produto).pipe(
+      tap((res: any) => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Produto cadastrado na base com sucesso. ID Gerado: ${res?.id} | SKU: ${res?.descricao} | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error('[TRACKING-SERVICE] [ERROR] Erro ao submeter criação de produto.', err);
+        return throwError(() => err);
+      })
+    );
   }
 
   editar(id: number, produto: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, produto);
+    const startTime = performance.now();
+    console.log(`[TRACKING-SERVICE] [PUT] Alterando dados cadastrais estruturais do produto ID: ${id}`, { payloadModificacao: produto });
+
+    return this.http.put(`${this.apiUrl}/${id}`, produto).pipe(
+      tap((res: any) => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Atualização do produto concluída para o ID ${id}. Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error(`[TRACKING-SERVICE] [ERROR] Erro ao atualizar produto ID ${id}.`, err);
+        return throwError(() => err);
+      })
+    );
   }
 
   alterarStatus(id: number, status: string): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${id}/status`, {}, { params: { status } });
+    const startTime = performance.now();
+    console.log(`[TRACKING-SERVICE] [PATCH] Alteração de estado de ativação de SKU. ID: ${id} -> Novo Status Desejado: "${status}"`);
+
+    const params = new HttpParams().set('status', status);
+
+    return this.http.patch(`${this.apiUrl}/${id}/status`, {}, { params }).pipe(
+      tap((res: any) => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Transição de estado de ativação consolidada para o ID ${id}. Estado atual: ${res?.status || status} | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error(`[TRACKING-SERVICE] [ERROR] Falha ao tentar mudar flag de ativação do produto ${id}.`, err);
+        return throwError(() => err);
+      })
+    );
   }
 }

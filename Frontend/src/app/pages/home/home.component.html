@@ -29,3 +29,11 @@
 </app-card-flutuante>
 
 <app-perfil></app-perfil>
+
+<app-card-flutuante #cardProdutosDoFornecedor [titulo]="'Produtos de: ' + fornecedorSelecionadoNome">
+  <app-produtos-fornecedor 
+    *ngIf="fornecedorSelecionadoId"
+    [fornecedorId]="fornecedorSelecionadoId" 
+    [fornecedorNome]="fornecedorSelecionadoNome">
+  </app-produtos-fornecedor>
+</app-card-flutuante>

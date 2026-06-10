@@ -109,4 +109,20 @@ export class ProdutoService {
       })
     );
   }
+
+  listarPorFornecedor(fornecedorId: number): Observable<any[]> {
+    const startTime = performance.now();
+    console.log(`[TRACKING-SERVICE] [GET] Buscando produtos vinculados ao fornecedor ID: ${fornecedorId}`);
+
+    return this.http.get<any[]>(`${this.apiUrl}/por-fornecedor/${fornecedorId}`).pipe(
+      tap((res) => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Produtos do fornecedor ${fornecedorId} carregados. Total: ${res.length} itens | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error(`[TRACKING-SERVICE] [ERROR] Falha ao carregar produtos do fornecedor ${fornecedorId}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
 }

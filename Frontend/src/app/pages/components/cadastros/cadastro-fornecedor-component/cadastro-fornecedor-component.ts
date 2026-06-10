@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FornecedorService, Fornecedor } from '../../../../core/services/erp/fornecedor.service';
+import { ModalService } from '../../../../core/services/ui/modal.service';
 
 @Component({
   selector: 'app-cadastro-fornecedor-component',
@@ -47,7 +48,7 @@ export class CadastroFornecedorComponent {
   
   @Output() salvoComSucesso = new EventEmitter<void>();
 
-  constructor(private service: FornecedorService, private cdr: ChangeDetectorRef) {
+  constructor(private service: FornecedorService, private cdr: ChangeDetectorRef, private modalService: ModalService) {
     console.log('[TRACKING-FRONT] CadastroFornecedorComponent inicializado com sucesso.');
   }
 
@@ -216,6 +217,10 @@ export class CadastroFornecedorComponent {
   private finalizarProcessoComSucesso() {
     console.log('[TRACKING-FRONT] Emitindo sinalizador de sucesso para o componente pai (Output).');
     this.salvoComSucesso.emit();
+    
+    // AQUI ESTÁ A CHAVE: Notifica globalmente o sistema que o banco foi atualizado!
+    this.modalService.notificarFornecedorSalvo();
+    
     this.limparFormulario();
   }
 

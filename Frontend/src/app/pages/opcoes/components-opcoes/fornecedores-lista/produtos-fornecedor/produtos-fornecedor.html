@@ -1,0 +1,51 @@
+<div class="produtos-container">
+  
+  <div class="produtos-header">
+    <div class="header-info">
+      <h2>Catálogo de Produtos</h2>
+      <span class="sub-fornecedor">Fornecedor: {{ fornecedorNome }}</span>
+    </div>
+
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="termoPesquisa" 
+        (input)="filtrarProdutos()" 
+        placeholder="Pesquisar produto pela descrição...">
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Buscando produtos no banco...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && produtosFiltrados.length === 0">
+    <p>Nenhum produto encontrado para este fornecedor.</p>
+  </div>
+
+  <div class="produtos-grid" *ngIf="!isLoading && produtosFiltrados.length > 0">
+    <div class="card-produto" *ngFor="let p of produtosFiltrados" (click)="abrirDetalhesProduto(p)">
+      
+      <div class="produto-foto-wrapper">
+        <img *ngIf="p.foto; else noPhoto" [src]="p.foto" alt="Produto">
+        <ng-template #noPhoto>
+          <div class="produto-sem-foto">📦</div>
+        </ng-template>
+        <span class="badge-estoque" [ngClass]="{'baixo': p.estoque <= 5}">
+          Estoque: {{ p.estoque }}
+        </span>
+      </div>
+
+      <div class="produto-info">
+        <h4 class="produto-nome" [title]="p.descricao">{{ p.descricao }}</h4>
+        <div class="produto-footer">
+          <span class="produto-preco">R$ {{ p.preco ? p.preco.toFixed(2) : '0.00' }}</span>
+          <span class="status-tag" [ngClass]="p.status?.toLowerCase()">{{ p.status }}</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

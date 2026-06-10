@@ -15,7 +15,7 @@
         <span class="fornecedor-nome">Adicionar</span>
       </div>
 
-      <div class="card-fornecedor" *ngFor="let f of fornecedores">
+      <div class="card-fornecedor" *ngFor="let f of fornecedores" (click)="abrirProdutosDoFornecedor(f)">
         <div class="avatar-wrapper">
           <div class="avatar">
             <img *ngIf="f.foto; else noPhoto" [src]="f.foto" alt="Avatar">

@@ -1,1 +1,31 @@
-<p>fiscal works!</p>
+<div class="fiscal-dashboard-wrapper">
+  
+  <div class="row-metrics">
+    <app-card-metrica 
+      *ngFor="let m of metricas"
+      [titulo]="m.titulo"
+      [valor]="m.valor"
+      [rodape]="m.rodape"
+      [icone]="m.icone">
+    </app-card-metrica>
+  </div>
+
+  <div class="row-modules">
+    <app-card-modulo 
+      *ngFor="let mod of modulos"
+      [titulo]="mod.titulo"
+      [descricao]="mod.descricao"
+      [icone]="mod.icone">
+    </app-card-modulo>
+  </div>
+
+  <div class="row-bottom">
+    <div class="col-table">
+      <app-tabela-movimentacoes></app-tabela-movimentacoes>
+    </div>
+    <div class="col-actions">
+      <app-acoes-rapidas></app-acoes-rapidas>
+    </div>
+  </div>
+
+</div>

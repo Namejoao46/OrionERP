@@ -1,0 +1,49 @@
+.dashboard-wrapper {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: #040d21;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.row-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  width: 100%;
+}
+
+.row-middle-charts {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+.row-bottom-tables {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+.row-footer-actions {
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .row-kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .row-middle-charts, .row-bottom-tables {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .row-kpis {
+    grid-template-columns: 1fr;
+  }
+}

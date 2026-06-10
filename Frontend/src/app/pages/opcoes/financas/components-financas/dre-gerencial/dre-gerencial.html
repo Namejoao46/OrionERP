@@ -1,0 +1,23 @@
+<div class="dre-card">
+  <div class="dre-header">
+    <h1>DRE Gerencial</h1>
+    <span class="date-badge">Mai/2026</span>
+  </div>
+
+  <div class="dre-list">
+    <div class="dre-item" *ngFor="let item of itensDRE">
+      <span class="item-label">{{ item.label }}</span>
+      <div class="item-values">
+        <span class="item-price">{{ item.valor }}</span>
+        <span class="item-percent" [ngClass]="item.class">{{ item.porcentagem }}</span>
+      </div>
+    </div>
+    <div class="dre-item total-margin">
+      <span class="item-label">Margem</span>
+      <div class="item-values">
+        <span class="item-price">34,71%</span>
+        <span class="item-percent positivo">▲ 6,1 p.p.</span>
+      </div>
+    </div>
+  </div>
+</div>

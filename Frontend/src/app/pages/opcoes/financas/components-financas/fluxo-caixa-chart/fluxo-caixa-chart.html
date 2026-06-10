@@ -1,0 +1,23 @@
+<div class="chart-card">
+  <div class="chart-header">
+    <h1>Fluxo de Caixa Mensal</h1>
+    <div class="time-filters">
+      <button class="btn-time">3 meses</button>
+      <button class="btn-time active">6 meses</button>
+      <button class="btn-time">12 meses</button>
+    </div>
+  </div>
+  <div class="chart-wrapper">
+    <apx-chart
+      [series]="chartOptions.series"
+      [chart]="chartOptions.chart"
+      [colors]="chartOptions.colors"
+      [stroke]="chartOptions.stroke"
+      [dataLabels]="chartOptions.dataLabels"
+      [grid]="chartOptions.grid"
+      [xaxis]="chartOptions.xaxis"
+      [yaxis]="chartOptions.yaxis"
+      [fill]="chartOptions.fill"
+    ></apx-chart>
+  </div>
+</div>

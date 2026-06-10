@@ -1,0 +1,29 @@
+<div class="table-card">
+  <div class="table-header">
+    <h1>Contas a Pagar/Receber</h1>
+    <a href="#" class="view-all">Ver todas</a>
+  </div>
+
+  <div class="responsive-table">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Documento</th>
+          <th>Cliente/Fornecedor</th>
+          <th>Vencimento</th>
+          <th>Status</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of contas">
+          <td class="id-column">{{ c.doc }}</td>
+          <td>{{ c.cliente }}</td>
+          <td>{{ c.vencimento }}</td>
+          <td><span class="badge" [ngClass]="c.class">{{ c.status }}</span></td>
+          <td class="valor-td">{{ c.valor }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

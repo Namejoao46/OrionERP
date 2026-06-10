@@ -1,0 +1,73 @@
+.table-card {
+  background-color: #050a30;
+  border: 2px solid #2b97fa;
+  border-radius: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.table-header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  border-bottom: 3px solid #2b97fa;
+  color: #ffffff;
+  padding-bottom: 3px;
+}
+
+.view-all {
+  color: #6b7c96;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.view-all:hover { color: #00c3ff; }
+
+.responsive-table { overflow-x: auto; }
+
+.custom-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  text-align: left;
+}
+
+.custom-table th {
+  color: #ffffff;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  padding: 10px;
+  border-bottom: 2px solid #2b97fa;
+}
+
+.custom-table td {
+  padding: 12px 10px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  background-color: rgba(10, 14, 41, 0.4);
+}
+
+.id-column { color: #00c3ff !important; font-weight: 600; }
+.valor-td { color: #ffffff; font-weight: 600; }
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.badge.receber { background: rgba(0, 191, 113, 0.15); color: #00bf71; }
+.badge.pagar { background: rgba(255, 51, 102, 0.15); color: #ff3366; }
+
+.custom-table tr:hover td {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  cursor: pointer;
+}

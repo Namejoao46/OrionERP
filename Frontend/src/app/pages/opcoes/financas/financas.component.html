@@ -1,4 +1,35 @@
-<p>financas works!</p>
-<button (click)="testarToast()">Testar Notificação</button>
-<button (click)="testarToast1()">Testar Notificação</button>
-<button (click)="testarToast2()">Testar Notificação</button>
+<div class="dashboard-wrapper">
+  
+  <div class="row-kpis">
+    <app-card-metrica-financas
+      *ngFor="let metrica of metricasFinancas"
+      [titulo]="metrica.titulo"
+      [valor]="metrica.valor"
+      [rodape]="metrica.rodape"
+      [icone]="metrica.icone">
+    </app-card-metrica-financas>
+  </div>
+
+  <div class="row-middle-charts">
+    <div class="col-main-chart">
+      <app-fluxo-caixa-chart></app-fluxo-caixa-chart>
+    </div>
+    <div class="col-side-dre">
+      <app-dre-gerencial></app-dre-gerencial>
+    </div>
+  </div>
+
+  <div class="row-bottom-tables">
+    <div class="col-table-left">
+      <app-tabela-contas></app-tabela-contas>
+    </div>
+    <div class="col-widgets-right">
+      <app-widgets-laterais></app-widgets-laterais>
+    </div>
+  </div>
+
+  <div class="row-footer-actions">
+    <app-acoes-rapidas-financas></app-acoes-rapidas-financas>
+  </div>
+
+</div>

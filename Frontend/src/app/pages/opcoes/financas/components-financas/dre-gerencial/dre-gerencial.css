@@ -1,0 +1,75 @@
+.dre-card {
+  background-color: #050a30;
+  border: 2px solid #2b97fa;
+  border-radius: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.dre-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dre-header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  border-bottom: 3px solid #2b97fa;
+  color: #ffffff;
+  padding-bottom: 3px;
+}
+
+.date-badge {
+  font-size: 0.75rem;
+  color: #00c3ff;
+  background: rgba(0, 195, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.dre-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dre-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: rgba(10, 14, 41, 0.4);
+  border-radius: 6px;
+}
+
+.item-label {
+  color: #ffffff;
+  font-size: 0.85rem;
+}
+
+.item-values {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.item-price {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.item-percent {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.item-percent.positivo { color: #00bf71; }
+.item-percent.negativo { color: #ff3366; }
+
+.total-margin {
+  border-left: 3px solid #00c3ff;
+}

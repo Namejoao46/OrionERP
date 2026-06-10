@@ -1,0 +1,102 @@
+.table-card {
+  background-color: #050a30;
+  border: 2px solid #2b97fa;
+  border-radius: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.table-header h1 {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  border-bottom: 3px solid #2b97fa;
+  padding-bottom: 3px;
+  display: inline-block;
+}
+
+.responsive-table {
+  overflow-x: auto;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  text-align: left;
+}
+
+.custom-table th {
+  color: #ffffff;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 2px solid #2b97fa;
+}
+
+.custom-table td {
+  padding: 14px 12px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  background-color: rgba(10, 14, 41, 0.4);
+}
+
+.custom-table tr td:first-child {
+  border-radius: 6px 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-table tr td:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.id-column {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* Container da Barra de Distribuição */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.progress-bar {
+  height: 6px;
+  border-radius: 3px;
+  min-width: 5px;
+}
+
+.progress-text {
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Efeito Hover nas linhas */
+.custom-table tr:hover td {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  cursor: pointer;
+}

@@ -1,0 +1,50 @@
+.dashboard-wrapper {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: #040d21;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.row-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  width: 100%;
+}
+
+.row-charts {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+.grid-modulos-rh {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  width: 100%;
+}
+
+.row-table {
+  width: 100%;
+}
+
+/* Responsividade para manter a qualidade visual do OrionERP */
+@media (max-width: 1024px) {
+  .row-kpis, .grid-modulos-rh {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .row-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .row-kpis, .grid-modulos-rh {
+    grid-template-columns: 1fr;
+  }
+}

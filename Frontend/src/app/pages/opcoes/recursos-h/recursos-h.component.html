@@ -1,1 +1,33 @@
-<p>recursos-h works!</p>
+<div class="dashboard-wrapper">
+  
+  <div class="row-kpis">
+    <app-card-metrica-rh
+      *ngFor="let metrica of metricasRH"
+      [titulo]="metrica.titulo"
+      [valor]="metrica.valor"
+      [rodape]="metrica.rodape"
+      [icone]="metrica.icone">
+    </app-card-metrica-rh>
+  </div>
+
+  <div class="row-charts">
+    <div class="col-chart-main">
+      <app-visao-geral-equipe></app-visao-geral-equipe>
+    </div>
+    <div class="col-chart-side">
+      <app-acoes-rapidas-rh></app-acoes-rapidas-rh>
+    </div>
+  </div>
+
+  <div class="row-table">
+    <div class="grid-modulos-rh">
+      <app-card-modulo-rh
+        *ngFor="let modulo of modulosRH"
+        [titulo]="modulo.titulo"
+        [descricao]="modulo.descricao"
+        [icone]="modulo.icone">
+      </app-card-modulo-rh>
+    </div>
+  </div>
+
+</div>

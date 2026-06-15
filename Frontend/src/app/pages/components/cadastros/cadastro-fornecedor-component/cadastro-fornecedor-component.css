@@ -4,8 +4,8 @@
   flex-direction: column;
   gap: 20px;
   width: 100%;
-  max-width: 900px;
-  max-height: 75vh; /* Limita a altura para não sumir com o cabeçalho nem estourar a janela */
+  max-width: 950px; /* Alargado levemente para acomodar melhor a tabela */
+  max-height: 80vh; /* Limita a altura para não sumir com o cabeçalho nem estourar a janela */
   overflow-y: auto !important;
   margin: 0 auto;
   padding: 15px 25px;
@@ -21,6 +21,7 @@
 /* --- Estilização do Scroll para Chrome, Edge e Safari --- */
 .form-container::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 .form-container::-webkit-scrollbar-track {
@@ -201,6 +202,74 @@
   grid-column: span 2;
 }
 
+/* --- NOVAS REGRAS: Estilização da Tabela de Itens do XML --- */
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 10px;
+  border: 1px solid #2d2d2d;
+  border-radius: 6px;
+}
+
+.xml-products-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: #ccc;
+  text-align: left;
+  min-width: 800px; /* Força scroll horizontal se a janela esmagar a tabela */
+}
+
+.xml-products-table th {
+  background: #222222;
+  color: #4da3ff;
+  font-weight: 600;
+  padding: 12px 10px;
+  border-bottom: 2px solid #2d2d2d;
+}
+
+.xml-products-table td {
+  padding: 10px;
+  border-bottom: 1px solid #222222;
+  vertical-align: middle;
+}
+
+.xml-products-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.font-mono {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+}
+
+.text-muted {
+  color: #777;
+}
+
+.font-highlight {
+  color: #eee;
+  font-weight: 500;
+}
+
+/* Badges para Códigos EAN / GTIN */
+.badge-ean {
+  background: #2a2a2a;
+  color: #bbb;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  display: inline-block;
+  border: 1px solid #3a3a3a;
+}
+
+.badge-ean.sem-gtin {
+  background: rgba(217, 119, 6, 0.15);
+  color: #fbbf24;
+  border-color: rgba(217, 119, 6, 0.3);
+}
+
 /* Botão de Confirmação */
 .btn-confirmar {
   background: #007bff;
@@ -221,10 +290,20 @@
   flex-shrink: 0; /* Impede o botão de sumir na base da rolagem */
 }
 
-.btn-confirmar:hover {
+.btn-confirmar:hover:not(:disabled) {
   background: #0056b3;
 }
 
-.btn-confirmar:active {
+.btn-confirmar:active:not(:disabled) {
   transform: scale(0.98);
+}
+
+.btn-confirmar:disabled {
+  background: #444;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.me-2 {
+  margin-right: 8px;
 }

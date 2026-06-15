@@ -1,6 +1,7 @@
 package backend.service.fiscal;
 
 import java.io.InputStream;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -15,7 +16,7 @@ import backend.model.erp.Fornecedor;
 public class FornecedorXmlService {
 
     /**
-     * Lê um arquivo XML completo da NF-e e extrai estritamente o Fornecedor (Emitante)
+     * Lê um arquivo XML completo da NF-e e extrai estritamente o Fornecedor (Emitente)
      */
     @SuppressWarnings("CallToPrintStackTrace")
     public Fornecedor lerDadosEmitente(InputStream xmlInputStream) throws Exception {
@@ -26,9 +27,9 @@ public class FornecedorXmlService {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             
-            // Exibe a configuração atual do Namespace
-            System.out.println("[LOG SERVICE-XML] NamespaceAware está definido como: false");
-            factory.setNamespaceAware(false);
+            // Ativa o suporte a Namespaces para compatibilidade com o XML da SEFAZ
+            System.out.println("[LOG SERVICE-XML] NamespaceAware alterado e definido como: true");
+            factory.setNamespaceAware(true);
             
             DocumentBuilder builder = factory.newDocumentBuilder();
             
@@ -36,7 +37,8 @@ public class FornecedorXmlService {
             Document doc = builder.parse(xmlInputStream);
             System.out.println("[LOG SERVICE-XML] Parse realizado com sucesso. Procurando tag <emit>...");
 
-            NodeList emitList = doc.getElementsByTagName("emit");
+            // Busca usando coringa "*" para ignorar o prefixo ou namespace estrito
+            NodeList emitList = doc.getElementsByTagNameNS("*", "emit");
             System.out.println("[LOG SERVICE-XML] Quantidade de tags <emit> encontradas: " + emitList.getLength());
             
             if (emitList.getLength() == 0) {
@@ -88,7 +90,8 @@ public class FornecedorXmlService {
         }
 
         System.out.println("[LOG SERVICE-XML] Procurando bloco interno de endereço <enderEmit>...");
-        NodeList enderList = emit.getElementsByTagName("enderEmit");
+        // Utilizando getElementsByTagNameNS para localizar o sub-bloco interno com segurança
+        NodeList enderList = emit.getElementsByTagNameNS("*", "enderEmit");
         System.out.println("[LOG SERVICE-XML] Quantidade de blocos <enderEmit> encontrados: " + enderList.getLength());
         
         Element ender = enderList.getLength() > 0 ? (Element) enderList.item(0) : null;
@@ -115,24 +118,19 @@ public class FornecedorXmlService {
 
     private String getTagValue(String tag, Element element) {
         if (element == null) return null;
-        NodeList nl = element.getElementsByTagName(tag);
+        
+        // Modificado de getElementsByTagName para getElementsByTagNameNS usando "*"
+        NodeList nl = element.getElementsByTagNameNS("*", tag);
         
         if (nl.getLength() > 0) {
-            // LOG de depuração fina: Mostra se a tag existe e quantos filhos possui
-            int totalFilhos = nl.item(0).getChildNodes().getLength();
+            String valorExtraido = nl.item(0).getTextContent();
             
-            if (totalFilhos > 0) {
-                String valorExtraido = nl.item(0).getChildNodes().item(0).getNodeValue();
-                
-                // Correção segura temporária nos logs se o nodeValue falhar por ser espaço em branco
-                if (valorExtraido == null) {
-                    valorExtraido = nl.item(0).getTextContent();
-                }
-                
+            if (valorExtraido != null) {
+                valorExtraido = valorExtraido.trim();
                 System.out.println("[LOG TAG] Extraído <" + tag + "> = '" + valorExtraido + "'");
                 return valorExtraido;
             }
-            System.out.println("[LOG TAG] A tag <" + tag + "> foi achada, mas não contém nós filhos (vazia).");
+            System.out.println("[LOG TAG] A tag <" + tag + "> foi achada, mas está vazia.");
         } else {
             System.out.println("[LOG TAG] A tag <" + tag + "> NÃO existe nesse bloco.");
         }

@@ -3,10 +3,12 @@
   <div class="top-actions-grid">
     <div class="upload-xml-wrapper">
       <label for="xml-upload" class="btn-xml">
-        <i class="bi bi-file-earmark-arrow-up"></i> Importar via XML
+        <i class="bi bi-file-earmark-arrow-up" *ngIf="!isLoadingXml"></i>
+        <span class="spinner-border spinner-border-sm me-2" *ngIf="isLoadingXml"></span>
+        {{ isLoadingXml ? 'Lendo e Mapeando XML...' : 'Importar via XML' }}
       </label>
-      <input id="xml-upload" type="file" (change)="onFileSelected($event)" accept=".xml" hidden>
-      <p class="hint">Os campos serão preenchidos automaticamente com a leitura do arquivo</p>
+      <input id="xml-upload" type="file" (change)="onFileSelected($event)" accept=".xml" hidden [disabled]="isLoadingXml">
+      <p class="hint">Os campos e a lista de produtos serão preenchidos automaticamente com a leitura do arquivo</p>
     </div>
 
     <div class="photo-upload-wrapper">
@@ -130,5 +132,44 @@
     </div>
   </fieldset>
 
-  <button class="btn-confirmar" (click)="salvar()">Salvar Fornecedor</button>
+  <fieldset class="form-section" *ngIf="produtosDoXml && produtosDoXml.length > 0">
+    <legend>Produtos Detectados no XML ({{ produtosDoXml.length }} itens)</legend>
+    <div class="table-responsive-wrapper">
+      <table class="xml-products-table">
+        <thead>
+          <tr>
+            <th style="width: 50px; text-align: center;">Item</th>
+            <th style="width: 100px;">Cód. Forn.</th>
+            <th style="width: 130px;">EAN / GTIN</th>
+            <th>Descrição do Item</th>
+            <th style="width: 60px; text-align: center;">Unid.</th>
+            <th style="width: 80px; text-align: right;">Qtd.</th>
+            <th style="width: 110px; text-align: right;">Val. Unit.</th>
+            <th style="width: 120px; text-align: right;">Total Item</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let prod of produtosDoXml">
+            <td style="text-align: center; color: #888;">{{ prod.numeroItem }}</td>
+            <td class="font-mono text-muted">{{ prod.codigoProduto }}</td>
+            <td>
+              <span class="badge-ean" [ngClass]="{'sem-gtin': prod.ean === 'SEM GTIN'}">
+                {{ prod.ean }}
+              </span>
+            </td>
+            <td class="font-highlight">{{ prod.descricao }}</td>
+            <td style="text-align: center;">{{ prod.unidade }}</td>
+            <td style="text-align: right; font-weight: bold; color: #fff;">{{ prod.quantidade | number:'1.0-3' }}</td>
+            <td style="text-align: right;">R$ {{ prod.valorUnitario | number:'1.2-2' }}</td>
+            <td style="text-align: right; font-weight: bold; color: #4da3ff;">R$ {{ prod.valorTotal | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </fieldset>
+
+  <button class="btn-confirmar" (click)="salvar()" [disabled]="isSaving">
+    <span class="spinner-border spinner-border-sm me-2" *ngIf="isSaving"></span>
+    {{ isSaving ? 'Salvando Fornecedor...' : 'Salvar Fornecedor' }}
+  </button>
 </div>

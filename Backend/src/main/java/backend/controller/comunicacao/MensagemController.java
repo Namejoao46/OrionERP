@@ -1,6 +1,5 @@
 package backend.controller.comunicacao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
@@ -17,20 +16,18 @@ import backend.model.comunicacao.Mensagem;
 import backend.repository.auth.ColaboradorRepository;
 import backend.repository.comunicacao.MensagemRepository;
 import backend.service.comunicacao.NotificationService;
+import lombok.RequiredArgsConstructor; // Certificado a importação do Lombok aqui
 
 @RestController
 @RequestMapping("/api/mensagens")
+@RequiredArgsConstructor // Vincula construtores automaticamente aos objetos 'final'
 @CrossOrigin(origins = "*")
 public class MensagemController {
 
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    private MensagemRepository mensagemRepository;
-
-    @Autowired
-    private ColaboradorRepository colaboradorRepository;
+    // Adicionado o modificador 'final' em todas as variáveis injetadas
+    private final NotificationService notificationService;
+    private final MensagemRepository mensagemRepository;
+    private final ColaboradorRepository colaboradorRepository;
 
     private static final Map<String, String> tokensUsuarios = new ConcurrentHashMap<>();
 
@@ -51,7 +48,7 @@ public class MensagemController {
     // Enviar mensagem (remetente vem do JWT)
     @PostMapping("/enviar")
     public ResponseEntity<?> enviarMensagem(@RequestBody Map<String, String> payload, Principal principal) {
-        String remetente = principal.getName(); // usuário autenticado
+        String remetente = principal.getName(); 
         String destinatario = payload.get("destinatario");
         String conteudo = payload.get("mensagem");
 
@@ -59,6 +56,7 @@ public class MensagemController {
             return ResponseEntity.badRequest().body(Map.of("erro", "Dados inválidos"));
         }
 
+        @SuppressWarnings("LocalVariableHidesMemberVariable")
         Mensagem novaMensagem = new Mensagem();
         novaMensagem.setRemetente(remetente);
         novaMensagem.setDestinatario(destinatario);
@@ -132,9 +130,7 @@ public class MensagemController {
     @GetMapping("/recentes")
     public ResponseEntity<?> buscarTodasMensagens(Principal principal) {
         String destinatario = principal.getName();
-        // Busca todas as mensagens para você, da mais nova para a mais antiga
         List<Mensagem> historico = mensagemRepository.findByDestinatarioOrderByDataEnvioDesc(destinatario);
         return ResponseEntity.ok(historico);
     }
-
 }

@@ -13,7 +13,6 @@ import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
@@ -37,18 +36,20 @@ import backend.repository.erp.ProdutoRepository;
 import backend.repository.fiscal.ItemNotaRecebimentoRepository;
 import backend.repository.fiscal.NotaRecebimentoRepository;
 import backend.service.erp.ProdutoService;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class NotaRecebimentoService {
 
-    @Autowired private NotaRecebimentoRepository notaRepository;
-    @Autowired private FornecedorRepository fornecedorRepository;
-    @Autowired private ProdutoRepository produtoRepository;
-    @Autowired private ProdutoFornecedorRepository produtoFornecedorRepository;
-    @Autowired private ItemNotaRecebimentoRepository itemRepository;
-    @Autowired private ProdutoService produtoService;
-    
-    @Autowired private FornecedorXmlService fornecedorXmlService;
+    // Modificadores 'final' adicionados e '@Autowired' removidos
+    private final NotaRecebimentoRepository notaRepository;
+    private final FornecedorRepository fornecedorRepository;
+    private final ProdutoRepository produtoRepository;
+    private final ProdutoFornecedorRepository produtoFornecedorRepository;
+    private final ItemNotaRecebimentoRepository itemRepository;
+    private final ProdutoService produtoService;
+    private final FornecedorXmlService fornecedorXmlService;
 
     private static final DateTimeFormatter DT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -61,7 +62,8 @@ public class NotaRecebimentoService {
         String chave = getTagValue("chNFe", doc.getDocumentElement());
         if (chave == null || chave.isBlank()) {
             // Caso a tag chNFe esteja dentro de infNFe como atributo Id
-            Element infNFeAttr = (Element) doc.getElementsByTagName("infNFe").item(0);
+            NodeList infNFeList = doc.getElementsByTagNameNS("*", "infNFe");
+            Element infNFeAttr = infNFeList.getLength() > 0 ? (Element) infNFeList.item(0) : null;
             if (infNFeAttr != null && infNFeAttr.hasAttribute("Id")) {
                 chave = infNFeAttr.getAttribute("Id").replace("NFe", "");
             }
@@ -72,11 +74,12 @@ public class NotaRecebimentoService {
             throw new IllegalStateException("Esta NF-e (chave " + chave + ") já foi importada anteriormente.");
         }
 
-        Element infNFe = (Element) doc.getElementsByTagName("infNFe").item(0);
+        NodeList infNFeList = doc.getElementsByTagNameNS("*", "infNFe");
+        Element infNFe = infNFeList.getLength() > 0 ? (Element) infNFeList.item(0) : null;
         if (infNFe == null) throw new Exception("Tag <infNFe> não encontrada. Verifique se o XML é uma NF-e válida.");
 
         NotaRecebimento nota = new NotaRecebimento();
-        Element ide = (Element) infNFe.getElementsByTagName("ide").item(0);
+        Element ide = (Element) infNFe.getElementsByTagNameNS("*", "ide").item(0);
         nota.setNumeroNota(getTagValue("nNF", ide));
         nota.setSerie(getTagValue("serie", ide));
         nota.setChaveAcesso(chave);
@@ -88,15 +91,15 @@ public class NotaRecebimentoService {
         }
         nota.setDataEntrada(LocalDateTime.now());
 
-        Element emit = (Element) infNFe.getElementsByTagName("emit").item(0);
+        Element emit = (Element) infNFe.getElementsByTagNameNS("*", "emit").item(0);
         String[] statusForn = new String[1];
         
         Fornecedor fornecedor = processarFornecedorUnificado(emit, statusForn);
         nota.setFornecedor(fornecedor);
         nota.setStatusFornecedor(statusForn[0]);
 
-        Element total = (Element) infNFe.getElementsByTagName("total").item(0);
-        Element icmsTot = total != null ? (Element) total.getElementsByTagName("ICMSTot").item(0) : null;
+        Element total = (Element) infNFe.getElementsByTagNameNS("*", "total").item(0);
+        Element icmsTot = total != null ? (Element) total.getElementsByTagNameNS("*", "ICMSTot").item(0) : null;
         if (icmsTot != null) {
             nota.setValorTotalProdutos(parseBigDecimal(getTagValue("vProd", icmsTot)));
             nota.setValorTotalNota(parseBigDecimal(getTagValue("vNF", icmsTot)));
@@ -112,7 +115,7 @@ public class NotaRecebimentoService {
             nota.setValorCofins(parseBigDecimal(getTagValue("vCOFINS", icmsTot)));
         }
 
-        NodeList detList = infNFe.getElementsByTagName("det");
+        NodeList detList = infNFe.getElementsByTagNameNS("*", "det");
         List<ItemNotaRecebimento> itens = new ArrayList<>();
         System.out.println("[LOG NOTA-RECEBIMENTO] Detectados " + detList.getLength() + " itens no XML.");
         for (int i = 0; i < detList.getLength(); i++) {
@@ -122,14 +125,14 @@ public class NotaRecebimentoService {
         }
         nota.setItens(itens);
 
-        Element cobr = (Element) infNFe.getElementsByTagName("cobr").item(0);
+        Element cobr = (Element) infNFe.getElementsByTagNameNS("*", "cobr").item(0);
         List<DuplicataNota> duplicatas = new ArrayList<>();
         if (cobr != null) {
-            Element fat = (Element) cobr.getElementsByTagName("fat").item(0);
+            Element fat = (Element) cobr.getElementsByTagNameNS("*", "fat").item(0);
             if (fat != null) {
                 nota.setFormaPagamento(resolverFormaPagamento(infNFe));
             }
-            NodeList dupList = cobr.getElementsByTagName("dup");
+            NodeList dupList = cobr.getElementsByTagNameNS("*", "dup");
             for (int i = 0; i < dupList.getLength(); i++) {
                 Element dup = (Element) dupList.item(i);
                 DuplicataNota d = new DuplicataNota();
@@ -181,10 +184,10 @@ public class NotaRecebimentoService {
 
         return fornecedorRepository.save(fFinal);
     }
-
+    
     private ItemNotaRecebimento processarItem(Element det, NotaRecebimento nota, String cnpjFornecedor) {
-        Element prod = (Element) det.getElementsByTagName("prod").item(0);
-        Element imposto = (Element) det.getElementsByTagName("imposto").item(0);
+        Element prod = (Element) det.getElementsByTagNameNS("*", "prod").item(0);
+        Element imposto = (Element) det.getElementsByTagNameNS("*", "imposto").item(0);
 
         ItemNotaRecebimento item = new ItemNotaRecebimento();
         item.setNota(nota);
@@ -203,7 +206,6 @@ public class NotaRecebimentoService {
         if (imposto != null) {
             Element icms = primeiroFilho(imposto, "ICMS");
             if (icms != null) {
-                // Corrige o bug do item(0) buscando dinamicamente o primeiro nó do tipo ELEMENT
                 Element icmsGrupo = obterPrimeiroElementoFilho(icms);
                 if (icmsGrupo != null) {
                     item.setCst(getTagValue("CST", icmsGrupo));
@@ -224,12 +226,53 @@ public class NotaRecebimentoService {
             }
         }
 
-        produtoFornecedorRepository
-                .findByCnpjFornecedorAndCodigoFornecedor(cnpjFornecedor, cProd)
-                .ifPresent(vinculo -> {
-                    System.out.println("[LOG NOTA-RECEBIMENTO] Vínculo De-Para encontrado automaticamente para o item: " + cProd);
-                    item.setProduto(vinculo.getProduto());
-                });
+        System.out.println("[LOG NOTA-RECEBIMENTO] Buscando relacionamento para o item do fornecedor: " + cProd);
+        
+        Optional<ProdutoFornecedor> vinculoExistente = produtoFornecedorRepository
+                .findByCnpjFornecedorAndCodigoFornecedor(cnpjFornecedor, cProd);
+
+        if (vinculoExistente.isPresent()) {
+            System.out.println("[LOG NOTA-RECEBIMENTO] Vínculo De-Para encontrado automaticamente para o item: " + cProd);
+            item.setProduto(vinculoExistente.get().getProduto());
+        } else {
+            String ean = getTagValue("cEAN", prod);
+
+            // CORREÇÃO: Avalia a nulidade diretamente na condição do if.
+            // O compilador agora entende com 100% de certeza que o bloco interno só executa se 'ean' NÃO for nulo.
+            if (ean != null && !ean.isBlank() && !ean.equalsIgnoreCase("SEM GTIN")) {
+                System.out.println("[LOG NOTA-RECEBIMENTO] De-Para não encontrado. Tentando vincular por EAN: " + ean);
+                Optional<Produto> produtoPorEan = produtoRepository.findByCodigoBarras(ean.trim());
+
+                if (produtoPorEan.isPresent()) {
+                    Produto prodEncontrado = produtoPorEan.get();
+                    System.out.println("[LOG NOTA-RECEBIMENTO] Sucesso! Produto localizado no ERP por EAN: " + prodEncontrado.getDescricao());
+                    item.setProduto(prodEncontrado);
+
+                    gravarVinculoDePara(nota.getFornecedor(), cProd, prodEncontrado, item.getValorUnitario());
+                } else {
+                    System.out.println("[LOG NOTA-RECEBIMENTO] Produto com EAN " + ean + " não cadastrado no banco de dados.");
+                }
+            }
+
+            if (item.getProduto() == null && item.getDescricaoNota() != null && !item.getDescricaoNota().isBlank()) {
+                String descricaoXml = item.getDescricaoNota().trim();
+                System.out.println("[LOG NOTA-RECEBIMENTO] Tentando localizar produto por Descrição Exata: '" + descricaoXml + "'");
+                
+                List<Produto> produtosPorDescricao = produtoRepository.buscarPorDescricao(descricaoXml);
+                
+                Optional<Produto> correspondenciaExata = produtosPorDescricao.stream()
+                        .filter(p -> p.getDescricao() != null && p.getDescricao().trim().equalsIgnoreCase(descricaoXml))
+                        .findFirst();
+
+                if (correspondenciaExata.isPresent()) {
+                    Produto prodEncontrado = correspondenciaExata.get();
+                    System.out.println("[LOG NOTA-RECEBIMENTO] Sucesso! Produto localizado por Descrição: " + prodEncontrado.getDescricao());
+                    item.setProduto(prodEncontrado);
+
+                    gravarVinculoDePara(nota.getFornecedor(), cProd, prodEncontrado, item.getValorUnitario());
+                }
+            }
+        }
 
         return item;
     }
@@ -319,7 +362,7 @@ public class NotaRecebimentoService {
     private Document parsearXml(InputStream is) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        factory.setNamespaceAware(false);
+        factory.setNamespaceAware(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
         return builder.parse(is);
     }
@@ -379,9 +422,9 @@ public class NotaRecebimentoService {
     }
 
     private String resolverFormaPagamento(Element infNFe) {
-        Element pag = (Element) infNFe.getElementsByTagName("pag").item(0);
+        Element pag = (Element) infNFe.getElementsByTagNameNS("*", "pag").item(0);
         if (pag == null) return "Sem pagamento";
-        Element detPag = (Element) pag.getElementsByTagName("detPag").item(0);
+        Element detPag = (Element) pag.getElementsByTagNameNS("*", "detPag").item(0);
         if (detPag == null) return "Sem pagamento";
         String tPag = getTagValue("tPag", detPag);
         return switch (tPag != null ? tPag : "") {
@@ -396,10 +439,9 @@ public class NotaRecebimentoService {
         };
     }
 
-    // Método utilitário otimizado para evitar problemas com quebras de linhas do XML
     private String getTagValue(String tag, Element element) {
         if (element == null) return null;
-        NodeList nl = element.getElementsByTagName(tag);
+        NodeList nl = element.getElementsByTagNameNS("*", tag);
         if (nl.getLength() > 0) {
             String txt = nl.item(0).getTextContent();
             return txt != null ? txt.trim() : null;
@@ -408,11 +450,10 @@ public class NotaRecebimentoService {
     }
 
     private Element primeiroFilho(Element parent, String tagName) {
-        NodeList nl = parent.getElementsByTagName(tagName);
+        NodeList nl = parent.getElementsByTagNameNS("*", tagName);
         return nl.getLength() > 0 ? (Element) nl.item(0) : null;
     }
 
-    // Auxiliar estratégico para pular nós de texto invisíveis do XML (\n\t)
     private Element obterPrimeiroElementoFilho(Element parent) {
         NodeList filhos = parent.getChildNodes();
         for (int i = 0; i < filhos.getLength(); i++) {

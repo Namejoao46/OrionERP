@@ -4,26 +4,27 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Base64;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import backend.model.erp.Fornecedor;
 import backend.repository.erp.FornecedorRepository;
+import backend.repository.fiscal.NotaRecebimentoRepository;
 import backend.service.fiscal.FornecedorXmlService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/fornecedores")
 @CrossOrigin("*")
+@RequiredArgsConstructor
 public class FornecedorController {
 
-    @Autowired
-    private FornecedorRepository repository;
-
-    @Autowired
-    private FornecedorXmlService xmlService;
+    private final FornecedorRepository repository;
+    private final FornecedorXmlService xmlService;
+    private final NotaRecebimentoRepository notaRecebimentoRepository;
 
     @GetMapping
     public List<Fornecedor> listar() {
@@ -146,9 +147,56 @@ public class FornecedorController {
             System.out.println("[LOG SALVAR] Detalhes do erro: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Erro ao registrar fornecedor: " + e.getMessage());
-        } finally { // CORRIGIDO: De 'finaly' para 'finally' aqui na linha 153
+        } finally {
             System.out.println("=================================================");
         }
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional // CRÍTICO: Garante a atomicidade das duas operações de exclusão
+    public ResponseEntity<?> deletar(
+            @PathVariable Long id,
+            @RequestHeader(value = "User-Role", defaultValue = "USER") String userRole) {
+        
+        System.out.println("=================================================");
+        System.out.println("[LOG DELETAR] Rota para exclusão ativada. ID: " + id);
+        System.out.println("[LOG DELETAR] User-Role avaliado: " + userRole);
+
+        if (!"MASTER".equalsIgnoreCase(userRole) && !"ADMIN".equalsIgnoreCase(userRole)) {
+            System.out.println("[LOG DELETAR] BLOQUEADO: Perfil não autorizado.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permissão negada para remover registros.");
+        }
+
+        return repository.findById(id).map(fornecedor -> {
+            try {
+                // Tenta deletar diretamente de forma otimista
+                repository.delete(fornecedor);
+                System.out.println("[LOG DELETAR] Fornecedor '" + fornecedor.getRazaoSocial() + "' deletado com sucesso.");
+                return ResponseEntity.ok().build();
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                System.out.println("[LOG DELETAR] CONFLITO DE CHAVE ESTRANGEIRA: Identificado vínculo em NOTAS_RECEBIMENTO.");
+                System.out.println("[LOG DELETAR] Executando limpeza relacional forçada...");
+                
+                try {
+                    // 1. Remove os rascunhos de notas associados ao ID do fornecedor primeiro
+                    notaRecebimentoRepository.deleteByFornecedorId(id);
+                    System.out.println("[LOG DELETAR] Dependências em 'NOTAS_RECEBIMENTO' limpas.");
+
+                    // 2. Tenta apagar o fornecedor novamente agora que a restrição sumiu
+                    repository.delete(fornecedor);
+                    System.out.println("[LOG DELETAR] Fornecedor '" + fornecedor.getRazaoSocial() + "' removido com sucesso após limpeza.");
+                    
+                    return ResponseEntity.ok().build();
+                } catch (Exception ex) {
+                    System.out.println("[LOG DELETAR] ERRO CRÍTICO: Falha na limpeza forçada: " + ex.getMessage());
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Falha ao executar limpeza relacional: " + ex.getMessage());
+                }
+            }
+        }).orElseGet(() -> {
+            System.out.println("[LOG DELETAR] Registro não localizado.");
+            return ResponseEntity.notFound().build();
+        });
     }
 
     @PutMapping("/{id}/foto")

@@ -3,7 +3,6 @@ package backend.service.config;
 import java.io.IOException; 
 import java.time.LocalDate;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.lang.NonNull;
@@ -15,28 +14,24 @@ import backend.model.auth.UserRole;
 import backend.model.gestao.Empresa;
 import backend.repository.auth.ColaboradorRepository;
 import backend.repository.gestao.EmpresaRepository;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
-    @Autowired
-    private ColaboradorRepository repository;
-
-    @Autowired
-    private EmpresaRepository empresaRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final ColaboradorRepository repository;
+    private final EmpresaRepository empresaRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
         
         // 1. Criar Empresa OrionERP se não existir
-        // Usando o campo correto: nomeFantasia
         Empresa orion = empresaRepository.findByNomeFantasia("OrionERP").orElse(null);
         if (orion == null) {
             orion = new Empresa();
-            orion.setNomeFantasia("OrionERP"); // Campo correto
+            orion.setNomeFantasia("OrionERP");
             orion.setCnpj("00.000.000/0001-00");
             orion.setPlano("Premium");
             orion = empresaRepository.save(orion);

@@ -1,7 +1,6 @@
 package backend.security;
 
 import java.io.IOException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,15 +13,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class SecurityFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private ColaboradorRepository repository;
+    // Modificadores 'final' adicionados e '@Autowired' removidos
+    private final TokenService tokenService;
+    private final ColaboradorRepository repository;
 
     @Override
     protected void doFilterInternal(

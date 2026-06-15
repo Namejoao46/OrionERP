@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,15 +12,15 @@ import backend.model.erp.Produto;
 import backend.model.erp.Fornecedor;
 import backend.repository.erp.ProdutoRepository;
 import backend.repository.erp.FornecedorRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class ProdutoService {
 
-    @Autowired
-    private ProdutoRepository repository;
-
-    @Autowired
-    private FornecedorRepository fornecedorRepository;
+    // Modificadores 'final' adicionados e '@Autowired' removidos
+    private final ProdutoRepository repository;
+    private final FornecedorRepository fornecedorRepository;
 
     public List<Produto> listarTodos() {
         System.out.println("[LOG PRODUTO-SERVICE] Listando todos os produtos.");

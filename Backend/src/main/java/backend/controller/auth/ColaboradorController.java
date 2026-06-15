@@ -3,7 +3,6 @@ package backend.controller.auth;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,16 +19,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import backend.model.auth.Colaborador;
 import backend.repository.auth.ColaboradorRepository;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/colaboradores")
+@RequiredArgsConstructor
 @CrossOrigin("*")
 public class ColaboradorController {
 
-    @Autowired
-    private ColaboradorRepository repository;
+    private final ColaboradorRepository repository;
 
-    @Autowired
     private backend.service.gestao.GestaoService gestaoService;
 
     @GetMapping("/equipe")

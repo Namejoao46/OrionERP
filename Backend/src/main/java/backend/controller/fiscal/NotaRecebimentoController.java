@@ -3,7 +3,6 @@ package backend.controller.fiscal;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,14 +18,15 @@ import backend.dto.fiscal.NotaImportadaResponse;
 import backend.dto.fiscal.VinculoItemRequest;
 import backend.model.fiscal.NotaRecebimento;
 import backend.service.fiscal.NotaRecebimentoService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/notas-recebimento")
 @CrossOrigin("*")
+@RequiredArgsConstructor
 public class NotaRecebimentoController {
 
-    @Autowired
-    private NotaRecebimentoService service;
+    private final NotaRecebimentoService service;
 
     @PostMapping("/importar-xml")
     public ResponseEntity<?> importarXml(@RequestParam("xml") MultipartFile arquivo) {
@@ -54,7 +54,6 @@ public class NotaRecebimentoController {
         }
     }
 
-   
     @PostMapping("/{id}/confirmar")
     public ResponseEntity<?> confirmar(@PathVariable Long id) {
         try {

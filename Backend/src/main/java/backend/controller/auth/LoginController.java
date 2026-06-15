@@ -4,11 +4,11 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder; // Simplificado o import
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,23 +18,19 @@ import org.springframework.web.bind.annotation.RestController;
 import backend.model.auth.Colaborador;
 import backend.repository.auth.ColaboradorRepository;
 import backend.service.security.TokenService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 @CrossOrigin(origins = "*") 
 public class LoginController {
 
-    @Autowired
-    private AuthenticationManager manager;
-
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private ColaboradorRepository colaboradorRepository;
-
-    @Autowired
-    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    // Adicionado o modificador 'final' em todas as dependências abaixo para sanar o aviso do VS Code
+    private final AuthenticationManager manager;
+    private final TokenService tokenService;
+    private final ColaboradorRepository colaboradorRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     @SuppressWarnings("CallToPrintStackTrace")
@@ -58,13 +54,11 @@ public class LoginController {
 
             Map<String, Object> resposta = new HashMap<>();
             
-            // CORREÇÃO CRÍTICA: Enviando o ID do usuário para o Angular!
             resposta.put("id", colaborador.getId()); 
             resposta.put("token", tokenJWT);
             resposta.put("nome", colaborador.getNome());
             resposta.put("login", colaborador.getLogin());
             
-            // Enviando os dados complementares do perfil para evitar LocalStorage em branco
             resposta.put("sobrenome", colaborador.getSobrenome());
             resposta.put("cargo", colaborador.getCargo());
             resposta.put("cpf", colaborador.getCpf());
@@ -108,7 +102,6 @@ public class LoginController {
     public ResponseEntity<?> registrar(@RequestBody Colaborador novo) {
         System.out.println(">>> [LoginController] Inicializando auto-cadastro de conta master");
         
-        // CORREÇÃO: Adicionado bloqueio se o RequestBody vier nulo
         if (novo == null) {
             System.out.println(">>> [LoginController] Recusado: Objeto do colaborador veio nulo.");
             return ResponseEntity.badRequest().body(Map.of("erro", "Dados inválidos", "detalhe", "O corpo da requisição não pode ser vazio."));

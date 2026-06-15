@@ -3,6 +3,20 @@ import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { FornecedorService, Fornecedor } from '../../../../core/services/erp/fornecedor.service';
 import { ModalService } from '../../../../core/services/ui/modal.service';
+import { forkJoin } from 'rxjs';
+import { ProdutoService } from '../../../../core/services/erp/Produto.service';
+import { NotaRecebimentoService } from '../../../../core/services/erp/NotaRecebimento.service';
+
+export interface ItemProdutoXml {
+  numeroItem: number;
+  codigoProduto: string;
+  descricao: string;
+  ean: string;
+  unidade: string;
+  quantidade: number;
+  valorUnitario: number;
+  valorTotal: number;
+}
 
 @Component({
   selector: 'app-cadastro-fornecedor-component',
@@ -17,7 +31,8 @@ export class CadastroFornecedorComponent {
   public isLoadingFoto: boolean = false;
   public isSaving: boolean = false;
 
-  // Inicialização estável do modelo para os inputs
+  public produtosDoXml: ItemProdutoXml[] = [];
+
   fornecedor: Fornecedor = {
     id: undefined,
     cnpj: '',
@@ -48,140 +63,140 @@ export class CadastroFornecedorComponent {
   
   @Output() salvoComSucesso = new EventEmitter<void>();
 
-  constructor(private service: FornecedorService, private cdr: ChangeDetectorRef, private modalService: ModalService) {
-    console.log('[TRACKING-FRONT] CadastroFornecedorComponent inicializado com sucesso.');
+  constructor(
+    private service: FornecedorService,
+    private notaService: NotaRecebimentoService,
+    private produtoService: ProdutoService, 
+    private cdr: ChangeDetectorRef, 
+    private modalService: ModalService
+  ) {
+    console.log('[TRACKING-FRONT] CadastroFornecedorComponent inicializado.');
   }
 
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
-    if (!file) {
-      console.warn('[TRACKING-FRONT] Seleção de arquivo XML cancelada pelo usuário.');
-      return;
-    }
+    if (!file) return;
 
-    console.log(`[TRACKING-FRONT] Arquivo XML selecionado: ${file.name} (${file.size} bytes). Iniciando upload.`);
     this.isLoadingXml = true;
+    this.produtosDoXml = [];
 
-    this.service.importarXml(file).subscribe({
-      next: (dados) => {
-        console.log('[TRACKING-FRONT] Resposta do backend obtida com sucesso para o XML. Dados brutos recebidos:', dados);
-        
+    this.notaService.importarXml(file).subscribe({
+      next: (dados: any) => {
         if (!dados) {
-          console.warn('[TRACKING-FRONT] Backend retornou estrutura vazia para o XML.');
           this.isLoadingXml = false;
           return;
         }
 
-        const antigoCnpj = this.fornecedor.cnpj;
+        let itensDetectados: any[] = dados.itens || dados.det || dados.produtos || [];
 
-        // O setTimeout joga a execução para o próximo ciclo de microtasks, mitigando conflitos de checagem
-        setTimeout(() => {
-          // Atualiza as propriedades mantendo a mesma referência de memória do objeto inicial
-          Object.assign(this.fornecedor, {
-            id: dados.id || this.fornecedor.id,
-            cnpj: dados.cnpj || '',
-            razaoSocial: dados.razaoSocial || '',
-            nomeFantasia: dados.nomeFantasia || '',
-            inscricaoEstadual: dados.inscricaoEstadual || '',
-            inscricaoMunicipal: dados.inscricaoMunicipal || '',
-            cnaePrincipal: dados.cnaePrincipal || '',
-            crt: dados.crt !== undefined && dados.crt !== null ? Number(dados.crt) : undefined,
-            logradouro: dados.logradouro || '',
-            numero: dados.numero || '',
-            complemento: dados.complemento || '',
-            bairro: dados.bairro || '',
-            cidade: dados.cidade || '',
-            uf: dados.uf || '',
-            cep: dados.cep || '',
-            cMun: dados.cMun || (dados as any).cmun || '', 
-            telefone: dados.telefone || '',
-            email: dados.email || '',
-            chavePix: dados.chavePix || '',
-            leadTime: dados.leadTime !== undefined ? dados.leadTime : 0,
-            limiteCredito: dados.limiteCredito !== undefined ? dados.limiteCredito : 0.0,
-            observacoes: dados.observacoes || '',
-            foto: dados.foto || this.fornecedor.foto
-          });
-
-          console.log(`[TRACKING-FRONT] Merge de dados concluído na View. CNPJ anterior: "${antigoCnpj}" -> Novo CNPJ: "${this.fornecedor.cnpj}"`);
-          this.isLoadingXml = false;
-          
-          // Força o Angular a recalcular a árvore DOM e aplicar o binding nos inputs
-          this.cdr.detectChanges(); 
-          
-          setTimeout(() => {
-            alert('Dados da Nota Fiscal (XML) carregados com sucesso no formulário!');
-          }, 50);
+        this.produtosDoXml = itensDetectados.map((item: any, index: number) => {
+          const p = item.prod || item; 
+          return {
+            numeroItem: Number(item.numeroItem || item['$']?.nItem || (index + 1)),
+            codigoProduto: p.codigoProdutoFornecedor || p.cProd || '',
+            descricao: p.descricaoNota || p.xProd || '',
+            ean: p.ean || p.cEAN || 'SEM GTIN',
+            unidade: p.unidadeComercial || p.uCom || '',
+            quantidade: Number(p.quantidadeFaturada || p.qCom || 0),
+            valorUnitario: Number(p.valorUnitario || p.vUnCom || 0),
+            valorTotal: Number(p.valorTotal || p.vProd || 0)
+          };
         });
+
+        const fData = dados.fornecedor || dados.emit || dados;
+        const ender = fData.enderEmit || fData;
+
+        Object.assign(this.fornecedor, {
+          id: fData.id || this.fornecedor.id,
+          cnpj: fData.cnpj || fData.CNPJ || '',
+          razaoSocial: fData.razaoSocial || fData.xNome || '',
+          nomeFantasia: fData.nomeFantasia || fData.xFant || '',
+          inscricaoEstadual: fData.inscricaoEstadual || fData.IE || '',
+          inscricaoMunicipal: fData.inscricaoMunicipal || fData.IM || '',
+          cnaePrincipal: fData.cnaePrincipal || fData.CNAE || '',
+          crt: fData.crt !== undefined && fData.crt !== null ? Number(fData.crt) : (fData.CRT ? Number(fData.CRT) : undefined),
+          logradouro: fData.logradouro || ender.xLgr || '',
+          numero: fData.numero || ender.nro || '',
+          complemento: fData.complemento || ender.xCpl || '',
+          bairro: fData.bairro || ender.xBairro || '',
+          cidade: fData.cidade || ender.xMun || '',
+          uf: fData.uf || ender.UF || '',
+          cep: fData.cep || ender.CEP || '',
+          cMun: fData.cMun || fData.cmun || ender.cMun || '', 
+          telefone: fData.telefone || ender.fone || '',
+          email: fData.email || '',
+          chavePix: fData.chavePix || '',
+          leadTime: fData.leadTime !== undefined ? fData.leadTime : 0,
+          limiteCredito: fData.limiteCredito !== undefined ? fData.limiteCredito : 0.0,
+          observacoes: fData.observacoes || '',
+          foto: fData.foto || this.fornecedor.foto
+        });
+
+        this.isLoadingXml = false;
+        this.cdr.detectChanges(); 
       },
       error: (err) => {
-        console.error('[TRACKING-FRONT] CRÍTICO: Falha ao processar ou transmitir o XML para o servidor.', err);
         this.isLoadingXml = false;
-        alert(`Erro ao processar o arquivo XML: ${err.message || 'Verifique o formato do arquivo.'}`);
+        console.error('[TRACKING-FRONT] Erro retornado pelo barramento de notas:', err);
+
+        // TRATAMENTO ADICIONADO: Captura o erro 409 enviado pelo backend
+        if (err.status === 409) {
+          alert('Atenção: Esta NF-e (Chave de Acesso) já foi importada anteriormente no sistema OrionERP.');
+        } else if (err.status === 403) {
+          alert('Permissão negada: Seu usuário atual não tem privilégios para importar arquivos fiscais.');
+        } else {
+          alert(`Erro ao processar o arquivo XML: ${err.error?.message || err.message || 'Formato ou estrutura inválida.'}`);
+        }
+        
+        this.cdr.detectChanges();
       }
     });
   }
 
   onFotoSelected(event: any) {
     const file: File = event.target.files[0];
-    if (!file) {
-      console.warn('[TRACKING-FRONT] Seleção de foto cancelada pelo usuário.');
-      return;
-    }
+    if (!file) return;
 
-    console.log(`[TRACKING-FRONT] Nova foto capturada no input local: ${file.name} | Tipo: ${file.type}`);
     this.arquivoFotoSelecionado = file;
-
     const reader = new FileReader();
-    console.log('[TRACKING-FRONT] Instanciando FileReader para renderização do preview em memória.');
-    
     reader.onload = () => {
       this.fornecedor.foto = reader.result as string;
-      console.log('[TRACKING-FRONT] String Base64 gerada com sucesso. Preview updated na View.');
+      this.cdr.detectChanges();
     };
-    
-    reader.onerror = (fileError) => {
-      console.error('[TRACKING-FRONT] Erro ao ler o arquivo de imagem local no navegador:', fileError);
-    };
-
     reader.readAsDataURL(file);
   }
 
   salvar() {
-    console.log('[TRACKING-FRONT] Evento "salvar()" disparado. Executando validações de acesso.');
-    
     if (!this.fornecedor.cnpj || !this.fornecedor.razaoSocial) {
-      console.warn('[TRACKING-FRONT] Validação recusada: Campos obrigatórios ausentes.', {
-        cnpj: this.fornecedor.cnpj,
-        razaoSocial: this.fornecedor.razaoSocial
-      });
       alert('CNPJ e Razão Social são obrigatórios!');
       return;
     }
 
-    console.log('[TRACKING-FRONT] Formulário válido. Payload preparado para envio:', this.fornecedor);
-    this.isSaving = true;
+    setTimeout(() => {
+      this.isSaving = true;
+      this.cdr.markForCheck();
+    }, 0);
 
     this.service.salvar(this.fornecedor).subscribe({
       next: (fornecedorSalvo) => {
-        console.log('[TRACKING-FRONT] Sucesso na persistência textual. Entidade salva retornada do Banco:', fornecedorSalvo);
+        console.log('[TRACKING-FRONT] Fornecedor persistido. ID obtido:', fornecedorSalvo.id);
         
-        if (this.arquivoFotoSelecionado && fornecedorSalvo.id) {
-          console.log(`[TRACKING-FRONT] Detectada foto pendente para upload. Encaminhando para o método secundário. ID Alvo: ${fornecedorSalvo.id}`);
-          this.vincularFotoAoFornecedor(fornecedorSalvo.id);
+        if (this.produtosDoXml && this.produtosDoXml.length > 0 && fornecedorSalvo.id) {
+          this.guardarEVincularProdutosDoXml(fornecedorSalvo.id, fornecedorSalvo);
         } else {
-          console.log('[TRACKING-FRONT] Fluxo de salvamento concluído sem imagem acessória. Resetando tela.');
-          alert('Fornecedor registrado com sucesso!');
-          this.finalizarProcessoComSucesso();
+          this.verificarUploadFoto(fornecedorSalvo);
         }
       },
       error: (err) => {
-        console.error('[TRACKING-FRONT] Erro no pipeline de salvamento de texto:', err);
-        this.isSaving = false;
-        
-        if (err.status === 403) {
-          console.error('[TRACKING-FRONT] Quebra de barreira de segurança de perfil (403 Forbidden).');
-          alert('Acesso negado: Seu nível de acesso atual não possui permissão (ADMIN/MASTER) para esta operação.');
+        console.error('[TRACKING-FRONT] Erro ao salvar o fornecedor:', err);
+        setTimeout(() => {
+          this.isSaving = false;
+          this.cdr.detectChanges();
+        }, 0);
+
+        // TRATAMENTO ADICIONADO: Avalia erro de banco ou CNPJ já existente ao salvar manualmente
+        if (err.status === 409) {
+          alert('Erro de Consistência: Já existe um fornecedor cadastrado com este CNPJ.');
         } else {
           alert(`Erro ao salvar fornecedor no servidor [Status ${err.status}].`);
         }
@@ -189,47 +204,116 @@ export class CadastroFornecedorComponent {
     });
   }
 
-  private vincularFotoAoFornecedor(id: number) {
-    if (!this.arquivoFotoSelecionado) {
-      console.warn('[TRACKING-FRONT] Tentativa de upload abortada: Arquivo binário nulo.');
-      return;
+  private guardarEVincularProdutosDoXml(fornecedorId: number, fornecedorSalvo: any) {
+    console.log(`[TRACKING-FRONT] Transmitindo lote de produtos para o ID: ${fornecedorId}`);
+    
+    const requisicoesDeCadastro = this.produtosDoXml.map(item => {
+      const payloadProduto = {
+        codigoBarras: item.ean !== 'SEM GTIN' ? item.ean : '',
+        descricao: item.descricao,
+        unidadeMedida: item.unidade,
+        categoria: 'GERAL', 
+        status: 'ATIVO',
+        estoqueMinimo: 0,
+        estoqueMaximo: 100,
+        localizacaoFisica: 'ALMOXARIFADO',
+        precoCusto: item.valorUnitario,
+        margemLucro: 50.0, 
+        precoVenda: item.valorUnitario * 1.5,
+        ncm: (item as any).ncm || '00000000', 
+        cest: '',
+        origemProduto: 0,
+        cstIcms: '00',
+        aliquotaIcms: 0,
+        aliquotaPis: 0,
+        aliquotaCofins: 0,
+        fornecedorId: fornecedorId 
+      };
+      return this.produtoService.cadastrar(payloadProduto);
+    });
+
+    forkJoin(requisicoesDeCadastro).subscribe({
+      next: (produtosCadastrados) => {
+        console.log(`[TRACKING-FRONT] Sucesso: ${produtosCadastrados.length} SKUs integrados.`);
+        this.verificarUploadFoto(fornecedorSalvo);
+      },
+      error: (err) => {
+        console.error('[TRACKING-FRONT] Erro detectado no lote de produtos. Iniciando Rollback automático do fornecedor...', err);
+        
+        this.service.deletar(fornecedorId).subscribe({
+          next: () => {
+            console.log(`[TRACKING-FRONT] Rollback concluído. Fornecedor ${fornecedorId} e Rascunhos de Notas limpos com sucesso.`);
+            setTimeout(() => {
+              this.isSaving = false;
+              this.cdr.detectChanges();
+            }, 0);
+            alert(`Falha na gravação do lote de produtos da Nota: ${err.error?.message || 'Dados inválidos em um dos itens'}. O processo foi abortado e os dados temporários foram limpos.`);
+          },
+          error: (rollbackErr: any) => {
+            console.error('[TRACKING-FRONT] Falha ao executar o rollback do fornecedor órfão:', rollbackErr);
+            setTimeout(() => {
+              this.isSaving = false;
+              this.cdr.detectChanges();
+            }, 0);
+
+            // TRATAMENTO ADICIONADO: Alerta se o backend falhar durante a deleção do rollback
+            if (rollbackErr.status === 409) {
+              alert('Atenção: Houve um erro nos produtos, mas o fornecedor não pôde ser limpo automaticamente devido a Notas Fiscais presas a ele no banco.');
+            } else {
+              alert('Erro crítico: Falha ao executar limpeza preventiva de dados órfãos após erro nos itens da nota.');
+            }
+          }
+        });
+      }
+    });
+  }
+
+  private verificarUploadFoto(fornecedorSalvo: any) {
+    if (this.arquivoFotoSelecionado && fornecedorSalvo.id) {
+      this.vincularFotoAoFornecedor(fornecedorSalvo.id);
+    } else {
+      alert('Fornecedor registrado com sucesso!');
+      this.finalizarProcessoComSucesso();
     }
+  }
 
-    console.log(`[TRACKING-FRONT] Iniciando chamada HTTP PUT Multipart/Form-Data para upload da foto. ID: ${id}`);
+  private vincularFotoAoFornecedor(id: number) {
     this.isLoadingFoto = true;
-
-    this.service.uploadFoto(id, this.arquivoFotoSelecionado).subscribe({
-      next: (resultadoFinal) => {
-        console.log('[TRACKING-FRONT] Upload da foto executado e processado pelo Storage do Backend.', resultadoFinal);
-        alert('Fornecedor e Foto salvos com sucesso!');
+    this.service.uploadFoto(id, this.arquivoFotoSelecionado!).subscribe({
+      next: () => {
+        alert('Fornecedor, produtos do XML e foto salvos com sucesso!');
         this.isLoadingFoto = false;
         this.finalizarProcessoComSucesso();
       },
       error: (err) => {
-        console.error(`[TRACKING-FRONT] Falha ao vincular foto ao ID ${id}. O registro textual foi mantido no banco.`, err);
+        console.error('[TRACKING-FRONT] Falha de upload da imagem:', err);
         this.isLoadingFoto = false;
-        this.isSaving = false;
-        alert('Os dados cadastrais foram salvos, mas a foto foi recusada ou excedeu o limite do servidor.');
+        setTimeout(() => {
+          this.isSaving = false;
+          this.cdr.detectChanges();
+        }, 0);
+        alert('Os dados cadastrais e produtos foram salvos, mas o arquivo de imagem de perfil falhou ou excede o tamanho limite.');
       }
     });
   }
 
   private finalizarProcessoComSucesso() {
-    console.log('[TRACKING-FRONT] Emitindo sinalizador de sucesso para o componente pai (Output).');
     this.salvoComSucesso.emit();
-    
-    // AQUI ESTÁ A CHAVE: Notifica globalmente o sistema que o banco foi atualizado!
     this.modalService.notificarFornecedorSalvo();
-    
     this.limparFormulario();
+    this.cdr.detectChanges();
   }
 
   public limparFormulario() {
-    console.log('[TRACKING-FRONT] Limpando estado local do formulário e referências de arquivos.');
     this.arquivoFotoSelecionado = null;
-    this.isSaving = false;
-    this.isLoadingXml = false;
-    this.isLoadingFoto = false;
+    this.produtosDoXml = [];
+    
+    setTimeout(() => {
+      this.isSaving = false;
+      this.isLoadingXml = false;
+      this.isLoadingFoto = false;
+      this.cdr.detectChanges();
+    }, 0);
 
     this.fornecedor = {
       id: undefined,

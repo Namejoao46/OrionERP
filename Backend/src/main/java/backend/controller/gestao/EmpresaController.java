@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,14 +20,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import backend.model.gestao.Empresa;
 import backend.repository.gestao.EmpresaRepository;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/empresas")
 @CrossOrigin("*")
+@RequiredArgsConstructor
 public class EmpresaController {
 
-    @Autowired
-    private EmpresaRepository repository;
+    private final EmpresaRepository repository;
 
     @PostMapping(consumes = {"multipart/form-data"})
     @Transactional // Garante a segurança da operação no banco de dados
@@ -36,7 +36,6 @@ public class EmpresaController {
             @RequestParam("empresa") String empresaJson,
             @RequestParam(value = "logo", required = false) MultipartFile logo) throws IOException {
         
-        // Removemos o try/catch interno para o RestExceptionHandler interceptar os erros!
         ObjectMapper objectMapper = new ObjectMapper();
         
         // Configura o ObjectMapper para reconhecer os módulos do Java 8+ se necessário (ex: datas)

@@ -10,7 +10,7 @@ export interface Fornecedor {
   inscricaoEstadual?: string;
   inscricaoMunicipal?: string;
   cnaePrincipal?: string;
-  crt?: number; // Alterado de string para number para coincidir com o backend
+  crt?: number;
   logradouro?: string;
   numero?: string;
   complemento?: string;
@@ -76,6 +76,24 @@ export class FornecedorService {
       }),
       catchError((err) => {
         console.error(`[TRACKING-SERVICE] [ERROR] Falha na requisição de salvamento. Código HTTP: ${err.status}`, { payloadRecusado: fornecedor, erro: err });
+        return throwError(() => err);
+      })
+    );
+  }
+
+  // ADICIONADO: Método de deleção/rollback para manter a integridade do ERP
+  deletar(id: number): Observable<void> {
+    const startTime = performance.now();
+    const headers = this.criarHeadersSeguranca();
+    console.log(`[TRACKING-SERVICE] [DELETE] Solicitando remoção/rollback do registro ID: ${id}`);
+
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers }).pipe(
+      tap(() => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Registro excluído com sucesso. Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error(`[TRACKING-SERVICE] [ERROR] Erro ao tentar remover o fornecedor órfão de ID: ${id}`, err);
         return throwError(() => err);
       })
     );

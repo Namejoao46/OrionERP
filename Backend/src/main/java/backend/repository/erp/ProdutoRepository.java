@@ -9,6 +9,10 @@ import backend.model.erp.Produto;
 
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
+    // 🧠 CORREÇÃO: SQL Nativo limpo que o Firebird processa instantaneamente e sem erros de sintaxe
+    @Query(value = "SELECT * FROM PRODUTOS WHERE fornecedor_id = :fornecedorId", nativeQuery = true)
+    List<Produto> findByFornecedorId(@Param("fornecedorId") Long fornecedorId);
+
     Optional<Produto> findByCodigoBarras(String codigoBarras);
 
     boolean existsByCodigoBarras(String codigoBarras);

@@ -8,35 +8,38 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import backend.dto.erp.ProdutoRequest;
-import backend.model.erp.Produto;
 import backend.model.erp.Fornecedor;
-import backend.repository.erp.ProdutoRepository;
+import backend.model.erp.Produto;
 import backend.repository.erp.FornecedorRepository;
+import backend.repository.erp.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ProdutoService {
 
-    // Modificadores 'final' adicionados e '@Autowired' removidos
     private final ProdutoRepository repository;
     private final FornecedorRepository fornecedorRepository;
 
+    @Transactional(readOnly = true)
     public List<Produto> listarTodos() {
         System.out.println("[LOG PRODUTO-SERVICE] Listando todos os produtos.");
         return repository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<Produto> listarAtivos() {
         System.out.println("[LOG PRODUTO-SERVICE] Listando produtos com status ATIVO.");
         return repository.findByStatus("ATIVO");
     }
 
+    @Transactional(readOnly = true)
     public List<Produto> buscarPorDescricao(String termo) {
         System.out.println("[LOG PRODUTO-SERVICE] Buscando por descrição. Termo: " + termo);
         return repository.buscarPorDescricao(termo);
     }
 
+    @Transactional(readOnly = true)
     public Produto buscarPorId(Long id) {
         System.out.println("[LOG PRODUTO-SERVICE] Buscando produto por ID: " + id);
         if (id == null) {
@@ -44,6 +47,16 @@ public class ProdutoService {
         }
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
+    }
+
+    // 🔥 MELHORIA: Método essencial com transação ativa para ler dados e mapear o JSON sem quebrar no Firebird
+    @Transactional(readOnly = true)
+    public List<Produto> listarPorFornecedor(Long fornecedorId) {
+        System.out.println("[LOG PRODUTO-SERVICE] Buscando produtos do fornecedor ID: " + fornecedorId);
+        if (fornecedorId == null) {
+            throw new IllegalArgumentException("O ID do fornecedor não pode ser nulo.");
+        }
+        return repository.findByFornecedorId(fornecedorId);
     }
 
     @Transactional
@@ -170,6 +183,7 @@ public class ProdutoService {
         repository.save(produto);
     }
 
+    @SuppressWarnings("UnnecessaryTemporaryOnConversionFromString")
     private Produto mapearRequest(Produto produto, ProdutoRequest req) {
         System.out.println("[LOG PRODUTO-SERVICE] Vinculando e mapeando ProdutoRequest para a Entidade...");
         if (req.fornecedorId() == null) {
@@ -180,7 +194,13 @@ public class ProdutoService {
                 .orElseThrow(() -> new IllegalArgumentException("Fornecedor não encontrado com o ID informado."));
                 
         produto.setFornecedor(fornecedor);
-        produto.setCodigoBarras(req.codigoBarras());
+        
+        if (req.codigoBarras() != null && !req.codigoBarras().isBlank()) {
+            produto.setCodigoBarras(req.codigoBarras().trim());
+        } else {
+            produto.setCodigoBarras(null); 
+        }
+        
         produto.setDescricao(req.descricao());
         produto.setUnidadeMedida(req.unidadeMedida());
         produto.setCategoria(req.categoria());
@@ -193,7 +213,18 @@ public class ProdutoService {
         if (req.precoVenda() != null) produto.setPrecoVenda(req.precoVenda());
         produto.setNcm(req.ncm());
         produto.setCest(req.cest());
-        produto.setOrigemProduto(req.origemProduto());
+        
+        if (req.origemProduto() != null && !req.origemProduto().isBlank()) {
+            try {
+                produto.setOrigemProduto(Integer.parseInt(req.origemProduto().trim()));
+            } catch (NumberFormatException e) {
+                System.out.println("[LOG PRODUTO-SERVICE] Erro ao converter origem '" + req.origemProduto() + "' para número. Definindo como 0.");
+                produto.setOrigemProduto(0);
+            }
+        } else {
+            produto.setOrigemProduto(0);
+        }
+
         produto.setCstIcms(req.cstIcms());
         produto.setAliquotaIcms(req.aliquotaIcms());
         produto.setAliquotaPis(req.aliquotaPis());
@@ -205,13 +236,13 @@ public class ProdutoService {
         BigDecimal base = produto.getCustoMedio() != null ? produto.getCustoMedio() : produto.getPrecoCusto();
         if (base == null || produto.getMargemLucro() == null) {
             System.out.println("[LOG PRODUTO-SERVICE] Custo ou margem nulos. Mantendo preço de venda original.");
-            return produto.getPrecoVenda();
+            return produto.getPrecoVenda() != null ? produto.getPrecoVenda() : BigDecimal.ZERO;
         }
 
-        BigDecimal fator = BigDecimal.ONE.add(
+        BigDecimal factor = BigDecimal.ONE.add(
             produto.getMargemLucro().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP)
         );
-        BigDecimal precoCalculado = base.multiply(fator).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal precoCalculado = base.multiply(factor).setScale(2, RoundingMode.HALF_UP);
         System.out.println("[LOG PRODUTO-SERVICE] Preço de venda calculado automaticamente: " + precoCalculado);
         return precoCalculado;
     }

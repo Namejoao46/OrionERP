@@ -3,6 +3,8 @@ package backend.model.erp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +30,7 @@ public class ProdutoFornecedor {
 
     @ManyToOne
     @JoinColumn(name = "produto_id", nullable = false)
+    @JsonIgnoreProperties({"fornecedores", "fornecedor"}) // 🧠 CORREÇÃO: Corta o loop infinito de volta para Produto
     private Produto produto;
 
     @Column(name = "cnpj_fornecedor", nullable = false, length = 14)

@@ -5,13 +5,15 @@
     background: #050a30;
     border-radius: 16px;
     font-family: 'Inter', sans-serif;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 h1 {
     color: #ffffff;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    margin: 10px 0 20px 20px;
+    margin: 10px 0 20px 15px;
     border-bottom: 3px solid #2b97fa;
     padding-bottom: 5px;
     display: inline-block;
@@ -23,49 +25,107 @@ h1 {
   gap: 15px;
   margin-bottom: 12px;
   padding: 12px;
-  background: #060b26; /* Fundo padrão dos cards */
+  background: #060b26; 
   border-radius: 10px;
   border: 1px solid #1a2245;
   transition: all 0.3s ease;
   cursor: pointer;
+  position: relative; /* Necessário para ancorar o balão do tooltip */
 }
 
 /* Efeito de vir para frente no Hover */
 .item-recente:hover {
-  transform: translateX(-5px); /* Move levemente para a esquerda */
+  transform: translateX(-5px); 
   background: #0d143d;
   border-color: #00c3ff;
 }
 
-/* Indicador de Status (Aquele pontinho) */
+/* Indicador de Status */
 .status-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: #00ff88;
   box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
-  flex-shrink: 0; /* Não deixa o círculo amassar */
+  flex-shrink: 0; 
 }
 
 .info {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  width: 100%;
+  overflow: hidden; /* Corta o que sobrar na largura */
 }
 
-.info strong {
+/* 🔥 CORREÇÃO: Limita o texto do produto a uma linha com reticências (...) */
+.info strong.produto-titulo {
   font-size: 0.85rem;
   color: #ffffff;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
 }
 
 .info span {
   font-size: 0.75rem;
-  color: #5d6588; /* Cinza azulado para não brigar com o título */
+  color: #5d6588; 
 }
 
 /* Estilo para quando o item for uma saída (opcional para o futuro) */
 .item-recente.saida .status-dot {
   background: #ff0055;
   box-shadow: 0 0 8px rgba(255, 0, 85, 0.4);
+}
+
+/* ==========================================================================
+   TOOLTIP NEON CUSTOMIZADO PARA A SIDEBAR
+   ========================================================================== */
+
+/* Caixa flutuante que surge acima do card */
+.item-recente:hover::after {
+    content: attr(data-title);
+    position: absolute;
+    bottom: 115%; /* Faz surgir flutuando em cima do card */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    
+    background: #0a0e29;
+    color: #ffffff;
+    border: 1px solid #2b97fa;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px; /* Largura segura para não estourar a sidebar */
+    
+    box-shadow: 0 4px 15px rgba(43, 151, 250, 0.35);
+    pointer-events: none;
+    animation: fadeInSidebarTooltip 0.12s ease-out forwards;
+}
+
+/* Pequena seta apontando para baixo indicando o card ativo */
+.item-recente:hover::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #2b97fa transparent transparent transparent;
+    pointer-events: none;
+    animation: fadeInSidebarTooltip 0.12s ease-out forwards;
+}
+
+@keyframes fadeInSidebarTooltip {
+    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }

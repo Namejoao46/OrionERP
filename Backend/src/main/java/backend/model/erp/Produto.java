@@ -19,6 +19,7 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
 @Entity
@@ -32,9 +33,9 @@ public class Produto {
 
     @ManyToOne
     @JoinColumn(name = "fornecedor_id", nullable = false) 
+    @JsonIgnoreProperties({"produtos", "hibernateLazyInitializer", "handler"}) // Impede o loop infinito com Fornecedor
     private Fornecedor fornecedor;
     
-    // Blindagem para aceitar EAN-13, DUN-14 e códigos estendidos de rascunho
     @Column(name = "codigo_barras", unique = true, length = 30)
     @Size(max = 30, message = "O código de barras não pode superar 30 caracteres.")
     private String codigoBarras;
@@ -81,12 +82,11 @@ public class Produto {
     @Column(name = "cest", length = 7)
     private String cest;
 
-    // Alterado para Integer para aceitar o 0, 1, 2 vindo do Front do OrionERP
     @Column(name = "origem_produto")
     private Integer origemProduto; 
 
     @Column(name = "cst_icms")
-    private String cstIcms;       
+    private String cstIcms;           
 
     @Column(name = "aliquota_icms")
     private BigDecimal aliquotaIcms;
@@ -98,6 +98,7 @@ public class Produto {
     private BigDecimal aliquotaCofins;
 
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"produto"}) // Impede o loop com a tabela ProdutoFornecedor
     private List<ProdutoFornecedor> fornecedores = new ArrayList<>();
 
     @Column(name = "criado_em", updatable = false)
@@ -112,7 +113,6 @@ public class Produto {
         this.atualizadoEm = LocalDateTime.now();
         if (this.status == null) this.status = "ATIVO";
         if (this.estoqueAtual == null) this.estoqueAtual = BigDecimal.ZERO;
-        // Fallback preventivo caso venha vazio do rascunho do front
         if (this.origemProduto == null) this.origemProduto = 0; 
     }
 

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core'; // Adicionado OnInit e inject
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ProdutoService } from '../../../../core/services/erp/Produto.service'; // Ajuste o caminho do serviço se necessário
+import { ProdutoService } from '../../../../core/services/erp/Produto.service';
 
 @Component({
   selector: 'app-ultimos-produtos',
@@ -11,10 +11,8 @@ import { ProdutoService } from '../../../../core/services/erp/Produto.service'; 
   styleUrl: './ultimos-produtos.css',
 })
 export class UltimosProdutos implements OnInit {
-  // Array que alimenta o seu *ngFor no HTML
   ultimos: any[] = [];
 
-  // Injeta o serviço de forma limpa usando inject()
   private produtoService = inject(ProdutoService);
 
   ngOnInit(): void {
@@ -24,9 +22,13 @@ export class UltimosProdutos implements OnInit {
   carregarUltimos(): void {
     this.produtoService.listarTodos().subscribe({
       next: (dados: any[]) => {
-        // Ordena pela data mais recente e extrai apenas os 5 primeiros
+        // Ordena pela data mais recente e pega os 5 primeiros
         this.ultimos = [...dados]
-          .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+          .sort((a, b) => {
+            const dataB = b.data ? new Date(b.data).getTime() : 0;
+            const dataA = a.data ? new Date(a.data).getTime() : 0;
+            return dataB - dataA;
+          })
           .slice(0, 5);
       },
       error: (err: any) => {

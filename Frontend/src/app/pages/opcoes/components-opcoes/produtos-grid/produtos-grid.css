@@ -6,8 +6,21 @@
     border-radius: 16px;
     font-family: 'Inter', sans-serif;
     overflow-y: auto;
-    overflow-x: auto;
+    overflow-x: hidden; /* Garante que o scroll horizontal fique morto */
     max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Customização moderna da barra de rolagem vertical */
+.lista-container::-webkit-scrollbar {
+    width: 6px;
+}
+.lista-container::-webkit-scrollbar-track {
+    background: #050a30;
+}
+.lista-container::-webkit-scrollbar-thumb {
+    background: #2b97fa;
+    border-radius: 4px;
 }
 
 /* Topo e Busca */
@@ -19,13 +32,15 @@
     top: 0;
     z-index: 10;
     margin-bottom: 25px;
+    background: #050a30; 
+    padding-bottom: 10px;
 }
 
 .topo-tabela h1 {
     color: #ffffff;
     font-size: 22px;
     font-weight: 700;
-    margin: 10px 0 20px 20px;
+    margin: 10px 0 0 20px;
     border-bottom: 3px solid #2b97fa;
     padding-bottom: 5px;
     display: inline-block;
@@ -39,7 +54,7 @@
     display: flex;
     align-items: center;
     transition: all 0.3s ease;
-    width: 300px;
+    width: 280px;
 }
 
 .busca-box:focus-within {
@@ -56,65 +71,137 @@
     font-size: 0.9rem;
 }
 
-/* Tabela Estilo "Card" */
+/* Tabela Estilizada */
 .tabela-estilizada {
-  width: max-content;
-  min-width: 100%;
-  border-collapse: collapse;
-  border-spacing: 0 12px; /* Cria o espaço entre as linhas */
-  margin-top: -12px; /* Ajusta o topo por causa do spacing */
+    width: 100%;
+    table-layout: fixed; 
+    border-collapse: collapse;
+    border-spacing: 0 12px; 
+    margin-top: 5px;
 }
 
+/* Definição de proporção das colunas */
+.tabela-estilizada th:nth-child(1) { width: 10%; } 
+.tabela-estilizada th:nth-child(2) { width: 50%; } 
+.tabela-estilizada th:nth-child(3) { width: 13%; } 
+.tabela-estilizada th:nth-child(4) { width: 13%; } 
+.tabela-estilizada th:nth-child(5) { width: 14%; } 
+
 .tabela-estilizada th {
-  color: #fff;
-  text-align: left;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  padding: 15px;
-  border-bottom: 2px solid #2b97fa;
+    color: #fff;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: 15px;
+    border-bottom: 2px solid #2b97fa;
 }
 
 .tabela-estilizada td {
-  padding: 18px 15px;
-  color: #d1d5db;
-  font-size: 0.9rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    color: #d1d5db;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
 }
 
 /* Arredondar as pontas de cada linha */
 .tabela-estilizada tr td:first-child {
-  border-radius: 12px 0 0 12px;
-  border-left: 3px solid transparent; /* Para o efeito de hover */
+    border-radius: 12px 0 0 12px;
+    border-left: 3px solid transparent;
 }
 
 .tabela-estilizada tr td:last-child {
-  border-radius: 0 12px 12px 0;
+    border-radius: 0 12px 12px 0;
 }
 
 /* Efeito de Hover na Linha Inteira */
 .tabela-estilizada tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
-  cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
 }
 
 .tabela-estilizada tr:hover td:first-child {
-  border-left-color: #00c3ff; /* Linha azul acende no início */
+    border-left-color: #00c3ff;
 }
 
 /* Badges Estilizados */
 .badge {
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  background: rgba(40, 167, 69, 0.15);
-  color: #28a745;
-  border: 1px solid rgba(40, 167, 69, 0.3);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: rgba(40, 167, 69, 0.15);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    display: inline-block;
 }
 
 .badge.low {
-  background: rgba(220, 53, 69, 0.15);
-  color: #dc3545;
-  border: 1px solid rgba(220, 53, 69, 0.3);
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+/* ==========================================================================
+   🔥 NOVO: ALINHAMENTO E CUSTOMIZAÇÃO DO TOOLTIP NEON
+   ========================================================================== */
+
+.coluna-descricao {
+    max-width: 0; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    cursor: help !important; 
+}
+
+/* Criação da caixa do balão estilizado */
+.coluna-descricao:hover::after {
+    content: attr(data-title); 
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 999;
+    
+    /* Cores combinando com o OrionERP */
+    background: #0a0e29;
+    color: #ffffff;
+    border: 1px solid #2b97fa;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: normal; 
+    width: max-content;
+    max-width: 380px;
+    
+    /* Efeito de brilho neon no contorno */
+    box-shadow: 0 4px 20px rgba(43, 151, 250, 0.35);
+    
+    pointer-events: none;
+    animation: fadeInTooltip 0.12s ease-out forwards;
+}
+
+/* Pequena seta indicadora lateral ligando a linha ao balão */
+.coluna-descricao:hover::before {
+    content: "";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 999;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #2b97fa transparent transparent;
+    pointer-events: none;
+    animation: fadeInTooltip 0.12s ease-out forwards;
+}
+
+@keyframes fadeInTooltip {
+    from { opacity: 0; transform: translateY(-50%) scale(0.95); }
+    to { opacity: 1; transform: translateY(-50%) scale(1); }
 }

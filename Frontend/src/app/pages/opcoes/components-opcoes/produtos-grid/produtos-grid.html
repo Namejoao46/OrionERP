@@ -1,12 +1,12 @@
 <div class="lista-container">
   <div class="topo-tabela">
-    <h1>Estoque de Produtos</h1>
+    <h1>Estoque Geral de Produtos</h1>
     <div class="busca-box">
       <span style="color: #00c3ff;">🔍</span>
       <input 
         type="text" 
         [(ngModel)]="termoBusca" 
-        placeholder="Pesquisar por nome ou código..."
+        placeholder="Pesquisar por descrição ou código..."
       >
     </div>
   </div>
@@ -15,7 +15,7 @@
     <thead>
       <tr>
         <th>Código</th>
-        <th>Produto</th>
+        <th>Produto / Descrição</th>
         <th>Quantidade</th>
         <th>Preço Unit.</th>
         <th>Status</th>
@@ -24,12 +24,18 @@
     <tbody>
       <tr *ngFor="let p of produtosFiltrados">
         <td style="color: #00c3ff; font-weight: bold;">#{{ p.id }}</td>
-        <td style="font-weight: 500;">{{ p.nome }}</td>
-        <td>{{ p.qtd }} un</td>
-        <td>{{ p.preco | currency:'BRL' }}</td>
+        
+        <td class="coluna-descricao" style="font-weight: 500;" [attr.data-title]="p.descricao">
+          {{ p.descricao }}
+        </td>
+        
+        <td>{{ p.estoqueAtual ?? 0 }} un</td>
+        
+        <td>{{ (p.precoVenda ?? 0) | currency:'BRL' }}</td>
+        
         <td>
-          <span class="badge" [class.low]="p.qtd < 10">
-            {{ p.qtd < 10 ? 'Baixo Estoque' : 'Em Dia' }}
+          <span class="badge" [class.low]="(p.estoqueAtual ?? 0) <= 5">
+            {{ (p.estoqueAtual ?? 0) <= 5 ? 'Baixo Estoque' : 'Em Dia' }}
           </span>
         </td>
       </tr>
@@ -37,6 +43,6 @@
   </table>
 
   <div *ngIf="produtosFiltrados.length === 0 && produtos.length > 0" style="color: gray; padding: 20px; text-align: center;">
-    Nenhum produto encontrado para "{{termoBusca}}"
+    Nenhum produto encontrado para "{{ termoBusca }}"
   </div>
 </div>

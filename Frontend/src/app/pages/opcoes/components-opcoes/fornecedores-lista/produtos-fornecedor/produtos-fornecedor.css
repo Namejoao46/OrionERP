@@ -2,12 +2,52 @@
 
 .produtos-container {
   width: 100%;
+  /* MELHORIA: Define uma altura máxima para o contêiner e libera o scroll se passar dela */
+  max-height: 80vh; 
+  overflow-y: auto;
+  overflow-x: hidden;
+  
   background: #050a30;
   border-radius: 16px;
   padding: 25px;
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
+
+  /* Suporte nativo moderno para navegadores Firefox baseados no novo padrão CSS */
+  scrollbar-width: thin;
+  scrollbar-color: #2b97fa #0b0f29;
 }
+
+/* ==========================================================================
+   ESTILIZAÇÃO DA BARRA DE ROLAGEM (Motores Webkit: Chrome, Edge, Opera, Safari)
+   ========================================================================== */
+
+/* Largura da barra de scroll vertical */
+.produtos-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Fundo da calha por onde a barra desliza (Track) */
+.produtos-container::-webkit-scrollbar-track {
+  background: #0b0f29;
+  border-radius: 0 16px 16px 0; /* Alinha o canto arredondado com o container */
+}
+
+/* O indicador que se move (Thumb) estilizado no azul #2b97fa */
+.produtos-container::-webkit-scrollbar-thumb {
+  background: #2b97fa;
+  border-radius: 4px;
+}
+
+/* Efeito sutil de brilho quando o usuário passa o mouse na barra */
+.produtos-container::-webkit-scrollbar-thumb:hover {
+  background: #4da3ff;
+  box-shadow: 0 0 8px rgba(43, 151, 250, 0.6);
+}
+
+/* ==========================================================================
+   DEMAIS ESTILOS DO COMPONENTE
+   ========================================================================== */
 
 .produtos-header {
   display: flex;
@@ -16,6 +56,12 @@
   border-bottom: 2px solid #2b97fa;
   padding-bottom: 15px;
   margin-bottom: 25px;
+  /* Garante que o header fique fixo no topo se o scroll acontecer abaixo dele */
+  position: sticky;
+  top: -25px;
+  background: #050a30;
+  z-index: 10;
+  padding-top: 5px;
 }
 
 .header-info h2 {
@@ -49,6 +95,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
+  padding-bottom: 10px; /* Margem de segurança inferior */
 }
 
 .card-produto {

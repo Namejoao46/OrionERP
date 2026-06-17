@@ -51,6 +51,13 @@ public class ProdutoController {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
+    @GetMapping("/por-fornecedor/{fornecedorId}")
+    public ResponseEntity<List<Produto>> listarPorFornecedor(@PathVariable Long fornecedorId) {
+        System.out.println("[LOG PRODUTO] Requisição recebida para listar produtos do fornecedor ID: " + fornecedorId);
+        List<Produto> produtos = service.listarPorFornecedor(fornecedorId);
+        return ResponseEntity.ok(produtos);
+    }
+
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody ProdutoRequest req) {
         System.out.println("=================================================");

@@ -32,15 +32,15 @@
         <ng-template #noPhoto>
           <div class="produto-sem-foto">📦</div>
         </ng-template>
-        <span class="badge-estoque" [ngClass]="{'baixo': p.estoque <= 5}">
-          Estoque: {{ p.estoque }}
+        <span class="badge-estoque" [ngClass]="{'baixo': (p.estoqueAtual ?? 0) <= 5}">
+          Estoque: {{ p.estoqueAtual ?? 0 }}
         </span>
       </div>
 
       <div class="produto-info">
         <h4 class="produto-nome" [title]="p.descricao">{{ p.descricao }}</h4>
         <div class="produto-footer">
-          <span class="produto-preco">R$ {{ p.preco ? p.preco.toFixed(2) : '0.00' }}</span>
+          <span class="produto-preco">R$ {{ p.precoVenda ? p.precoVenda.toFixed(2) : '0.00' }}</span>
           <span class="status-tag" [ngClass]="p.status?.toLowerCase()">{{ p.status }}</span>
         </div>
       </div>

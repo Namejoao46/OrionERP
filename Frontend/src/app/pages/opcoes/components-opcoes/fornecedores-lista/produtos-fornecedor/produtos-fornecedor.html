@@ -20,13 +20,13 @@
     <p>Buscando produtos no banco...</p>
   </div>
 
-  <div class="empty-state" *ngIf="!isLoading && produtosFiltrados.length === 0">
-    <p>Nenhum produto encontrado para este fornecedor.</p>
+  <div class="empty-state" *ngIf="!isLoading && produtos.length === 0">
+    <p>Nenhum produto cadastrado para este fornecedor.</p>
   </div>
 
-  <div class="produtos-grid" *ngIf="!isLoading && produtosFiltrados.length > 0">
+  <div class="produtos-grid" *ngIf="!isLoading">
+    
     <div class="card-produto" *ngFor="let p of produtosFiltrados" (click)="abrirDetalhesProduto(p)">
-      
       <div class="produto-foto-wrapper">
         <img *ngIf="p.foto; else noPhoto" [src]="p.foto" alt="Produto">
         <ng-template #noPhoto>
@@ -44,8 +44,15 @@
           <span class="status-tag" [ngClass]="p.status?.toLowerCase()">{{ p.status }}</span>
         </div>
       </div>
-
     </div>
+
+    <div class="card-produto card-adicionar-novo" (click)="adicionarNovoProduto()" title="Cadastrar Novo Produto para este Fornecedor">
+      <div class="conteudo-adicionar">
+        <span class="icone-mais">+</span>
+        <span class="texto-adicionar">Adicionar Produto</span>
+      </div>
+    </div>
+
   </div>
 
 </div>

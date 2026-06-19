@@ -1,14 +1,36 @@
 <div class="lista-container">
   <div class="topo-tabela">
     <h1>Estoque Geral de Produtos</h1>
-    <div class="busca-box">
-      <span style="color: #00c3ff;">🔍</span>
-      <input 
-        type="text" 
-        [(ngModel)]="termoBusca" 
-        placeholder="Pesquisar por descrição ou código..."
-      >
+    
+    <div class="acoes-topo">
+      <button class="btn-config" (click)="mostrarConfig = !mostrarConfig" title="Ajustar Níveis de Alerta">
+        ⚙️ Alertas
+      </button>
+
+      <div class="busca-box">
+        <span style="color: #00c3ff;">🔍</span>
+        <input 
+          type="text" 
+          [(ngModel)]="termoBusca" 
+          placeholder="Pesquisar por descrição ou código..."
+        >
+      </div>
     </div>
+  </div>
+
+  <div class="painel-preferencias" *ngIf="mostrarConfig">
+    <h3>⚙️ Personalizar Alertas de Estoque</h3>
+    <div class="campos-preferencias">
+      <div class="campo-pref">
+        <label>🔴 Limite Crítico (e abaixo):</label>
+        <input type="number" [(ngModel)]="limiteCritico" min="0">
+      </div>
+      <div class="campo-pref">
+        <label>🟡 Limite Baixo (e abaixo):</label>
+        <input type="number" [(ngModel)]="limiteBaixo" [min]="limiteCritico + 1">
+      </div>
+    </div>
+    <small>* Os produtos mudarão de cor na tabela em tempo real com base nesses valores.</small>
   </div>
 
   <table class="tabela-estilizada">
@@ -19,6 +41,7 @@
         <th>Quantidade</th>
         <th>Preço Unit.</th>
         <th>Status</th>
+        <th class="coluna-acoes">Ações</th>
       </tr>
     </thead>
     <tbody>
@@ -34,9 +57,18 @@
         <td>{{ (p.precoVenda ?? 0) | currency:'BRL' }}</td>
         
         <td>
-          <span class="badge" [class.low]="(p.estoqueAtual ?? 0) <= 5">
-            {{ (p.estoqueAtual ?? 0) <= 5 ? 'Baixo Estoque' : 'Em Dia' }}
+          <span class="badge-status" [ngClass]="obterClasseEstoque(p.estoqueAtual)">
+            {{ obterTextoEstoque(p.estoqueAtual) }}
           </span>
+        </td>
+
+        <td class="coluna-acoes-botoes">
+          <button class="btn-acao btn-editar" (click)="abrirEdicao(p); $event.stopPropagation()" title="Editar Produto">
+            ✏️
+          </button>
+          <button class="btn-acao btn-deletar" (click)="deletarProduto(p.id); $event.stopPropagation()" title="Excluir Produto">
+            🗑️
+          </button>
         </td>
       </tr>
     </tbody>

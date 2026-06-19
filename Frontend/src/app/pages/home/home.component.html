@@ -37,3 +37,11 @@
     [fornecedorNome]="fornecedorSelecionadoNome">
   </app-produtos-fornecedor>
 </app-card-flutuante>
+
+<app-card-flutuante #cardEdicaoProduto [titulo]="produtoSelecionado ? 'Alterar SKU: #' + produtoSelecionado.id : 'Alterar Produto'">
+  <app-edicao-produto 
+    *ngIf="produtoSelecionado" 
+    [produto]="produtoSelecionado"
+    (salvo)="onProdutoSalvo()">
+  </app-edicao-produto>
+</app-card-flutuante>

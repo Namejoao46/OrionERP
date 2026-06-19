@@ -1,9 +1,11 @@
 package backend.controller.erp;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -122,5 +124,35 @@ public class ProdutoController {
             System.out.println("[LOG PRODUTO] Detalhes: " + e.getMessage());
             return ResponseEntity.badRequest().body("Erro ao alterar status: " + e.getMessage());
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletar(@PathVariable Long id) {
+        System.out.println("=================================================");
+        System.out.println("[LOG PRODUTO] Comando DELETE recebido para o ID: " + id);
+        try {
+            service.deletar(id);
+            return ResponseEntity.noContent().build(); // Retorna Status 204 (Sucesso, sem conteúdo)
+        } catch (IllegalStateException e) {
+            System.out.println("[LOG PRODUTO] RECUSADO: Violência de regra de negócio: " + e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            System.out.println("[LOG PRODUTO] ERRO: Produto não encontrado para exclusão.");
+            return ResponseEntity.notFound().build();
+        } finally {
+            System.out.println("=================================================");
+        }
+    }
+
+    @GetMapping("/estoque-baixo")
+    public List<Produto> listarEstoqueBaixo() {
+        System.out.println("[LOG PRODUTO] Requisição para relatório de produtos com estoque baixo.");
+        return service.listarEstoqueBaixo();
+    }
+
+    @GetMapping("/patrimonio-total")
+    public ResponseEntity<BigDecimal> obterValorTotalEstoque() {
+        System.out.println("[LOG PRODUTO] Requisitando avaliação monetária do estoque atual.");
+        return ResponseEntity.ok(service.calcularTotalPatrimonialEstoque());
     }
 }

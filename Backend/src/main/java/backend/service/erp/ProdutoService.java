@@ -49,7 +49,6 @@ public class ProdutoService {
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
     }
 
-    // 🔥 MELHORIA: Método essencial com transação ativa para ler dados e mapear o JSON sem quebrar no Firebird
     @Transactional(readOnly = true)
     public List<Produto> listarPorFornecedor(Long fornecedorId) {
         System.out.println("[LOG PRODUTO-SERVICE] Buscando produtos do fornecedor ID: " + fornecedorId);
@@ -65,8 +64,7 @@ public class ProdutoService {
         if (req == null) {
             throw new IllegalArgumentException("A requisição não pode ser nula.");
         }
-        System.out.println("[LOG PRODUTO-SERVICE] Payload recebido -> Descrição: " + req.descricao() + " | Fornecedor ID: " + req.fornecedorId());
-
+        
         if (req.descricao() == null || req.descricao().isBlank()) {
             throw new IllegalArgumentException("A descrição do produto é obrigatória.");
         }
@@ -75,7 +73,6 @@ public class ProdutoService {
         }
 
         if (req.codigoBarras() != null && !req.codigoBarras().isBlank()) {
-            System.out.println("[LOG PRODUTO-SERVICE] Validando unicidade do código de barras: " + req.codigoBarras());
             repository.findByCodigoBarras(req.codigoBarras()).ifPresent(existente -> {
                 throw new IllegalArgumentException(
                     "Este código de barras já está cadastrado no produto: " + existente.getDescricao()
@@ -84,12 +81,13 @@ public class ProdutoService {
         }
 
         Produto produto = mapearRequest(new Produto(), req);
-        produto.setPrecoVenda(calcularPrecoVenda(produto));
         
-        System.out.println("[LOG PRODUTO-SERVICE] Salvando produto mapeado no banco...");
-        Produto salvo = repository.save(produto);
-        System.out.println("[LOG PRODUTO-SERVICE] Produto salvo com ID: " + salvo.getId());
-        return salvo;
+        // Se não digitou preço de venda direto, calcula pela margem
+        if (req.precoVenda() == null || req.precoVenda().compareTo(BigDecimal.ZERO) == 0) {
+            produto.setPrecoVenda(calcularPrecoVenda(produto));
+        }
+        
+        return repository.save(produto);
     }
 
     @Transactional
@@ -102,7 +100,6 @@ public class ProdutoService {
         Produto produto = buscarPorId(id);
 
         if (req.codigoBarras() != null && !req.codigoBarras().isBlank()) {
-            System.out.println("[LOG PRODUTO-SERVICE] Verificando conflito de código de barras para edição...");
             repository.findByCodigoBarras(req.codigoBarras()).ifPresent(existente -> {
                 if (!existente.getId().equals(id)) {
                     throw new IllegalArgumentException(
@@ -113,15 +110,20 @@ public class ProdutoService {
         }
 
         mapearRequest(produto, req);
-        produto.setPrecoVenda(calcularPrecoVenda(produto));
         
-        System.out.println("[LOG PRODUTO-SERVICE] Persistindo alterações da edição...");
+        // Se a margem mudou ou o preço digitado veio zerado, recalcula. Caso contrário respeita o input da tela
+        if (req.precoVenda() == null || req.precoVenda().compareTo(BigDecimal.ZERO) == 0) {
+            produto.setPrecoVenda(calcularPrecoVenda(produto));
+        } else {
+            produto.setPrecoVenda(req.precoVenda());
+        }
+        
+        System.out.println("[LOG PRODUTO-SERVICE] Persistindo alterações da edição no banco...");
         return repository.save(produto);
     }
 
     @Transactional
     public Produto duplicar(Long id) {
-        System.out.println("[LOG PRODUTO-SERVICE] Duplicando produto ID: " + id);
         Produto original = buscarPorId(id);
         Produto copia = new Produto();
 
@@ -144,13 +146,11 @@ public class ProdutoService {
         copia.setAliquotaCofins(original.getAliquotaCofins());
         copia.setPrecoVenda(calcularPrecoVenda(copia));
         
-        System.out.println("[LOG PRODUTO-SERVICE] Criando cópia do produto com sucesso.");
         return repository.save(copia);
     }
 
     @Transactional
     public Produto alterarStatus(Long id, String novoStatus) {
-        System.out.println("[LOG PRODUTO-SERVICE] Alterando status do produto ID " + id + " para " + novoStatus);
         Produto produto = buscarPorId(id);
         produto.setStatus(novoStatus);
         return repository.save(produto);
@@ -158,7 +158,6 @@ public class ProdutoService {
 
     @Transactional
     public void atualizarCustoMedioEEstoque(Long produtoId, BigDecimal quantidadeEntrada, BigDecimal custoRealUnitario) {
-        System.out.println("[LOG PRODUTO-SERVICE] Atualizando Custo Médio. Produto ID: " + produtoId);
         Produto produto = buscarPorId(produtoId);
 
         BigDecimal estoqueAtual = produto.getEstoqueAtual() != null ? produto.getEstoqueAtual() : BigDecimal.ZERO;
@@ -170,9 +169,6 @@ public class ProdutoService {
         BigDecimal novoCustoMedio = novoEstoque.compareTo(BigDecimal.ZERO) > 0
                 ? totalAtual.add(totalNovo).divide(novoEstoque, 4, RoundingMode.HALF_UP)
                 : custoRealUnitario;
-
-        System.out.println("[LOG PRODUTO-SERVICE] Estoque Antigo: " + estoqueAtual + " | Novo Estoque: " + novoEstoque);
-        System.out.println("[LOG PRODUTO-SERVICE] Custo Médio Calculado: " + novoCustoMedio);
 
         produto.setEstoqueAtual(novoEstoque);
         produto.setCustoMedio(novoCustoMedio);
@@ -205,6 +201,10 @@ public class ProdutoService {
         produto.setUnidadeMedida(req.unidadeMedida());
         produto.setCategoria(req.categoria());
         produto.setStatus(req.status() != null ? req.status() : "ATIVO");
+        
+        // 🌟 CORREÇÃO CRÍTICA: Passando o estoque enviado na requisição para a entidade JPA persistir!
+        produto.setEstoqueAtual(req.estoqueAtual() != null ? req.estoqueAtual() : BigDecimal.ZERO);
+        
         produto.setEstoqueMinimo(req.estoqueMinimo());
         produto.setEstoqueMaximo(req.estoqueMaximo());
         produto.setLocalizacaoFisica(req.localizacaoFisica());
@@ -218,7 +218,6 @@ public class ProdutoService {
             try {
                 produto.setOrigemProduto(Integer.parseInt(req.origemProduto().trim()));
             } catch (NumberFormatException e) {
-                System.out.println("[LOG PRODUTO-SERVICE] Erro ao converter origem '" + req.origemProduto() + "' para número. Definindo como 0.");
                 produto.setOrigemProduto(0);
             }
         } else {
@@ -235,15 +234,46 @@ public class ProdutoService {
     private BigDecimal calcularPrecoVenda(Produto produto) {
         BigDecimal base = produto.getCustoMedio() != null ? produto.getCustoMedio() : produto.getPrecoCusto();
         if (base == null || produto.getMargemLucro() == null) {
-            System.out.println("[LOG PRODUTO-SERVICE] Custo ou margem nulos. Mantendo preço de venda original.");
             return produto.getPrecoVenda() != null ? produto.getPrecoVenda() : BigDecimal.ZERO;
         }
 
         BigDecimal factor = BigDecimal.ONE.add(
             produto.getMargemLucro().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP)
         );
-        BigDecimal precoCalculado = base.multiply(factor).setScale(2, RoundingMode.HALF_UP);
-        System.out.println("[LOG PRODUTO-SERVICE] Preço de venda calculado automaticamente: " + precoCalculado);
-        return precoCalculado;
+        return base.multiply(factor).setScale(2, RoundingMode.HALF_UP);
+    }
+    
+    @Transactional
+    public void deletar(Long id) {
+        System.out.println("[LOG PRODUTO-SERVICE] Solicitando exclusão do produto ID: " + id);
+        Produto produto = buscarPorId(id);
+
+        // Regra de segurança: impede a deleção se houver estoque físico
+        if (produto.getEstoqueAtual() != null && produto.getEstoqueAtual().compareTo(BigDecimal.ZERO) > 0) {
+            throw new IllegalStateException("Não é permitido deletar um produto com saldo em estoque positivo (" 
+                + produto.getEstoqueAtual() + " un). Zere o estoque antes de excluir.");
+        }
+
+        repository.delete(produto);
+        System.out.println("[LOG PRODUTO-SERVICE] Produto ID " + id + " deletado permanentemente.");
+    }
+
+    @Transactional(readOnly = true)
+    public List<Produto> listarEstoqueBaixo() {
+        return repository.findAll().stream()
+                .filter(p -> p.getEstoqueMinimo() != null && p.getEstoqueAtual().compareTo(p.getEstoqueMinimo()) <= 0)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal calcularTotalPatrimonialEstoque() {
+        return repository.findAll().stream()
+                .map(p -> {
+                    BigDecimal custo = p.getCustoMedio() != null ? p.getCustoMedio() : p.getPrecoCusto();
+                    if (custo == null || p.getEstoqueAtual() == null) return BigDecimal.ZERO;
+                    return p.getEstoqueAtual().multiply(custo);
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 }

@@ -16,6 +16,9 @@ export class ModalService {
   private abrirCardProdutoSource = new Subject<any>();
   abrirCardProduto$ = this.abrirCardProdutoSource.asObservable();
 
+  private produtoSalvoSource = new Subject<void>();
+  produtoSalvo$ = this.produtoSalvoSource.asObservable();
+
   notificarAbrirFornecedor() {
     this.abrirFornecedorSource.next();
   }
@@ -28,8 +31,11 @@ export class ModalService {
     this.fornecedorSalvoSource.next();
   }
 
-  // Aciona a abertura do card flutuante passando o produto clicado
   notificarAbrirCardProduto(produto: any) {
     this.abrirCardProdutoSource.next(produto);
+  }
+
+  notificarProdutoSalvo() {
+    this.produtoSalvoSource.next();
   }
 }

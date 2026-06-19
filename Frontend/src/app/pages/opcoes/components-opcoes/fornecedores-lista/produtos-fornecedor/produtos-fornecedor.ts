@@ -1,6 +1,7 @@
-import { Component, OnInit, OnChanges, SimpleChanges, inject, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, inject, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ModalService } from '../../../../../core/services/ui/modal.service';
 import { ProdutoService } from '../../../../../core/services/erp/Produto.service';
 
@@ -11,7 +12,7 @@ import { ProdutoService } from '../../../../../core/services/erp/Produto.service
   templateUrl: './produtos-fornecedor.html',
   styleUrl: './produtos-fornecedor.css'
 })
-export class ProdutosFornecedor implements OnInit, OnChanges {
+export class ProdutosFornecedor implements OnInit, OnChanges, OnDestroy {
   private produtoService = inject(ProdutoService);
   private modalService = inject(ModalService);
   private cdr = inject(ChangeDetectorRef);
@@ -24,13 +25,20 @@ export class ProdutosFornecedor implements OnInit, OnChanges {
   public termoPesquisa: string = '';
   public isLoading: boolean = false;
 
+  private subProdutoSalvo!: Subscription;
+
   ngOnInit(): void {
     if (this.fornecedorId) {
       this.carregarProdutos();
     }
+
+    // Escuta eventos de salvamento do modal para atualizar a lista do fornecedor sem F5
+    this.subProdutoSalvo = this.modalService.produtoSalvo$.subscribe(() => {
+      console.log('[TRACKING-PRODUTOS] Novo produto detectado, atualizando lista do fornecedor.');
+      this.carregarProdutos();
+    });
   }
 
-  // Monitora se o componente pai (Home) alterou as propriedades do input para recarregar o banco
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['fornecedorId'] && !changes['fornecedorId'].firstChange) {
       console.log('[TRACKING-PRODUTOS] Alteração detectada no ID do Fornecedor. Atualizando lista de itens.');
@@ -69,5 +77,29 @@ export class ProdutosFornecedor implements OnInit, OnChanges {
   abrirDetalhesProduto(produto: any) {
     console.log('[TRACKING-PRODUTOS] Disparando abertura do Card Flutuante:', produto);
     this.modalService.notificarAbrirCardProduto(produto);
+  }
+
+  // 🌟 NOVO: Abre o card do formulário limpo, injetando o vínculo do fornecedor atual
+  adicionarNovoProduto() {
+    const novoProdutoVazio = {
+      descricao: '',
+      estoqueAtual: 0,
+      precoVenda: 0,
+      fornecedorId: this.fornecedorId,
+      fornecedor: {
+        id: this.fornecedorId,
+        nome: this.fornecedorNome
+      },
+      status: 'ATIVO'
+    };
+    
+    console.log('[TRACKING-PRODUTOS] Abrindo formulário para novo SKU vinculado ao Fornecedor ID:', this.fornecedorId);
+    this.modalService.notificarAbrirCardProduto(novoProdutoVazio);
+  }
+
+  ngOnDestroy(): void {
+    if (this.subProdutoSalvo) {
+      this.subProdutoSalvo.unsubscribe();
+    }
   }
 }

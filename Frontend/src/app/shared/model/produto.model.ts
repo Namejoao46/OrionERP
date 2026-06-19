@@ -8,4 +8,5 @@ export interface Produto {
   categoria?: string;
   unidadeMedida?: string;
   foto?: string;
+  fornecedorId?: number; // Prático para amarrar os payloads de envio
 }

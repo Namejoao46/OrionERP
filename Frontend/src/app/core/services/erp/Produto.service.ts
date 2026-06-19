@@ -125,4 +125,52 @@ export class ProdutoService {
       })
     );
   }
+
+  deletar(id: number): Observable<void> {
+    const startTime = performance.now();
+    console.log(`[TRACKING-SERVICE] [DELETE] Solicitando exclusão do produto ID: ${id}`);
+
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Produto ID ${id} excluído com sucesso do banco | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error(`[TRACKING-SERVICE] [ERROR] Erro ao deletar produto ID ${id}. Detalhes:`, err.error || err.message);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  listarEstoqueBaixo(): Observable<any[]> {
+    const startTime = performance.now();
+    console.log(`[TRACKING-SERVICE] [GET] Buscando itens com estoque em nível crítico.`);
+
+    return this.http.get<any[]>(`${this.apiUrl}/estoque-baixo`).pipe(
+      tap((res) => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Alerta de reposição gerado. Total crítico: ${res.length} SKUs | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error('[TRACKING-SERVICE] [ERROR] Falha ao processar relatório de estoque crítico.', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  obterValorTotalEstoque(): Observable<number> {
+    const startTime = performance.now();
+    console.log(`[TRACKING-SERVICE] [GET] Requisitando avaliação patrimonial de inventário.`);
+
+    return this.http.get<number>(`${this.apiUrl}/patrimonio-total`).pipe(
+      tap((valor) => {
+        const endTime = performance.now();
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Avaliação financeira de pátio: BRL ${valor} | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+      }),
+      catchError((err) => {
+        console.error('[TRACKING-SERVICE] [ERROR] Falha ao obter avaliação do patrimônio.', err);
+        return throwError(() => err);
+      })
+    );
+  }
 }

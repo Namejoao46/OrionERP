@@ -1,0 +1,71 @@
+.form-edicao {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  color: #ffffff;
+  padding: 10px 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.grupo-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.grupo-campo label {
+  font-size: 0.75rem;
+  color: #00c3ff;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-erp {
+  background: #0a0e29;
+  border: 1px solid #1a2245;
+  border-radius: 8px;
+  padding: 12px;
+  color: #ffffff;
+  outline: none;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.input-erp:focus {
+  border-color: #00c3ff;
+  box-shadow: 0 0 8px rgba(0, 195, 255, 0.2);
+}
+
+.linha-dupla {
+  display: flex;
+  gap: 15px;
+}
+
+.linha-dupla .grupo-campo {
+  flex: 1;
+}
+
+.botoes-acoes-form {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-salvar {
+  background: #2b97fa;
+  border: none;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-salvar:hover {
+  background: #00c3ff;
+  box-shadow: 0 0 12px rgba(0, 195, 255, 0.4);
+  transform: translateY(-1px);
+}

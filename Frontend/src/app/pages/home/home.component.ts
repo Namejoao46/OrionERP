@@ -13,6 +13,7 @@ import { CadastroFornecedorComponent } from '../components/cadastros/cadastro-fo
 import { Perfil } from "../components/menu-bar/perfil/perfil";
 import { OpcoesComponent } from '../opcoes/opcoes.component';
 import { ProdutosFornecedor } from "../opcoes/components-opcoes/fornecedores-lista/produtos-fornecedor/produtos-fornecedor";
+import { EdicaoProdutoComponent } from "../components/edicao-produto-component/edicao-produto-component";
 
 @Component({
   selector: 'app-home',
@@ -21,29 +22,34 @@ import { ProdutosFornecedor } from "../opcoes/components-opcoes/fornecedores-lis
     RouterModule, CommonModule, FormsModule, MenuBarComponent,
     OpcoesComponent, MenuFixoComponent, CardFlutuante,
     ChatComponent, CadastroGeralComponent, CadastroFornecedorComponent,
-    Perfil, ProdutosFornecedor
-],
+    Perfil, ProdutosFornecedor,
+    EdicaoProdutoComponent
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  menuAberto: boolean = true;
+  public menuAberto: boolean = true;
   private cdr = inject(ChangeDetectorRef);
   private modalService = inject(ModalService);
 
   // Inscrições para evitar vazamento de memória
   private subFornecedor!: Subscription;
-  private subProdutos!: Subscription;
+  private subCardProduto!: Subscription;
 
-  // Estados para o fornecedor selecionado que vai para o modal de produtos
+  // Estados para o fornecedor selecionado (Modal de visualização)
   public fornecedorSelecionadoId!: number;
   public fornecedorSelecionadoNome: string = '';
 
+  // Estado para o produto que será editado
+  public produtoSelecionado: any = null;
+
   @ViewChild('cardFornecedor') cardFornecedor!: CardFlutuante;
   @ViewChild('cardProdutosDoFornecedor') cardProdutosDoFornecedor!: CardFlutuante;
+  @ViewChild('cardEdicaoProduto') cardEdicaoProduto!: CardFlutuante;
 
   ngOnInit() {
-    // Escuta pedidos de abertura para CADASTRAR novo fornecedor
+    // 1. Escuta pedidos de abertura para CADASTRAR novo fornecedor
     this.subFornecedor = this.modalService.abrirFornecedor$.subscribe(() => {
       if (this.cardFornecedor) {
         this.cardFornecedor.abrir();
@@ -51,18 +57,30 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     });
 
-    // ESCUTA ATIVA: Quando clica em um fornecedor existente para ver os PRODUTOS
-    this.subProdutos = this.modalService.abrirCardProduto$.subscribe((fornecedor) => {
-      if (fornecedor && this.cardProdutosDoFornecedor) {
-        console.log('[TRACKING-HOME] Capturando fornecedor para exibir catálogo:', fornecedor);
-        
-        // Mapeia os dados dinamicamente vindos do clique da lista
-        this.fornecedorSelecionadoId = fornecedor.id || fornecedor.codigo;
-        this.fornecedorSelecionadoNome = fornecedor.nomeTone || fornecedor.nomeFantasia || fornecedor.razaoSocial;
+    // 2. ESCUTA ATIVA: Filtra dinamicamente se o payload recebido é um Fornecedor ou um Produto
+    this.subCardProduto = this.modalService.abrirCardProduto$.subscribe((payload) => {
+      if (!payload) return;
 
-        // Força a atualização dos bindings do template e abre o card flutuante
+      // Se o objeto possuir propriedades típicas de produto, abre o modal de edição
+      if ('precoVenda' in payload || 'estoqueAtual' in payload || 'descricao' in payload) {
+        console.log('[TRACKING-HOME] Identificado: Fluxo de Edição de Produto.', payload);
+        this.produtoSelecionado = payload;
+        
         this.cdr.detectChanges();
-        this.cardProdutosDoFornecedor.abrir();
+        if (this.cardEdicaoProduto) {
+          this.cardEdicaoProduto.abrir();
+        }
+      } 
+      // Caso contrário, trata como o fluxo clássico de abertura de produtos por Fornecedor
+      else {
+        console.log('[TRACKING-HOME] Identificado: Fluxo de Catálogo por Fornecedor.', payload);
+        this.fornecedorSelecionadoId = payload.id || payload.codigo;
+        this.fornecedorSelecionadoNome = payload.nomeTone || payload.nomeFantasia || payload.razaoSocial;
+
+        this.cdr.detectChanges();
+        if (this.cardProdutosDoFornecedor) {
+          this.cardProdutosDoFornecedor.abrir();
+        }
       }
     });
   }
@@ -71,8 +89,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.menuAberto = estado;
   }
 
+  onProdutoSalvo() {
+    console.log('[TRACKING-HOME] Evento de sucesso capturado. Fechando modal de edição.');
+    if (this.cardEdicaoProduto) {
+      this.cardEdicaoProduto.fechar();
+    }
+    this.modalService.notificarProdutoSalvo();
+  }
+
   ngOnDestroy() {
     if (this.subFornecedor) this.subFornecedor.unsubscribe();
-    if (this.subProdutos) this.subProdutos.unsubscribe();
+    if (this.subCardProduto) this.subCardProduto.unsubscribe();
   }
 }

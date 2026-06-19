@@ -1,0 +1,26 @@
+<div class="form-edicao" *ngIf="produto">
+  
+  <div class="grupo-campo">
+    <label>Descrição / Nome do SKU</label>
+    <input type="text" [(ngModel)]="produto.descricao" class="input-erp">
+  </div>
+
+  <div class="linha-dupla">
+    <div class="grupo-campo">
+      <label>Estoque Atual</label>
+      <input type="number" [(ngModel)]="produto.estoqueAtual" class="input-erp">
+    </div>
+    
+    <div class="grupo-campo">
+      <label>Preço Venda (R$)</label>
+      <input type="number" [(ngModel)]="produto.precoVenda" class="input-erp">
+    </div>
+  </div>
+
+  <div class="botoes-acoes-form">
+    <button class="btn-salvar" (click)="salvarAlteracoes()">
+      Salvar Alterações
+    </button>
+  </div>
+
+</div>

@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  background-color: #040d21; /* Garante o fundo escuro da página */
+  background-color: #040d21;
   min-height: 100vh;
   box-sizing: border-box;
 }
@@ -12,20 +12,26 @@
   width: 100%;
 }
 
+/* Linha do Gráfico de Área + Formulário */
 .row-charts {
   display: grid;
-  grid-template-columns: 2fr 1fr; /* O gráfico de linha ocupa o dobro do espaço do de rosca */
+  grid-template-columns: 2fr 1fr; /* Mantém a proporção equilibrada */
   gap: 20px;
   width: 100%;
 }
 
-.row-table {
+/* Nova Linha Inferior: Tabela + Status */
+.row-bottom-group {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Tabela ganha mais espaço horizontal */
+  gap: 20px;
   width: 100%;
 }
 
-/* Responsividade básica para telas menores */
-@media (max-width: 1024px) {
-  .row-charts {
-    grid-template-columns: 1fr;
+/* Responsividade para telas menores (Tablets/Celulares) */
+@media (max-width: 1200px) {
+  .row-charts, 
+  .row-bottom-group {
+    grid-template-columns: 1fr; /* Tudo vira uma coluna única empilhada */
   }
 }

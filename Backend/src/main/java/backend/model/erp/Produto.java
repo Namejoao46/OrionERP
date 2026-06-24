@@ -33,7 +33,8 @@ public class Produto {
 
     @ManyToOne
     @JoinColumn(name = "fornecedor_id", nullable = false) 
-    @JsonIgnoreProperties({"produtos", "hibernateLazyInitializer", "handler"}) // Impede o loop infinito com Fornecedor
+    // AJUSTADO: Removido "produtos" para alinhar com o seu modelo Fornecedor puro
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
     private Fornecedor fornecedor;
     
     @Column(name = "codigo_barras", unique = true, length = 30)
@@ -86,7 +87,7 @@ public class Produto {
     private Integer origemProduto; 
 
     @Column(name = "cst_icms")
-    private String cstIcms;           
+    private String cstIcms;               
 
     @Column(name = "aliquota_icms")
     private BigDecimal aliquotaIcms;
@@ -98,7 +99,7 @@ public class Produto {
     private BigDecimal aliquotaCofins;
 
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"produto"}) // Impede o loop com a tabela ProdutoFornecedor
+    @JsonIgnoreProperties({"produto"}) 
     private List<ProdutoFornecedor> fornecedores = new ArrayList<>();
 
     @Column(name = "criado_em", updatable = false)

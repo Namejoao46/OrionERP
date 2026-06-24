@@ -37,7 +37,6 @@ public class NotaRecebimentoController {
             NotaImportadaResponse resposta = service.importarXml(arquivo.getInputStream());
             return ResponseEntity.ok(resposta);
         } catch (IllegalStateException e) {
-            // NF-e duplicada
             return ResponseEntity.status(409).body(Map.of("erro", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("erro", "Erro ao processar o XML: " + e.getMessage()));
@@ -58,7 +57,7 @@ public class NotaRecebimentoController {
     public ResponseEntity<?> confirmar(@PathVariable Long id) {
         try {
             service.confirmarEntrada(id);
-            return ResponseEntity.ok(Map.of("status", "Entrada confirmada com sucesso."));
+            return ResponseEntity.ok(Map.of("status", "Entrada confirmada com sucesso e lançada no financeiro."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
         }

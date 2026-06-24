@@ -36,13 +36,13 @@ import backend.repository.erp.ProdutoRepository;
 import backend.repository.fiscal.ItemNotaRecebimentoRepository;
 import backend.repository.fiscal.NotaRecebimentoRepository;
 import backend.service.erp.ProdutoService;
+import backend.service.finance.CompraService; // 🌟 Importação do serviço financeiro mapeado
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class NotaRecebimentoService {
 
-    // Modificadores 'final' adicionados e '@Autowired' removidos
     private final NotaRecebimentoRepository notaRepository;
     private final FornecedorRepository fornecedorRepository;
     private final ProdutoRepository produtoRepository;
@@ -50,6 +50,7 @@ public class NotaRecebimentoService {
     private final ItemNotaRecebimentoRepository itemRepository;
     private final ProdutoService produtoService;
     private final FornecedorXmlService fornecedorXmlService;
+    private final CompraService compraService; // 🌟 Injetado automaticamente via RequiredArgsConstructor
 
     private static final DateTimeFormatter DT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -61,7 +62,6 @@ public class NotaRecebimentoService {
         
         String chave = getTagValue("chNFe", doc.getDocumentElement());
         if (chave == null || chave.isBlank()) {
-            // Caso a tag chNFe esteja dentro de infNFe como atributo Id
             NodeList infNFeList = doc.getElementsByTagNameNS("*", "infNFe");
             Element infNFeAttr = infNFeList.getLength() > 0 ? (Element) infNFeList.item(0) : null;
             if (infNFeAttr != null && infNFeAttr.hasAttribute("Id")) {
@@ -237,8 +237,6 @@ public class NotaRecebimentoService {
         } else {
             String ean = getTagValue("cEAN", prod);
 
-            // CORREÇÃO: Avalia a nulidade diretamente na condição do if.
-            // O compilador agora entende com 100% de certeza que o bloco interno só executa se 'ean' NÃO for nulo.
             if (ean != null && !ean.isBlank() && !ean.equalsIgnoreCase("SEM GTIN")) {
                 System.out.println("[LOG NOTA-RECEBIMENTO] De-Para não encontrado. Tentando vincular por EAN: " + ean);
                 Optional<Produto> produtoPorEan = produtoRepository.findByCodigoBarras(ean.trim());
@@ -328,7 +326,15 @@ public class NotaRecebimentoService {
             item.setCustoRealUnitario(custoRealUnitario);
             itemRepository.save(item);
 
+            // 1. Atualiza o custo médio e o estoque físico no bloco ERP
             produtoService.atualizarCustoMedioEEstoque(item.getProduto().getId(), qtd, custoRealUnitario);
+
+            // 2. 🌟 GATILHO AUTOMÁTICO: Registra a movimentação financeira e débito por item comprado
+            compraService.registrarCompraFornecedor(
+                item.getProduto().getId(),
+                qtd.intValue(), // Converte a quantidade de BigDecimal para int esperada pelo seu serviço financeiro
+                item.getValorUnitario()
+            );
 
             gravarVinculoDePara(nota.getFornecedor(), item.getCodigoProdutoFornecedor(),
                     item.getProduto(), item.getValorUnitario());

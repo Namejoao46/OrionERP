@@ -2,6 +2,7 @@ package backend.model.erp;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import backend.model.gestao.Empresa;
 
 @Entity
 @Table(name = "FORNECEDORES")
@@ -12,7 +13,12 @@ public class Fornecedor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    // 🔒 VÍNCULO MULTI-TENANT: Cada fornecedor agora pertence estritamente a uma empresa
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "empresa_id", nullable = false)
+    private Empresa empresa;
+
+    @Column(nullable = false) // Removido o 'unique=true' global pois o mesmo CNPJ pode existir em empresas diferentes
     private String cnpj;
     
     private String razaoSocial;
@@ -29,7 +35,7 @@ public class Fornecedor {
     private String cidade;
     private String uf;
     private String cep;
-    private String cMun; // Código do município do IBGE (visto no XML)
+    private String cMun; 
 
     private String email;
     private String telefone;
@@ -37,12 +43,10 @@ public class Fornecedor {
     private Integer leadTime; 
     private Double limiteCredito;
 
-    // Correção para o Firebird: Usa BLOB SUB_TYPE TEXT para textos longos de observações
     @Lob
     @Column(columnDefinition = "BLOB SUB_TYPE TEXT")
     private String observacoes;
 
-    // Correção para o Firebird: Mapeado perfeitamente para suportar strings Base64 pesadas de fotos
     @Lob
     @Column(name = "foto_fornecedor", columnDefinition = "BLOB SUB_TYPE TEXT")
     private String foto; 

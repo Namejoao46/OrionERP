@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import backend.model.erp.Fornecedor;
+import backend.model.gestao.Empresa;
 import backend.repository.erp.FornecedorRepository;
+import backend.repository.gestao.EmpresaRepository;
 import backend.repository.fiscal.NotaRecebimentoRepository;
 import backend.service.fiscal.FornecedorXmlService;
 import lombok.RequiredArgsConstructor;
@@ -23,49 +25,34 @@ import lombok.RequiredArgsConstructor;
 public class FornecedorController {
 
     private final FornecedorRepository repository;
+    private final EmpresaRepository empresaRepository;
     private final FornecedorXmlService xmlService;
     private final NotaRecebimentoRepository notaRecebimentoRepository;
 
     @GetMapping
-    public List<Fornecedor> listar() {
-        System.out.println("[LOG FORNECEDOR] Solicitando listagem de todos os fornecedores.");
-        return repository.findAll();
+    public List<Fornecedor> listar(@RequestHeader(value = "Empresa-Id") Long empresaId) {
+        System.out.println("[LOG FORNECEDOR] Listando fornecedores da Empresa ID: " + empresaId);
+        return repository.findByEmpresaId(empresaId);
     }
 
     @PostMapping("/importar-xml")
     @SuppressWarnings("CallToPrintStackTrace")
-    public ResponseEntity<Fornecedor> importarXml(@RequestParam("xml") MultipartFile file) {
-        System.out.println("=================================================");
-        System.out.println("[LOG XML] Rota '/importar-xml' foi acionada!");
+    @Transactional
+    public ResponseEntity<Fornecedor> importarXml(
+            @RequestParam("xml") MultipartFile file,
+            @RequestHeader(value = "Empresa-Id") Long empresaId) {
         
-        if (file == null || file.isEmpty()) {
-            System.out.println("[LOG XML] ERRO: O arquivo MultipartFile recebido está NULO ou VAZIO!");
-            return ResponseEntity.badRequest().build();
-        }
-        
-        System.out.println("[LOG XML] Arquivo recebido: " + file.getOriginalFilename());
-        System.out.println("[LOG XML] Tamanho do arquivo: " + file.getSize() + " bytes");
-        System.out.println("[LOG XML] Content Type: " + file.getContentType());
+        if (file == null || file.isEmpty()) return ResponseEntity.badRequest().build();
 
         try {
-            System.out.println("[LOG XML] Iniciando chamada para o 'xmlService.lerDadosEmitente'...");
             Fornecedor fornecedor = xmlService.lerDadosEmitente(file.getInputStream());
-            
-            if (fornecedor == null) {
-                System.out.println("[LOG XML] AVISO: O 'xmlService' retornou um objeto Fornecedor NULO.");
-                return ResponseEntity.badRequest().build();
-            }
+            if (fornecedor == null) return ResponseEntity.badRequest().build();
 
-            System.out.println("[LOG XML] Sucesso ao processar XML!");
-            System.out.println("[LOG XML] CNPJ extraído: " + fornecedor.getCnpj());
-            System.out.println("[LOG XML] Razão Social extraída: " + fornecedor.getRazaoSocial());
-            System.out.println("[LOG XML] Cidade extraída: " + fornecedor.getCidade() + " - " + fornecedor.getUf());
+            Empresa empresaLogada = empresaRepository.findById(empresaId)
+                    .orElseThrow(() -> new RuntimeException("Empresa não encontrada."));
 
-            System.out.println("[LOG XML] Verificando se o CNPJ '" + fornecedor.getCnpj() + "' já existe no banco...");
-            return repository.findByCnpj(fornecedor.getCnpj())
+            return repository.findByCnpjAndEmpresaId(fornecedor.getCnpj(), empresaId)
                     .map(existente -> {
-                        System.out.println("[LOG XML] Fornecedor existente (ID: " + existente.getId() + "). Mesclando novos dados do XML...");
-                        
                         existente.setRazaoSocial(fornecedor.getRazaoSocial());
                         existente.setNomeFantasia(fornecedor.getNomeFantasia() != null ? fornecedor.getNomeFantasia() : existente.getNomeFantasia());
                         existente.setInscricaoEstadual(fornecedor.getInscricaoEstadual());
@@ -81,162 +68,113 @@ public class FornecedorController {
                         existente.setCMun(fornecedor.getCMun());
                         existente.setTelefone(fornecedor.getTelefone());
                         
-                        Fornecedor updated = repository.save(existente);
-                        return ResponseEntity.ok(updated);
+                        return ResponseEntity.ok(repository.save(existente));
                     })
                     .orElseGet(() -> {
-                        System.out.println("[LOG XML] Novo fornecedor detectado. Enviando dados temporários do XML para a tela.");
-                        return ResponseEntity.ok(fornecedor);
+                        // 🛠️ CORREÇÃO: Vincula a empresa E salva o novo registro no banco de dados
+                        fornecedor.setEmpresa(empresaLogada);
+                        Fornecedor novoFornecedor = repository.save(fornecedor);
+                        return ResponseEntity.ok(novoFornecedor);
                     });
 
         } catch (Exception e) {
-            System.out.println("[LOG XML] CRÍTICO: Exceção capturada ao tentar ler/processar o arquivo XML!");
-            System.out.println("[LOG XML] Mensagem do erro: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
-        } finally {
-            System.out.println("=================================================");
         }
     }
 
     @PostMapping("/salvar")
-    @SuppressWarnings("CallToPrintStackTrace")
+    @Transactional
     public ResponseEntity<?> salvarComSeguranca(
             @RequestBody Fornecedor fornecedor,
-            @RequestHeader(value = "User-Role", defaultValue = "USER") String userRole) {
+            @RequestHeader(value = "User-Role", defaultValue = "USER") String userRole,
+            @RequestHeader(value = "Empresa-Id") Long empresaId) {
         
-        System.out.println("=================================================");
-        System.out.println("[LOG SALVAR] Rota '/salvar' acionada.");
-        System.out.println("[LOG SALVAR] Perfil do usuário recebido no Header (User-Role): " + userRole);
-        
-        if (fornecedor == null) {
-            System.out.println("[LOG SALVAR] ERRO: O corpo do fornecedor (@RequestBody) está vindo NULO.");
-            return ResponseEntity.badRequest().body("Corpo da requisição vazio.");
-        }
-        
-        System.out.println("[LOG SALVAR] Dados a salvar -> CNPJ: " + fornecedor.getCnpj() + " | Razão Social: " + fornecedor.getRazaoSocial());
+        if (fornecedor == null) return ResponseEntity.badRequest().body("Corpo da requisição vazio.");
 
         if (!"MASTER".equalsIgnoreCase(userRole) && !"ADMIN".equalsIgnoreCase(userRole)) {
-            System.out.println("[LOG SALVAR] BLOQUEADO: Permissão negada para o perfil: " + userRole);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Apenas usuários Administradores ou Masters possuem permissão para modificar os fornecedores.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permissão negada.");
         }
 
         try {
-            System.out.println("[LOG SALVAR] Iniciando processo de salvamento/atualização no banco...");
-            Fornecedor salvo = repository.findByCnpj(fornecedor.getCnpj())
+            Empresa empresaLogada = empresaRepository.findById(empresaId)
+                    .orElseThrow(() -> new RuntimeException("Empresa não localizada."));
+
+            Fornecedor salvo = repository.findByCnpjAndEmpresaId(fornecedor.getCnpj(), empresaId)
                     .map(existente -> {
-                        System.out.println("[LOG SALVAR] Fornecedor já cadastrado. Atualizando ID: " + existente.getId());
-                        
                         fornecedor.setId(existente.getId());
-                        
+                        fornecedor.setEmpresa(empresaLogada);
                         if (fornecedor.getFoto() == null || fornecedor.getFoto().isBlank()) {
-                            System.out.println("[LOG SALVAR] Foto não enviada nesta requisição. Mantendo a foto antiga.");
                             fornecedor.setFoto(existente.getFoto());
                         }
                         return repository.save(fornecedor);
                     }).orElseGet(() -> {
-                        System.out.println("[LOG SALVAR] Inserindo novo registro de fornecedor no banco de dados.");
+                        fornecedor.setEmpresa(empresaLogada);
                         return repository.save(fornecedor);
                     });
                     
-            System.out.println("[LOG SALVAR] Operação realizada com sucesso! ID salvo: " + salvo.getId());
             return ResponseEntity.ok(salvo);
         } catch (Exception e) {
-            System.out.println("[LOG SALVAR] ERRO: Falha ao salvar a entidade no JPA!");
-            System.out.println("[LOG SALVAR] Detalhes do erro: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.badRequest().body("Erro ao registrar fornecedor: " + e.getMessage());
-        } finally {
-            System.out.println("=================================================");
         }
     }
 
     @DeleteMapping("/{id}")
-    @Transactional // CRÍTICO: Garante a atomicidade das duas operações de exclusão
+    @Transactional
     public ResponseEntity<?> deletar(
             @PathVariable Long id,
-            @RequestHeader(value = "User-Role", defaultValue = "USER") String userRole) {
+            @RequestHeader(value = "User-Role", defaultValue = "USER") String userRole,
+            @RequestHeader(value = "Empresa-Id") Long empresaId) {
         
-        System.out.println("=================================================");
-        System.out.println("[LOG DELETAR] Rota para exclusão ativada. ID: " + id);
-        System.out.println("[LOG DELETAR] User-Role avaliado: " + userRole);
-
         if (!"MASTER".equalsIgnoreCase(userRole) && !"ADMIN".equalsIgnoreCase(userRole)) {
-            System.out.println("[LOG DELETAR] BLOQUEADO: Perfil não autorizado.");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permissão negada para remover registros.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permissão negada.");
         }
 
         return repository.findById(id).map(fornecedor -> {
+            // 🔒 BARREIRA MULTI-TENANT: Impede que uma empresa delete dados de outra informando IDs sequenciais na URL
+            if (!fornecedor.getEmpresa().getId().equals(empresaId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado a este registro.");
+            }
+
             try {
-                // Tenta deletar diretamente de forma otimista
                 repository.delete(fornecedor);
-                System.out.println("[LOG DELETAR] Fornecedor '" + fornecedor.getRazaoSocial() + "' deletado com sucesso.");
                 return ResponseEntity.ok().build();
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
-                System.out.println("[LOG DELETAR] CONFLITO DE CHAVE ESTRANGEIRA: Identificado vínculo em NOTAS_RECEBIMENTO.");
-                System.out.println("[LOG DELETAR] Executando limpeza relacional forçada...");
-                
-                try {
-                    // 1. Remove os rascunhos de notas associados ao ID do fornecedor primeiro
-                    notaRecebimentoRepository.deleteByFornecedorId(id);
-                    System.out.println("[LOG DELETAR] Dependências em 'NOTAS_RECEBIMENTO' limpas.");
-
-                    // 2. Tenta apagar o fornecedor novamente agora que a restrição sumiu
-                    repository.delete(fornecedor);
-                    System.out.println("[LOG DELETAR] Fornecedor '" + fornecedor.getRazaoSocial() + "' removido com sucesso após limpeza.");
-                    
-                    return ResponseEntity.ok().build();
-                } catch (Exception ex) {
-                    System.out.println("[LOG DELETAR] ERRO CRÍTICO: Falha na limpeza forçada: " + ex.getMessage());
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body("Falha ao executar limpeza relacional: " + ex.getMessage());
-                }
+                notaRecebimentoRepository.deleteByFornecedorId(id);
+                repository.delete(fornecedor);
+                return ResponseEntity.ok().build();
             }
-        }).orElseGet(() -> {
-            System.out.println("[LOG DELETAR] Registro não localizado.");
-            return ResponseEntity.notFound().build();
-        });
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/foto")
+    @Transactional
     public ResponseEntity<?> fazerUploadFoto(
             @PathVariable Long id, 
             @RequestParam("foto") MultipartFile file,
-            @RequestHeader(value = "User-Role", defaultValue = "USER") String userRole) {
+            @RequestHeader(value = "User-Role", defaultValue = "USER") String userRole,
+            @RequestHeader(value = "Empresa-Id") Long empresaId) {
         
-        System.out.println("=================================================");
-        System.out.println("[LOG FOTO] Rota para upload de foto acionada para o ID: " + id);
-        System.out.println("[LOG FOTO] User-Role avaliado: " + userRole);
-
         if (!"MASTER".equalsIgnoreCase(userRole) && !"ADMIN".equalsIgnoreCase(userRole)) {
-            System.out.println("[LOG FOTO] BLOQUEADO: Perfil não autorizado.");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permissão negada para atualizar imagens.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permissão negada.");
         }
 
-        if (file == null || file.isEmpty()) {
-            System.out.println("[LOG FOTO] ERRO: Arquivo de imagem recebido está nulo ou vazio.");
-            return ResponseEntity.badRequest().body("Arquivo de foto inválido.");
-        }
+        if (file == null || file.isEmpty()) return ResponseEntity.badRequest().body("Arquivo inválido.");
 
         return repository.findById(id).map(fornecedor -> {
+            // 🔒 BARREIRA MULTI-TENANT: Garante a posse do registro antes de aceitar a mídia
+            if (!fornecedor.getEmpresa().getId().equals(empresaId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+            }
+
             try {
-                System.out.println("[LOG FOTO] Fornecedor localizado: " + fornecedor.getRazaoSocial());
                 byte[] bytes = file.getBytes();
-                System.out.println("[LOG FOTO] Convertendo binário de " + bytes.length + " bytes para Base64...");
                 String base64Image = "data:" + file.getContentType() + ";base64," + Base64.getEncoder().encodeToString(bytes);
-                
                 fornecedor.setFoto(base64Image);
-                repository.save(fornecedor);
-                System.out.println("[LOG FOTO] String Base64 persistida com sucesso na coluna @Lob!");
-                return ResponseEntity.ok(fornecedor);
+                return ResponseEntity.ok(repository.save(fornecedor));
             } catch (IOException e) {
-                System.out.println("[LOG FOTO] ERRO: Falha de I/O ao ler os bytes do arquivo.");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao processar imagem.");
             }
-        }).orElseGet(() -> {
-            System.out.println("[LOG FOTO] ERRO: Fornecedor de ID " + id + " não existe na base.");
-            return ResponseEntity.notFound().build();
-        });
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

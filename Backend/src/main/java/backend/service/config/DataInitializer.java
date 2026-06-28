@@ -1,6 +1,7 @@
 package backend.service.config;
 
 import java.io.IOException; 
+import java.math.BigDecimal; // Importação adicionada para tratar os valores monetários
 import java.time.LocalDate;
 
 import org.springframework.boot.CommandLineRunner;
@@ -34,6 +35,11 @@ public class DataInitializer implements CommandLineRunner {
             orion.setNomeFantasia("OrionERP");
             orion.setCnpj("00.000.000/0001-00");
             orion.setPlano("Premium");
+            
+            // Alteração: Definindo os capitais solicitados exclusivamente para a OrionERP
+            orion.setCapitalMesAnterior(new BigDecimal("25780.67"));
+            orion.setCapitalMesAtual(new BigDecimal("35970.03"));
+            
             orion = empresaRepository.save(orion);
             System.out.println(">>> Empresa OrionERP criada com sucesso.");
         }

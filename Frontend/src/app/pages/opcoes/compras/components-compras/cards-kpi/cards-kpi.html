@@ -6,7 +6,7 @@
         <span class="title">Total Comprado</span>
       </div>
     </div>
-    <div class="kpi-value">R$ 548.189,25</div>
+    <div class="kpi-value">{{ dadosDashboard.totalComprado | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
     <div class="kpi-sub">Total geral de compras</div>
     <div class="kpi-footer">
       <span class="kpi-trend up">▲ +32,5%</span>
@@ -21,7 +21,7 @@
         <span class="title">Compras do Mês</span>
       </div>
     </div>
-    <div class="kpi-value">R$ 72.548,56</div>
+    <div class="kpi-value">{{ dadosDashboard.comprasMes | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
     <div class="kpi-sub">Total de compras no mês</div>
     <div class="kpi-footer">
       <span class="kpi-trend up">▲ +17,8%</span>
@@ -36,7 +36,7 @@
         <span class="title">Pedidos Pendentes</span>
       </div>
     </div>
-    <div class="kpi-value">32</div>
+    <div class="kpi-value">{{ dadosDashboard.pedidosPendentes }}</div>
     <div class="kpi-sub">Pedidos aguardando aprovação</div>
     <div class="kpi-footer">
       <span class="kpi-trend down">▼ -11,2%</span>
@@ -51,7 +51,7 @@
         <span class="title">Fornecedores ativos</span>
       </div>
     </div>
-    <div class="kpi-value">47</div>
+    <div class="kpi-value">{{ dadosDashboard.fornecedoresAtivos }}</div>
     <div class="kpi-sub">Fornecedores cadastrados</div>
     <div class="kpi-footer">
       <span class="kpi-trend up">▲ +9,5%</span>

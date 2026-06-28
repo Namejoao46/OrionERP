@@ -1,44 +1,115 @@
-<div class="cadastro-container">
+<div class="form-container">
   
-  <div *ngIf="roleLogado === 'ADMIN_DEV'">
-    <h2>Dados da Nova Empresa</h2>
-    <div class="form-group">
-      <input [(ngModel)]="empresa.nomeFantasia" name="nomeFantasia" placeholder="Nome Fantasia">
-      <input [(ngModel)]="empresa.cnpj" name="cnpj" placeholder="CNPJ (apenas números)">
-      <select [(ngModel)]="empresa.plano" name="plano" class="custom-select">
-        <option value="Basico">Plano Básico</option>
-        <option value="Premium">Plano Premium</option>
-      </select>
-      
-      <div class="file-upload">
-        <label for="logoInput">Logo da Empresa:</label>
-        <input id="logoInput" type="file" (change)="onFileSelected($event)" accept="image/*">
+  <div class="top-actions-grid">
+    <div class="photo-upload-wrapper" *ngIf="roleLogado === 'ADMIN_DEV'">
+      <div class="avatar-preview logo-preview">
+        <img [src]="'assets/images/default-company.png'" alt="Logo da Empresa" id="img-logo-preview">
+      </div>
+      <div class="photo-inputs">
+        <label for="logoInput" class="btn-photo-label">
+          <i class="bi bi-building-up"></i> Selecionar Logo
+        </label>
+        <input id="logoInput" type="file" (change)="onLogoSelected($event)" accept="image/*" hidden>
+        <p class="hint">Identidade Visual da Empresa</p>
+      </div>
+    </div>
+
+    <div class="photo-upload-wrapper" [ngClass]="{'full-width-top': roleLogado !== 'ADMIN_DEV'}">
+      <div class="avatar-preview">
+        <img [src]="'assets/images/default-avatar.png'" alt="Foto do Usuário">
+      </div>
+      <div class="photo-inputs">
+        <label for="fotoUsuarioInput" class="btn-photo-label">
+          <i class="bi bi-camera"></i> Foto de Perfil
+        </label>
+        <input id="fotoUsuarioInput" type="file" (change)="onFotoUsuarioSelected($event)" accept="image/*" hidden>
+        <p class="hint">Formatos aceitos: JPG, PNG</p>
       </div>
     </div>
   </div>
 
-  <h2>Dados do {{ roleLogado === 'ADMIN_DEV' ? 'Usuário Master' : 'Novo Colaborador' }}</h2>
-  <div class="form-group">
-    <div class="row-inputs">
-      <input [(ngModel)]="usuario.nome" name="nome" placeholder="Nome">
-      <input [(ngModel)]="usuario.sobrenome" name="sobrenome" placeholder="Sobrenome">
+  <fieldset class="form-section" *ngIf="roleLogado === 'ADMIN_DEV'">
+    <legend>Dados Institucionais da Empresa</legend>
+    <div class="input-grid">
+      <div class="field">
+        <label>Nome Fantasia *</label>
+        <input [(ngModel)]="empresa.nomeFantasia" name="nomeFantasia" placeholder="Nome Fantasia da Empresa">
+      </div>
+      <div class="field">
+        <label>CNPJ *</label>
+        <input [(ngModel)]="empresa.cnpj" name="cnpj" placeholder="CNPJ (Apenas números)">
+      </div>
+      <div class="field">
+        <label>Capital do Mês Atual (R$)</label>
+        <input [(ngModel)]="empresa.capitalMesAtual" name="capitalMesAtual" type="number" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label>Capital do Mês Anterior (R$)</label>
+        <input [(ngModel)]="empresa.capitalMesAnterior" name="capitalMesAnterior" type="number" placeholder="0.00">
+      </div>
+      <div class="field full-width">
+        <label>Plano de Assinatura</label>
+        <select [(ngModel)]="empresa.plano" name="plano">
+          <option value="Basico">Plano Básico</option>
+          <option value="Premium">Plano Premium</option>
+        </select>
+      </div>
     </div>
+  </fieldset>
 
-    <input [(ngModel)]="usuario.login" name="login" placeholder="Login (E-mail)">
-    <input [(ngModel)]="usuario.senha" name="senha" type="password" placeholder="Senha">
-    
-    <div class="row-inputs">
-      <input [(ngModel)]="usuario.cpf" name="cpf" placeholder="CPF (Ex: 000.000.000-00)">
-      <input [(ngModel)]="usuario.dataNascimento" name="dataNascimento" type="date" placeholder="Data de Nascimento">
+  <fieldset class="form-section">
+    <legend>Dados do {{ roleLogado === 'ADMIN_DEV' ? 'Usuário Master (Dono)' : 'Novo Colaborador' }}</legend>
+    <div class="input-grid">
+      <div class="field">
+        <label>Nome *</label>
+        <input [(ngModel)]="usuario.nome" name="nome" placeholder="Nome">
+      </div>
+      <div class="field">
+        <label>Sobrenome *</label>
+        <input [(ngModel)]="usuario.sobrenome" name="sobrenome" placeholder="Sobrenome">
+      </div>
+      <div class="field">
+        <label>Login / E-mail *</label>
+        <input [(ngModel)]="usuario.login" name="login" placeholder="exemplo@email.com">
+      </div>
+      <div class="field">
+        <label>Senha de Acesso *</label>
+        <input [(ngModel)]="usuario.senha" name="senha" type="password" placeholder="••••••••">
+      </div>
+      <div class="field">
+        <label>CPF *</label>
+        <input [(ngModel)]="usuario.cpf" name="cpf" placeholder="000.000.000-00">
+      </div>
+      <div class="field">
+        <label>Data de Nascimento</label>
+        <input [(ngModel)]="usuario.dataNascimento" name="dataNascimento" type="date">
+      </div>
     </div>
+  </fieldset>
 
-    <input [(ngModel)]="usuario.endereco" name="endereco" placeholder="Endereço Completo">
-    <input [(ngModel)]="usuario.cargo" name="cargo" placeholder="Cargo">
-    <input [(ngModel)]="usuario.matricula" name="matricula" placeholder="Matrícula">
+  <fieldset class="form-section">
+    <legend>Informações de Contrato e Endereço</legend>
+    <div class="input-grid">
+      <div class="field full-width">
+        <label>Endereço Completo</label>
+        <input [(ngModel)]="usuario.endereco" name="endereco" placeholder="Rua, Número, Bairro, Cidade - UF">
+      </div>
+      <div class="field">
+        <label>Cargo / Função</label>
+        <input [(ngModel)]="usuario.cargo" name="cargo" placeholder="Cargo do colaborador">
+      </div>
+      <div class="field">
+        <label>Matrícula Interna</label>
+        <input [(ngModel)]="usuario.matricula" name="matricula" placeholder="Código de Registro">
+      </div>
+      <div class="field full-width" *ngIf="roleLogado === 'MASTER'">
+        <label>Tipo de Contratação / Regime</label>
+        <input [(ngModel)]="usuario.tipoColaborador" name="tipoColaborador" placeholder="Ex: CLT, Prestador de Serviço, Estágio">
+      </div>
+    </div>
+  </fieldset>
 
-    <input *ngIf="roleLogado === 'MASTER'" [(ngModel)]="usuario.tipoColaborador" name="tipoColaborador" placeholder="Tipo do Colaborador (Ex: CLT, Estágio)">
-
-    <button class="btn-salvar" (click)="salvar()">Salvar Cadastro</button>
-  </div>
-
+  <button class="btn-confirmar" (click)="salvar()">
+    <i class="bi bi-check-circle me-2"></i> Salvar Cadastro
+  </button>
 </div>

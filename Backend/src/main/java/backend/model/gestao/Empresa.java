@@ -1,16 +1,11 @@
 package backend.model.gestao;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "empresas")
@@ -31,8 +26,13 @@ public class Empresa {
 
     private String plano; // Ex: 'Basico', 'Premium'
 
+    @Column(nullable = false)
+    private BigDecimal capitalMesAtual; // 🪙 Adicionado
+
+    @Column(nullable = false)
+    private BigDecimal capitalMesAnterior; // 🪙 Adicionado
+
     @Lob
-    // Alterado de LONGBLOB para BLOB para total compatibilidade com o Firebird
     @Column(name = "logo", columnDefinition = "BLOB")
     private byte[] logo;
 }

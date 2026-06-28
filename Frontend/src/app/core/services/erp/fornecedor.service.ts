@@ -42,17 +42,29 @@ export class FornecedorService {
     return role;
   }
 
+  private obterEmpresaId(): string {
+    // 🔒 Recupera o contexto da empresa ativa do usuário logado
+    const empresaId = localStorage.getItem('empresaId') || '0';
+    console.log(`[TRACKING-SERVICE] Contexto Multi-Tenant. Empresa-Id detectado: "${empresaId}"`);
+    return empresaId;
+  }
+
   private criarHeadersSeguranca(): HttpHeaders {
     const role = this.obterUserRole();
-    console.log('[TRACKING-SERVICE] Injetando metadados de auditoria nos cabeçalhos HTTP.');
-    return new HttpHeaders({ 'User-Role': role });
+    const empresaId = this.obterEmpresaId();
+    console.log('[TRACKING-SERVICE] Injetando metadados de auditoria e escopo Multi-Tenant nos cabeçalhos HTTP.');
+    return new HttpHeaders({ 
+      'User-Role': role,
+      'Empresa-Id': empresaId 
+    });
   }
 
   listarTodos(): Observable<Fornecedor[]> {
     const startTime = performance.now();
-    console.log(`[TRACKING-SERVICE] [GET] Solicitando listagem geral de fornecedores à rota: ${this.apiUrl}`);
+    const headers = this.criarHeadersSeguranca();
+    console.log(`[TRACKING-SERVICE] [GET] Solicitando listagem isolada de fornecedores à rota: ${this.apiUrl}`);
 
-    return this.http.get<Fornecedor[]>(this.apiUrl).pipe(
+    return this.http.get<Fornecedor[]>(this.apiUrl, { headers }).pipe(
       tap((res) => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Listagem retornada. Registros encontrados: ${res.length} | Tempo de resposta: ${(endTime - startTime).toFixed(2)}ms`);
@@ -81,7 +93,6 @@ export class FornecedorService {
     );
   }
 
-  // ADICIONADO: Método de deleção/rollback para manter a integridade do ERP
   deletar(id: number): Observable<void> {
     const startTime = performance.now();
     const headers = this.criarHeadersSeguranca();
@@ -93,7 +104,7 @@ export class FornecedorService {
         console.log(`[TRACKING-SERVICE] [SUCCESS] Registro excluído com sucesso. Tempo: ${(endTime - startTime).toFixed(2)}ms`);
       }),
       catchError((err) => {
-        console.error(`[TRACKING-SERVICE] [ERROR] Erro ao tentar remover o fornecedor órfão de ID: ${id}`, err);
+        console.error(`[TRACKING-SERVICE] [ERROR] Erro ao tentar remover o fornecedor de ID: ${id}`, err);
         return throwError(() => err);
       })
     );
@@ -101,15 +112,16 @@ export class FornecedorService {
 
   importarXml(arquivo: File): Observable<Fornecedor> {
     const startTime = performance.now();
-    console.log(`[TRACKING-SERVICE] [POST] Transmitindo payload binário (XML) para processamento fiscal. Arquivo: ${arquivo.name} | Tamanho: ${arquivo.size} bytes`);
+    const headers = this.criarHeadersSeguranca();
+    console.log(`[TRACKING-SERVICE] [POST] Transmitindo payload binário (XML) para processamento fiscal. Arquivo: ${arquivo.name}`);
     
     const formData = new FormData();
     formData.append('xml', arquivo);
 
-    return this.http.post<Fornecedor>(`${this.apiUrl}/importar-xml`, formData).pipe(
+    return this.http.post<Fornecedor>(`${this.apiUrl}/importar-xml`, formData, { headers }).pipe(
       tap((res) => {
         const endTime = performance.now();
-        console.log(`[TRACKING-SERVICE] [SUCCESS] XML processado e mapeado pelo backend. Dados do Emitente extraídos:`, res, `| Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+        console.log(`[TRACKING-SERVICE] [SUCCESS] XML processado e associado à empresa proprietária. Dados do Emitente:`, res, `| Tempo: ${(endTime - startTime).toFixed(2)}ms`);
       }),
       catchError((err) => {
         console.error(`[TRACKING-SERVICE] [ERROR] Falha estrutural ou de validação no parseamento do XML da nota.`, err);
@@ -121,7 +133,7 @@ export class FornecedorService {
   uploadFoto(id: number, arquivoFoto: File): Observable<Fornecedor> {
     const startTime = performance.now();
     const headers = this.criarHeadersSeguranca();
-    console.log(`[TRACKING-SERVICE] [PUT] Iniciando upload multipart da imagem do fornecedor. ID Alvo: ${id} | Nome do arquivo: ${arquivoFoto.name}`);
+    console.log(`[TRACKING-SERVICE] [PUT] Iniciando upload multipart da imagem do fornecedor. ID Alvo: ${id}`);
 
     const formData = new FormData();
     formData.append('foto', arquivoFoto);
@@ -129,7 +141,7 @@ export class FornecedorService {
     return this.http.put<Fornecedor>(`${this.apiUrl}/${id}/foto`, formData, { headers }).pipe(
       tap((res) => {
         const endTime = performance.now();
-        console.log(`[TRACKING-SERVICE] [SUCCESS] Upload de foto executado e vinculado com sucesso ao ID ${id}. Tempo: ${(endTime - startTime).toFixed(2)}ms`);
+        console.log(`[TRACKING-SERVICE] [SUCCESS] Upload de foto executado e vinculado ao ID ${id}. Tempo: ${(endTime - startTime).toFixed(2)}ms`);
       }),
       catchError((err) => {
         console.error(`[TRACKING-SERVICE] [ERROR] Erro no pipe de upload da imagem para o ID ${id}.`, err);

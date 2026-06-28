@@ -30,8 +30,14 @@ public class PedidoCompraController {
     @PostMapping
     public ResponseEntity<PedidoCompra> criarPedido(@RequestBody PedidoCompra pedido) {
         if (pedido.getValorTotal() == null && pedido.getProduto() != null) {
-            pedido.setValorTotal(pedido.getProduto().getPrecoCusto().multiply(java.math.BigDecimal.valueOf(pedido.getQuantidade())));
+            pedido.setValorTotal(pedido.getProduto().getPrecoCusto().multiply(java.math.BigDecimal.valueOf(pedido.getQuantidade().doubleValue())));
         }
         return ResponseEntity.ok(service.salvar(pedido));
+    }
+
+    // 🔥 Adicionado: Rota para alterar o status direto pela ação manual da tabela
+    @PutMapping("/{id}/status")
+    public ResponseEntity<PedidoCompra> alterarStatus(@PathVariable Long id, @RequestParam String novoStatus) {
+        return ResponseEntity.ok(service.atualizarStatus(id, novoStatus));
     }
 }

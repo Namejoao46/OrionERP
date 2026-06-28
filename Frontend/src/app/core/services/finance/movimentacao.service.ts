@@ -34,6 +34,6 @@ export class MovimentacaoService {
   }
 
   obterComprasPorStatus(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:8080/api/pedidos-compra/status');
+    return this.http.get<any[]>(`${this.apiUrl}/compras-status`);
   }
 }

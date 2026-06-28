@@ -15,12 +15,16 @@ export class GastosService {
   registrarGastoManual(gasto: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/movimentacoes`, {
       ...gasto,
-      tipo: 'SAIDA', // Força o tipo de movimentação como saída financeira
+      tipo: 'SAIDA', 
       dataHora: new Date().toISOString()
     });
   }
 
   obterDashboard(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/movimentacoes/dashboard`);
+  }
+
+  alterarStatusPedido(id: number, novoStatus: string): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/pedidos-compra/${id}/status?novoStatus=${novoStatus}`, {});
   }
 }

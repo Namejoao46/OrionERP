@@ -17,7 +17,7 @@ export class ChartStatus implements OnInit {
   public legendaCustomizada: any[] = [];
   
   public chartOptions: any = {
-    series: [], 
+    series: [0], // 🔥 Inicialize com um valor dummy ou vazio seguro
     chart: {
       type: "donut" as ApexChart['type'],
       height: 250,

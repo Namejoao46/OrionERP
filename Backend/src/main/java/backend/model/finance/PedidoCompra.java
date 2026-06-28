@@ -1,10 +1,11 @@
 package backend.model.finance;
 
 import backend.model.erp.Produto;
+import backend.model.erp.Fornecedor;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -15,26 +16,23 @@ public class PedidoCompra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "cliente_fornecedor", nullable = false)
-    private String clienteFornecedor;
-
     @ManyToOne
     @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
 
-    private Integer quantidade;
-    
-    @Column(name = "valor_total")
+    @ManyToOne
+    @JoinColumn(name = "fornecedor_id", nullable = false)
+    private Fornecedor fornecedor;
+
+    @Column(nullable = false)
+    private BigDecimal quantidade;
+
+    @Column(name = "valor_total", nullable = false)
     private BigDecimal valorTotal;
 
-    private String status; // APROVADO, EM_ANALISE, RECEBIDO, CANCELADO
-    
-    @Column(name = "data_pedido")
-    private LocalDate dataPedido;
+    @Column(nullable = false)
+    private String status = "Em Análise"; // Em Análise, Aprovado, Recebido, Cancelado
 
-    @PrePersist
-    protected void onCreate() {
-        if (this.dataPedido == null) this.dataPedido = LocalDate.now();
-        if (this.status == null) this.status = "EM_ANALISE";
-    }
+    @Column(name = "data_pedido")
+    private LocalDateTime dataPedido = LocalDateTime.now();
 }

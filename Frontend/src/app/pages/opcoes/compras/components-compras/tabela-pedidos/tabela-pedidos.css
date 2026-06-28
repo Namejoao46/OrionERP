@@ -81,6 +81,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.02);
   border-bottom: 1px solid rgba(255, 255, 255, 0.02);
   transition: all 0.2s ease;
+  vertical-align: middle;
 }
 
 .custom-table tr td:first-child {
@@ -108,7 +109,6 @@
 .custom-table tr:hover td {
   background: rgba(255, 255, 255, 0.05);
   color: #ffffff;
-  cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -117,65 +117,77 @@
 }
 
 /* ==========================================================================
-   BADGES DE STATUS PREMIUM (Com bordas e brilho)
+   SELECTS DE STATUS INTERATIVOS (Estilo Badge Premium)
    ========================================================================== */
-.badge {
-  padding: 4px 8px;
+.badge-select {
+  padding: 5px 28px 5px 10px;
   border-radius: 6px;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   display: inline-block;
+  outline: none;
+  cursor: pointer;
+  appearance: none; /* Remove a seta padrão do sistema */
+  -webkit-appearance: none;
+  -moz-appearance: none;
   transition: all 0.2s ease;
+  
+  /* Seta estilizada customizada em SVG (Ciano) */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300c3ff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 8px) center;
 }
 
-/* Aprovado / Fechada (Verde) */
-.badge.aprovado {
+/* Estilização interna das opções dentro do dropdown */
+.badge-select option {
+  background-color: #0a0e29;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: none;
+  font-size: 0.8rem;
+  padding: 8px;
+}
+
+/* Aprovado (Verde) */
+.badge-select.aprovado {
   background-color: rgba(0, 191, 113, 0.15);
   color: #00bf71;
   border: 1px solid rgba(0, 191, 113, 0.3);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300bf71' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
-.badge.aprovado:hover {
+.badge-select.aprovado:hover, .badge-select.aprovado:focus {
   background-color: rgba(0, 191, 113, 0.25);
-  box-shadow: 0 0 8px rgba(0, 191, 113, 0.2);
-}
-
-/* Recebido / Em Andamento (Azul) */
-.badge.recebido {
-  background-color: rgba(0, 195, 255, 0.15);
-  color: #00c3ff;
-  border: 1px solid rgba(0, 195, 255, 0.3);
-}
-.badge.recebido:hover {
-  background-color: rgba(0, 195, 255, 0.25);
-  box-shadow: 0 0 8px rgba(0, 195, 255, 0.2);
+  box-shadow: 0 0 8px rgba(0, 191, 113, 0.3);
 }
 
 /* Em Análise / Negociação (Laranja/Amarelo) */
-.badge.analise {
+.badge-select.em-análise, .badge-select.em-analise {
   background-color: rgba(255, 159, 67, 0.15);
   color: #ff9f43;
   border: 1px solid rgba(255, 159, 67, 0.3);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ff9f43' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
-.badge.analise:hover {
+.badge-select.em-análise:hover, .badge-select.em-análise:focus {
   background-color: rgba(255, 159, 67, 0.25);
-  box-shadow: 0 0 8px rgba(255, 159, 67, 0.2);
+  box-shadow: 0 0 8px rgba(255, 159, 67, 0.3);
 }
 
 /* Cancelado / Atrasada (Vermelho) */
-.badge.cancelado {
+.badge-select.cancelado {
   background-color: rgba(255, 51, 102, 0.15);
   color: #ff3366;
   border: 1px solid rgba(255, 51, 102, 0.3);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ff3366' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
-.badge.cancelado:hover {
+.badge-select.cancelado:hover, .badge-select.cancelado:focus {
   background-color: rgba(255, 51, 102, 0.25);
-  box-shadow: 0 0 8px rgba(255, 51, 102, 0.2);
+  box-shadow: 0 0 8px rgba(255, 51, 102, 0.3);
 }
 
 /* ==========================================================================
    RODAPÉ DA TABELA
-   ========================================================================== */
+   ========================================================================= */
 .table-footer {
   margin-top: 15px;
   text-align: center;
@@ -190,5 +202,5 @@
 }
 
 .table-footer a:hover {
-  color: #00c3ff; /* Link brilha em ciano no hover */
+  color: #00c3ff;
 }

@@ -9,7 +9,7 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Fornecedor/Cliente</th>
+          <th>Fornecedor</th>
           <th>Produto</th>
           <th>Quantidade</th>
           <th>Valor Total</th>
@@ -19,16 +19,26 @@
       </thead>
       <tbody>
         <tr *ngFor="let pedido of pedidos">
-          <td class="id-column">#{{ pedido.id.toString().padStart(6, '0') }}</td>
-          <td>{{ pedido.clienteFornecedor }}</td>
+          <td class="id-column">#{{ pedido.id?.toString().padStart(6, '0') }}</td>
+          
+          <td>{{ pedido.fornecedor?.razaoSocial || 'Não informado' }}</td>
           <td>{{ pedido.produto?.descricao || 'Não informado' }}</td>
           <td>{{ pedido.quantidade }} und</td>
           <td>{{ pedido.valorTotal | currency:'BRL' }}</td>
+          
           <td>
-            <span class="badge" [ngClass]="pedido.status.toLowerCase()">
-              {{ pedido.status }}
-            </span>
+            <select 
+              [value]="pedido.status" 
+              (change)="mudarStatus(pedido.id, $any($event.target).value)"
+              class="badge-select"
+              [ngClass]="pedido.status?.toLowerCase().replace(' ', '-')"
+            >
+              <option value="Em Análise">Em Análise</option>
+              <option value="Aprovado">Aprovado ✅</option>
+              <option value="Cancelado">Cancelado ✕</option>
+            </select>
           </td>
+          
           <td>{{ pedido.dataPedido | date:'dd/MM/yyyy' }}</td>
         </tr>
       </tbody>

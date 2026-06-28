@@ -1,6 +1,8 @@
 package backend.controller.finance;
 
 import backend.dto.finance.DashboardFinanceDTO;
+import backend.dto.finance.DashboardGastosDTO;
+import backend.dto.finance.EvolucaoComprasDTO;
 import backend.model.finance.Movimentacao;
 import backend.service.finance.MovimentacaoService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,17 @@ public class MovimentacaoController {
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardFinanceDTO> obterDashboard() {
         return ResponseEntity.ok(service.obterDadosDashboard());
+    }
+
+    @GetMapping("/dashboard-gastos")
+    public ResponseEntity<DashboardGastosDTO> obterDashboardGastos() {
+        return ResponseEntity.ok(service.obterDadosDashboardGastos());
+    }
+
+    // 🔥 Adicionado: Endpoint para alimentar o gráfico do ApexCharts
+    @GetMapping("/evolucao-compras")
+    public ResponseEntity<List<EvolucaoComprasDTO>> obterEvolucaoCompras() {
+        return ResponseEntity.ok(service.obterEvolucaoCompras());
     }
 
     @PostMapping

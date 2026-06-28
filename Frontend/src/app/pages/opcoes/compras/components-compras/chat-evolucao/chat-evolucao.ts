@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgApexchartsModule, ApexChart, ApexStroke } from 'ng-apexcharts'; 
+import { MovimentacaoService } from '../../../../../core/services/finance/movimentacao.service'; // Ajuste o caminho real
 
 @Component({
   selector: 'app-chart-evolucao',
@@ -9,15 +10,16 @@ import { NgApexchartsModule, ApexChart, ApexStroke } from 'ng-apexcharts';
   templateUrl: './chat-evolucao.html',
   styleUrl: './chat-evolucao.css'
 })
-export class ChartEvolucao {
+export class ChartEvolucao implements OnInit {
   
-  public chartOptions = {
+  // Opções do gráfico iniciadas com estruturas vazias para aguardar a API
+  public chartOptions: any = {
     series: [{
       name: "Compras",
-      data: [15000, 18000, 50000, 22000, 65000, 85000]
+      data: [] // Começa vazio
     }],
     chart: {
-      type: "area" as ApexChart['type'], // Corrigido!
+      type: "area" as ApexChart['type'],
       height: 250,
       toolbar: { show: false },
       background: 'transparent'
@@ -33,7 +35,7 @@ export class ChartEvolucao {
     },
     dataLabels: { enabled: false },
     stroke: { 
-      curve: "smooth" as ApexStroke['curve'], // Corrigido!
+      curve: "smooth" as ApexStroke['curve'], 
       width: 3 
     },
     grid: {
@@ -41,7 +43,7 @@ export class ChartEvolucao {
       strokeDashArray: 3
     },
     xaxis: {
-      categories: ["Dez", "Jan", "Fev", "Mar", "Abr", "Mai"],
+      categories: [], // Começa vazio
       labels: { style: { colors: "#6b7c96" } },
       axisBorder: { show: false },
       axisTicks: { show: false }
@@ -49,9 +51,38 @@ export class ChartEvolucao {
     yaxis: {
       labels: {
         style: { colors: "#6b7c96" },
-        formatter: (val: number) => `R$ ${val / 1000}K`
+        formatter: (val: number) => `R$ ${(val / 1000).toFixed(1)}K`
       }
     },
     theme: { mode: "dark" }
   };
+
+  constructor(private movimentacaoService: MovimentacaoService) {}
+
+  ngOnInit(): void {
+    this.carregarDadosGrafico();
+  }
+
+  carregarDadosGrafico(): void {
+    this.movimentacaoService.obterEvolucaoCompras().subscribe({
+      next: (dados) => {
+
+        const meses = dados.map(item => item.mes);
+        const valores = dados.map(item => item.total);
+
+        this.chartOptions.series = [{
+          name: "Compras",
+          data: valores
+        }];
+
+        this.chartOptions.xaxis = {
+          ...this.chartOptions.xaxis,
+          categories: meses
+        };
+      },
+      error: (err) => {
+        console.error("Erro ao carregar evolução de compras:", err);
+      }
+    });
+  }
 }

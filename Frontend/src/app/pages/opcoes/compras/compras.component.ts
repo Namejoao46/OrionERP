@@ -8,6 +8,7 @@ import { ChartStatus } from "./components-compras/chat-status/chat-status";
 import { CardsKpi } from "./components-compras/cards-kpi/cards-kpi";
 import { TabelaPedidos } from "./components-compras/tabela-pedidos/tabela-pedidos";
 import { NovoGastoComponent } from './components-compras/novo-gasto.component/novo-gasto.component';
+import { CompraProdutoComponent } from './components-compras/compra-produto.component/compra-produto.component';
 
 @Component({
   selector: 'app-compras',
@@ -20,11 +21,12 @@ import { NovoGastoComponent } from './components-compras/novo-gasto.component/no
     ChartStatus,
     CardsKpi,
     TabelaPedidos,
-    NovoGastoComponent
+    NovoGastoComponent,
+    CompraProdutoComponent
   ],
   templateUrl: './compras.component.html',
   styleUrl: './compras.component.css'
 })
 export class ComprasComponent {
-  // Dados do Service serão injetados aqui futuramente
+  abaAtiva: 'gasto' | 'compra' = 'gasto';
 }

@@ -8,30 +8,91 @@
   box-sizing: border-box;
 }
 
+/* ==========================================================================
+   🔥 BARRA DE ROLAGEM AZUL (Correção com ::ng-deep para injetar globalmente)
+   ========================================================================== */
+::ng-deep ::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+::ng-deep ::-webkit-scrollbar-track {
+  background: #040d21 !important;
+}
+
+::ng-deep ::-webkit-scrollbar-thumb {
+  background: #2b97fa !important;
+  border-radius: 10px !important;
+  border: 2px solid #040d21 !important;
+}
+
+::ng-deep ::-webkit-scrollbar-thumb:hover {
+  background: #00c3ff !important; /* Brilha em ciano no hover */
+}
+
+/* ==========================================================================
+   RESTANTE DO SEU LAYOUT (Inalterado)
+   ========================================================================== */
 .row-kpis {
   width: 100%;
 }
 
-/* Linha do Gráfico de Área + Formulário */
 .row-charts {
   display: grid;
-  grid-template-columns: 2fr 1fr; /* Mantém a proporção equilibrada */
+  grid-template-columns: 2fr 1fr;
   gap: 20px;
   width: 100%;
 }
 
-/* Nova Linha Inferior: Tabela + Status */
 .row-bottom-group {
   display: grid;
-  grid-template-columns: 2fr 1fr; /* Tabela ganha mais espaço horizontal */
+  grid-template-columns: 2fr 1fr;
   gap: 20px;
   width: 100%;
 }
 
-/* Responsividade para telas menores (Tablets/Celulares) */
+.col-form-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tabs-container {
+  display: flex;
+  gap: 8px;
+  background: #050a30;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid #141c2f;
+}
+
+.tabs-container button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #6b7c96;
+  padding: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.tabs-container button.active {
+  background: #1a2245;
+  color: #00c3ff;
+  box-shadow: 0 0 8px rgba(0, 195, 255, 0.2);
+}
+
+.tab-content {
+  flex: 1;
+}
+
 @media (max-width: 1200px) {
   .row-charts, 
   .row-bottom-group {
-    grid-template-columns: 1fr; /* Tudo vira uma coluna única empilhada */
+    grid-template-columns: 1fr;
   }
 }

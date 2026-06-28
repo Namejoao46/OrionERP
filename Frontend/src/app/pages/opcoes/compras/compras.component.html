@@ -8,8 +8,17 @@
     <div class="col-chart-main">
       <app-chart-evolucao></app-chart-evolucao>
     </div>
+    
     <div class="col-form-side">
-      <app-novo-gasto></app-novo-gasto>
+      <div class="tabs-container">
+        <button [class.active]="abaAtiva === 'gasto'" (click)="abaAtiva = 'gasto'">Gasto Geral</button>
+        <button [class.active]="abaAtiva === 'compra'" (click)="abaAtiva = 'compra'">Compra Produto 📦</button>
+      </div>
+      
+      <div class="tab-content">
+        <app-novo-gasto *ngIf="abaAtiva === 'gasto'"></app-novo-gasto>
+        <app-compra-produto *ngIf="abaAtiva === 'compra'"></app-compra-produto>
+      </div>
     </div>
   </div>
 

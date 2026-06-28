@@ -1,16 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 .gasto-form-card {
-    background: #050a30; /* Fundo escuro azulado identico ao estoque */
+    background: #050a30;
     border: 1px solid #141c2f;
-    border-radius: 16px; /* Bordas arredondadas premium */
+    border-radius: 16px;
     padding: 24px;
     width: 100%;
     height: 100%;
     margin: 0;
     box-sizing: border-box;
     font-family: 'Inter', sans-serif;
-    border-left: 3px solid #ff1744;
+    border-left: 3px solid #00c3ff; /* Modificado para ciano para diferenciar visualmente do card de gastos */
 }
 
 .form-header h2 {
@@ -18,7 +18,7 @@
     font-size: 18px;
     font-weight: 700;
     margin: 0 0 4px 0;
-    border-bottom: 3px solid #ff1744;
+    border-bottom: 3px solid #00c3ff; /* Linha ciano */
     padding-bottom: 5px;
     display: inline-block;
 }
@@ -54,7 +54,6 @@ label {
     letter-spacing: 0.5px;
 }
 
-/* Envelopamento dos Inputs imitando o estilo de caixas (busca-box) do estoque */
 .input-wrapper {
     background: #0a0e29;
     border-radius: 12px;
@@ -66,7 +65,7 @@ label {
 }
 
 .input-wrapper:focus-within {
-    border-color: #00c3ff; /* Foco Neon Ciano identico ao estoque */
+    border-color: #00c3ff;
     box-shadow: 0 0 10px rgba(0, 195, 255, 0.2);
 }
 
@@ -75,7 +74,6 @@ label {
     font-size: 0.95rem;
 }
 
-/* Estilo limpo para inputs e selects internos removendo as bordas nativas */
 input, select {
     background: transparent;
     border: none;
@@ -91,7 +89,24 @@ select option {
     color: #ffffff;
 }
 
-/* Ações e botões baseados no design dos botões de ação e alertas */
+.total-preview {
+    background: rgba(0, 195, 255, 0.05);
+    border: 1px dashed rgba(0, 195, 255, 0.3);
+    padding: 12px;
+    border-radius: 12px;
+    color: #cbd5e0;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    text-align: right;
+}
+
+.total-preview span {
+    color: #00c3ff;
+    font-weight: bold;
+    font-size: 1.05rem;
+    margin-left: 5px;
+}
+
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -108,7 +123,6 @@ button {
     transition: all 0.2s ease-in-out;
 }
 
-/* Botão Limpar baseado no .btn-config do estoque */
 .btn-cancel {
     background: #0a0e29;
     border: 1px solid #1a2245;
@@ -121,15 +135,14 @@ button {
     border-color: rgba(0, 195, 255, 0.5);
 }
 
-/* Botão Confirmar baseado no comportamento neon vermelho do estoque */
 .btn-submit {
     background: #0a0e29;
     border: 1px solid #1a2245;
-    color: #ff4d4d;
+    color: #00c3ff; /* Mudado para ciano para combinar com o fluxo de compras */
 }
 
 .btn-submit:hover {
-    border-color: #ff0055;
-    background: rgba(255, 0, 85, 0.1);
-    box-shadow: 0 0 10px rgba(255, 0, 85, 0.35);
+    border-color: #00c3ff;
+    background: rgba(0, 195, 255, 0.1);
+    box-shadow: 0 0 10px rgba(0, 195, 255, 0.35);
 }

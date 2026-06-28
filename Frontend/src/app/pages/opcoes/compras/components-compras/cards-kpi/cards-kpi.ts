@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 🔥 Adicionado ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { MovimentacaoService } from '../../../../../core/services/finance/movimentacao.service';
 
@@ -20,19 +20,39 @@ export class CardsKpi implements OnInit {
     trendMes: 0
   };
 
-  constructor(private movimentacaoService: MovimentacaoService) {}
+  // 🔥 Injetado o ChangeDetectorRef (cdr) no construtor
+  constructor(
+    private movimentacaoService: MovimentacaoService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.carregarDados();
   }
 
   carregarDados(): void {
-    this.movimentacaoService.obterDashboard().subscribe({
+    console.log('[🔍 RASTREAMENTO - KPI] Solicitando dados corretos de gastos ao servidor...');
+    
+    this.movimentacaoService.obterDashboardGastos().subscribe({
       next: (dados) => {
-        this.dadosDashboard = dados;
+        console.log('[✅ RASTREAMENTO - KPI] Dados brutos recebidos:', dados);
+        
+        this.dadosDashboard = {
+          totalComprado: dados?.totalComprado ?? 0,
+          comprasMes: dados?.comprasMes ?? 0,
+          pedidosPendentes: dados?.pedidosPendentes ?? 0,
+          fornecedoresAtivos: dados?.fornecedoresAtivos ?? 47,
+          trendTotal: dados?.trendTotal ?? 0,
+          trendMes: dados?.trendMes ?? 0
+        };
+        
+        console.log('[📊 RASTREAMENTO - KPI] Forçando renderização imediata do HTML...');
+        
+        // 🔥 Força o Angular a renderizar os valores na tela sem precisar de cliques ou interações
+        this.cdr.detectChanges(); 
       },
       error: (err) => {
-        console.error('Erro ao carregar dados do KPI:', err);
+        console.error('[❌ RASTREAMENTO - KPI] Falha na requisição dos cards:', err);
       }
     });
   }

@@ -32,4 +32,8 @@ export class MovimentacaoService {
       dataHora: new Date().toISOString()
     });
   }
+
+  obterComprasPorStatus(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:8080/api/pedidos-compra/status');
+  }
 }

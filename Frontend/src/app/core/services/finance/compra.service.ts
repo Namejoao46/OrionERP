@@ -6,11 +6,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CompraService {
-  private apiUrl = 'http://localhost:8080/api/compras'; // Alinhe com a rota do seu controller de compras
+  private apiUrl = 'http://localhost:8080/api/compras';
 
   constructor(private http: HttpClient) {}
 
-  // Mapeia o método registrarCompraFornecedor
   registrarCompraFornecedor(produtoId: number, quantidadeComprada: number, precoCustoUnitario: number): Observable<void> {
     const params = new HttpParams()
       .set('produtoId', produtoId.toString())

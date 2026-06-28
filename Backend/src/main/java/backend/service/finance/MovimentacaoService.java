@@ -6,14 +6,13 @@ import backend.repository.finance.PedidoCompraRepository;
 import backend.dto.finance.DashboardFinanceDTO;
 import backend.dto.finance.DashboardGastosDTO;
 import backend.dto.finance.EvolucaoComprasDTO;
+import backend.dto.finance.StatusCompraDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,15 +48,16 @@ public class MovimentacaoService {
     }
 
     public DashboardGastosDTO obterDadosDashboardGastos() {
+        // 1. Total Comprado (Soma histórica de SAÍDAS)
         BigDecimal totalComprado = repository.somarPorTipo("SAIDA");
 
-        LocalDateTime inicioDoMes = LocalDateTime.now()
-                .with(TemporalAdjusters.firstDayOfMonth())
-                .with(LocalTime.MIN);
-        BigDecimal comprasMes = repository.somarComprasDoMes(inicioDoMes);
+        // 2. Compras do Mês Atual (🔥 Atualizado: Agora sem parâmetros, direto via Firebird)
+        BigDecimal comprasMes = repository.somarComprasDoMes();
         
+        // 3. Contagem de Pedidos de Compra Pendentes
         Long pedidosPendentes = pedidoCompraRepository.count(); 
 
+        // 4. Fornecedores Ativos
         Long proveedoresAtivos = 47L; 
 
         return new DashboardGastosDTO(totalComprado, comprasMes, pedidosPendentes, proveedoresAtivos);
@@ -74,5 +74,9 @@ public class MovimentacaoService {
 
         Collections.reverse(lista);
         return lista;
+    }
+
+    public List<StatusCompraDTO> obterStatusCompras() {
+        return pedidoCompraRepository.obterContagemPorStatus();
     }
 }

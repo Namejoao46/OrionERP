@@ -3,6 +3,7 @@ package backend.controller.finance;
 import backend.dto.finance.DashboardFinanceDTO;
 import backend.dto.finance.DashboardGastosDTO;
 import backend.dto.finance.EvolucaoComprasDTO;
+import backend.dto.finance.StatusCompraDTO;
 import backend.model.finance.Movimentacao;
 import backend.service.finance.MovimentacaoService;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +44,10 @@ public class MovimentacaoController {
     @PostMapping
     public ResponseEntity<Movimentacao> criarManualmente(@RequestBody Movimentacao movimentacao) {
         return ResponseEntity.ok(service.registrar(movimentacao));
+    }
+
+    @GetMapping("/compras-status")
+    public ResponseEntity<List<StatusCompraDTO>> obterStatusCompras() {
+        return ResponseEntity.ok(service.obterStatusCompras());
     }
 }

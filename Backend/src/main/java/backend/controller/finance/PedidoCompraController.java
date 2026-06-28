@@ -1,7 +1,8 @@
 package backend.controller.finance;
 
+import backend.dto.finance.StatusCompraDTO;
 import backend.model.finance.PedidoCompra;
-import backend.repository.finance.PedidoCompraRepository;
+import backend.service.finance.PedidoCompraService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +15,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PedidoCompraController {
 
-    private final PedidoCompraRepository repository;
+    private final PedidoCompraService service;
 
     @GetMapping
-    public List<PedidoCompra> listarTodos() {
-        // Retorna a lista para alimentar sua tabela do Angular
-        return repository.findAll();
+    public ResponseEntity<List<PedidoCompra>> listarTodos() {
+        return ResponseEntity.ok(service.listarTodos());
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<List<StatusCompraDTO>> obterStatusCompras() {
+        return ResponseEntity.ok(service.obterStatusCompras());
     }
 
     @PostMapping
@@ -27,6 +32,6 @@ public class PedidoCompraController {
         if (pedido.getValorTotal() == null && pedido.getProduto() != null) {
             pedido.setValorTotal(pedido.getProduto().getPrecoCusto().multiply(java.math.BigDecimal.valueOf(pedido.getQuantidade())));
         }
-        return ResponseEntity.ok(repository.save(pedido));
+        return ResponseEntity.ok(service.salvar(pedido));
     }
 }

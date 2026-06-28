@@ -4,6 +4,7 @@
   <div class="chart-content">
     <div class="chart-graphic">
       <apx-chart
+        *ngIf="chartOptions.series && chartOptions.series.length > 0"
         [series]="chartOptions.series"
         [chart]="chartOptions.chart"
         [labels]="chartOptions.labels"
@@ -16,25 +17,10 @@
     </div>
 
     <div class="custom-legend">
-      <div class="legend-item">
-        <span class="bullet aprovado">✓</span>
-        <span class="label">Aprovado</span>
-        <span class="value">64 (45%)</span>
-      </div>
-      <div class="legend-item">
-        <span class="bullet analise">🕒</span>
-        <span class="label">Em Análise</span>
-        <span class="value">24 (17%)</span>
-      </div>
-      <div class="legend-item">
-        <span class="bullet recebido">📦</span>
-        <span class="label">Recebido</span>
-        <span class="value">43 (30%)</span>
-      </div>
-      <div class="legend-item">
-        <span class="bullet cancelado">✕</span>
-        <span class="label">Cancelado</span>
-        <span class="value">11 (08%)</span>
+      <div class="legend-item" *ngFor="let item of legendaCustomizada">
+        <span class="bullet" [ngClass]="item.classeCss">{{ item.icone }}</span>
+        <span class="label">{{ item.status }}</span>
+        <span class="value">{{ item.quantidade }} ({{ item.porcentagem }}%)</span>
       </div>
     </div>
   </div>

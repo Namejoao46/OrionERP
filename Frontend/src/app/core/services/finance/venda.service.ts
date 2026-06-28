@@ -6,11 +6,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class VendaService {
-  private apiUrl = 'http://localhost:8080/api/vendas'; // Alinhe com a rota do seu controller de vendas
+  private apiUrl = 'http://localhost:8080/api/vendas';
 
   constructor(private http: HttpClient) {}
 
-  // Mapeia o método registrarVendaDigital
   registrarVendaDigital(produtoId: number, quantidadeVendida: number): Observable<void> {
     // Como os parâmetros geralmente vão via URL/Query no Spring (@RequestParam)
     const params = new HttpParams()

@@ -36,26 +36,32 @@ export class FornecedorService {
     console.log('[TRACKING-SERVICE] FornecedorService instanciado e pronto para monitoramento.');
   }
 
-  private obterUserRole(): string {
+  private obtenerUserRole(): string {
     const role = localStorage.getItem('userRole') || 'USER'; 
     console.log(`[TRACKING-SERVICE] Verificando Contexto de Segurança. Role atual detectada: "${role}"`);
     return role;
   }
 
-  private obterEmpresaId(): string {
-    // 🔒 Recupera o contexto da empresa ativa do usuário logado
-    const empresaId = localStorage.getItem('empresaId') || '0';
+  private obtenerEmpresaId(): string {
+    const empresaId = localStorage.getItem('empresaId');
+    
+    if (!empresaId || empresaId === '0') {
+      console.warn('[TRACKING-SERVICE] [WARN] Tenant inválido ("0" ou nulo) detectado. Aplicando fallback seguro para Empresa ID: "1".');
+      return '1';
+    }
+    
     console.log(`[TRACKING-SERVICE] Contexto Multi-Tenant. Empresa-Id detectado: "${empresaId}"`);
     return empresaId;
   }
 
   private criarHeadersSeguranca(): HttpHeaders {
-    const role = this.obterUserRole();
-    const empresaId = this.obterEmpresaId();
+    const role = this.obtenerUserRole();
+    const empresaId = this.obtenerEmpresaId();
     console.log('[TRACKING-SERVICE] Injetando metadados de auditoria e escopo Multi-Tenant nos cabeçalhos HTTP.');
+    
     return new HttpHeaders({ 
       'User-Role': role,
-      'Empresa-Id': empresaId 
+      'X-Empresa-Id': empresaId
     });
   }
 

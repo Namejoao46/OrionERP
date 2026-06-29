@@ -1,24 +1,37 @@
 package backend.model.erp;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import backend.model.gestao.Empresa;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity
 @Table(name = "FORNECEDORES")
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Fornecedor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 🔒 VÍNCULO MULTI-TENANT: Cada fornecedor agora pertence estritamente a uma empresa
+    // 🔒 VÍNCULO MULTI-TENANT
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "nomeFantasia", "cnpj", "plano", "capitalMesAtual", "capitalMesAnterior", "logo"})
     private Empresa empresa;
 
-    @Column(nullable = false) // Removido o 'unique=true' global pois o mesmo CNPJ pode existir em empresas diferentes
+    @Column(nullable = false)
     private String cnpj;
     
     private String razaoSocial;

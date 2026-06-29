@@ -177,7 +177,35 @@ export class CadastroFornecedorComponent {
       this.cdr.markForCheck();
     }, 0);
 
-    this.service.salvar(this.fornecedor).subscribe({
+    // 🛡️ SANEAMENTO DO PAYLOAD: Tratamento seguro para evitar Erro 400 no Jackson
+    // Criamos uma cópia do objeto usando 'any' temporariamente para poder limpar e anular propriedades numéricas vazias sem quebrar o compilador do TS
+    const payloadFormatado: any = { ...this.fornecedor };
+
+    // Tratamento do CRT
+    if (payloadFormatado.crt === '' || payloadFormatado.crt === undefined || payloadFormatado.crt === null) {
+      payloadFormatado.crt = null;
+    } else {
+      payloadFormatado.crt = Number(payloadFormatado.crt);
+    }
+
+    // Tratamento do Lead Time
+    if (payloadFormatado.leadTime === '' || payloadFormatado.leadTime === undefined || payloadFormatado.leadTime === null) {
+      payloadFormatado.leadTime = null;
+    } else {
+      payloadFormatado.leadTime = Number(payloadFormatado.leadTime);
+    }
+
+    // Tratamento do Limite de Crédito
+    if (payloadFormatado.limiteCredito === '' || payloadFormatado.limiteCredito === undefined || payloadFormatado.limiteCredito === null) {
+      payloadFormatado.limiteCredito = null;
+    } else {
+      payloadFormatado.limiteCredito = Number(payloadFormatado.limiteCredito);
+    }
+
+    console.log('[TRACKING-FRONT] Enviando payload saneado para o backend:', payloadFormatado);
+
+    // Enviamos o payloadFormatado (como any) para o service
+    this.service.salvar(payloadFormatado).subscribe({
       next: (fornecedorSalvo) => {
         console.log('[TRACKING-FRONT] Fornecedor persistido. ID obtido:', fornecedorSalvo.id);
         
@@ -194,9 +222,10 @@ export class CadastroFornecedorComponent {
           this.cdr.detectChanges();
         }, 0);
 
-        // TRATAMENTO ADICIONADO: Avalia erro de banco ou CNPJ já existente ao salvar manualmente
         if (err.status === 409) {
           alert('Erro de Consistência: Já existe um fornecedor cadastrado com este CNPJ.');
+        } else if (err.status === 400) {
+          alert('Erro 400 (Bad Request): O servidor rejeitou os dados. Verifique o console do Spring Boot para ver detalhes do mapeamento.');
         } else {
           alert(`Erro ao salvar fornecedor no servidor [Status ${err.status}].`);
         }

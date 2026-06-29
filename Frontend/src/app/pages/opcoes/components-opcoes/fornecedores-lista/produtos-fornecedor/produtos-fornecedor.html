@@ -20,7 +20,7 @@
     <p>Buscando produtos no banco...</p>
   </div>
 
-  <div class="empty-state" *ngIf="!isLoading && produtos.length === 0">
+  <div class="empty-state" *ngIf="!isLoading && (!produtos || produtos.length === 0)">
     <p>Nenhum produto cadastrado para este fornecedor.</p>
   </div>
 
@@ -40,7 +40,7 @@
       <div class="produto-info">
         <h4 class="produto-nome" [title]="p.descricao">{{ p.descricao }}</h4>
         <div class="produto-footer">
-          <span class="produto-preco">R$ {{ p.precoVenda ? p.precoVenda.toFixed(2) : '0.00' }}</span>
+          <span class="produto-preco">R$ {{ p.precoVenda ? (+p.precoVenda).toFixed(2) : '0.00' }}</span>
           <span class="status-tag" [ngClass]="p.status?.toLowerCase()">{{ p.status }}</span>
         </div>
       </div>

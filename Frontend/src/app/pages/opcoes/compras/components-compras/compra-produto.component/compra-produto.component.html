@@ -1,19 +1,53 @@
 <div class="gasto-form-card">
   <div class="form-header">
     <h2>Novo Pedido de Compra de Produto</h2>
-    <p>Insira uma nova aquisição de mercadoria diretamente via parâmetros de fornecedor</p>
+    <p>Selecione um parceiro comercial para carregar seu catálogo correspondente</p>
   </div>
 
   <form (ngSubmit)="salvarCompra()">
+    
     <div class="form-group">
-      <label for="produto">Produto</label>
+      <label for="fornecedor">Fornecedor</label>
       <div class="input-wrapper">
-        <span class="input-icon">📦</span>
-        <select id="produto" name="produtoId" [(ngModel)]="compra.produtoId" required>
-          <option [value]="null" disabled selected>Selecione o produto...</option>
-          <option *ngFor="let prod of produtos" [value]="prod.id">{{ prod.descricao }}</option>
+        <span class="input-icon">🏢</span>
+        <select 
+          id="fornecedor" 
+          name="fornecedorId" 
+          [(ngModel)]="fornecedorSelecionadoId" 
+          (change)="aoAlterarFornecedor()" 
+          required
+        >
+          <option [value]="null" disabled selected>Escolha o fornecedor fornecedor...</option>
+          <option *ngFor="let forn of fornecedores" [value]="forn.id">
+            {{ forn.razaoSocial }} {{ forn.nomeFantasia ? '- ' + forn.nomeFantasia : '' }}
+          </option>
         </select>
       </div>
+    </div>
+
+    <div class="form-group">
+      <label for="produto">Produto do Catálogo</label>
+      <div class="input-wrapper" [style.opacity]="!fornecedorSelecionadoId ? '0.6' : '1'">
+        <span class="input-icon">📦</span>
+        <select 
+          id="produto" 
+          name="produtoId" 
+          [(ngModel)]="compra.produtoId" 
+          (change)="aoAlterarProduto()"
+          [disabled]="!fornecedorSelecionadoId"
+          required
+        >
+          <option [value]="null" disabled selected>
+            {{ !fornecedorSelecionadoId ? 'Aguardando seleção de fornecedor...' : 'Selecione o produto...' }}
+          </option>
+          <option *ngFor="let prod of produtos" [value]="prod.id">
+            {{ prod.descricao }} (Estoque atual: {{ prod.quantidadeEstoque ?? 0 }})
+          </option>
+        </select>
+      </div>
+      <small style="color: #6b7c96; margin-top: 4px; font-size: 0.7rem;" *ngIf="fornecedorSelecionadoId && produtos.length === 0">
+        ⚠️ Nenhum produto cadastrado para este fornecedor.
+      </small>
     </div>
 
     <div class="form-row">
@@ -27,6 +61,7 @@
             name="quantidadeComprada" 
             [(ngModel)]="compra.quantidadeComprada" 
             placeholder="Ex: 10" 
+            min="1"
             required 
           />
         </div>
@@ -55,7 +90,7 @@
 
     <div class="form-actions">
       <button type="button" class="btn-cancel" (click)="limparFormulario()">Limpar</button>
-      <button type="submit" class="btn-submit">Registrar Compra ▲</button>
+      <button type="submit" class="btn-submit" [disabled]="!compra.produtoId">Registrar Compra ▲</button>
     </div>
   </form>
 </div>

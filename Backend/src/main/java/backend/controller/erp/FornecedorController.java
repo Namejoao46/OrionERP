@@ -30,7 +30,7 @@ public class FornecedorController {
     private final NotaRecebimentoRepository notaRecebimentoRepository;
 
     @GetMapping
-    public List<Fornecedor> listar(@RequestHeader(value = "Empresa-Id") Long empresaId) {
+    public List<Fornecedor> listar(@RequestHeader(value = "X-Empresa-Id") Long empresaId) {
         System.out.println("[LOG FORNECEDOR] Listando fornecedores da Empresa ID: " + empresaId);
         return repository.findByEmpresaId(empresaId);
     }
@@ -40,7 +40,7 @@ public class FornecedorController {
     @Transactional
     public ResponseEntity<Fornecedor> importarXml(
             @RequestParam("xml") MultipartFile file,
-            @RequestHeader(value = "Empresa-Id") Long empresaId) {
+            @RequestHeader(value = "X-Empresa-Id") Long empresaId) {
         
         if (file == null || file.isEmpty()) return ResponseEntity.badRequest().build();
 
@@ -71,7 +71,6 @@ public class FornecedorController {
                         return ResponseEntity.ok(repository.save(existente));
                     })
                     .orElseGet(() -> {
-                        // 🛠️ CORREÇÃO: Vincula a empresa E salva o novo registro no banco de dados
                         fornecedor.setEmpresa(empresaLogada);
                         Fornecedor novoFornecedor = repository.save(fornecedor);
                         return ResponseEntity.ok(novoFornecedor);
@@ -85,29 +84,69 @@ public class FornecedorController {
 
     @PostMapping("/salvar")
     @Transactional
+    @SuppressWarnings("CallToPrintStackTrace")
     public ResponseEntity<?> salvarComSeguranca(
             @RequestBody Fornecedor fornecedor,
             @RequestHeader(value = "User-Role", defaultValue = "USER") String userRole,
-            @RequestHeader(value = "Empresa-Id") Long empresaId) {
+            @RequestHeader(value = "X-Empresa-Id", required = false) Long empresaId) {
         
         if (fornecedor == null) return ResponseEntity.badRequest().body("Corpo da requisição vazio.");
 
+        // Fallback preventivo para ambiente de desenvolvimento local
+        if (empresaId == null || empresaId <= 0) {
+            System.out.println("[WARN] X-Empresa-Id ausente ou inválido. Utilizando id padronizado: 1");
+            empresaId = 1L; 
+        }
+
+        // 🛡️ Limpa payload clonado/aninhado do front para evitar conflito de persistência
+        fornecedor.setEmpresa(null);
+
         if (!"MASTER".equalsIgnoreCase(userRole) && !"ADMIN".equalsIgnoreCase(userRole)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permissão negada.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permissão negada. Nível atual: " + userRole);
         }
 
         try {
-            Empresa empresaLogada = empresaRepository.findById(empresaId)
-                    .orElseThrow(() -> new RuntimeException("Empresa não localizada."));
+            final Long finalEmpresaId = empresaId; 
+            Empresa empresaLogada = empresaRepository.findById(finalEmpresaId)
+                    .orElseGet(() -> {
+                        System.out.println("[⚠️ CRITICAL] ID de Empresa " + finalEmpresaId + " solicitado, mas não existe no BD. Criando tenant padrão...");
+                        Empresa novaEmpresa = new Empresa();
+                        novaEmpresa.setId(finalEmpresaId);
+                        novaEmpresa.setCnpj("00000000000000");
+                        novaEmpresa.setNomeFantasia("Tenant Provisório Local");
+                        novaEmpresa.setPlano("DEV");
+                        return empresaRepository.save(novaEmpresa);
+                    });
 
-            Fornecedor salvo = repository.findByCnpjAndEmpresaId(fornecedor.getCnpj(), empresaId)
+            Fornecedor salvo = repository.findByCnpjAndEmpresaId(fornecedor.getCnpj(), finalEmpresaId)
                     .map(existente -> {
-                        fornecedor.setId(existente.getId());
-                        fornecedor.setEmpresa(empresaLogada);
-                        if (fornecedor.getFoto() == null || fornecedor.getFoto().isBlank()) {
-                            fornecedor.setFoto(existente.getFoto());
+                        existente.setRazaoSocial(fornecedor.getRazaoSocial());
+                        existente.setNomeFantasia(fornecedor.getNomeFantasia());
+                        existente.setInscricaoEstadual(fornecedor.getInscricaoEstadual());
+                        existente.setInscricaoMunicipal(fornecedor.getInscricaoMunicipal());
+                        existente.setCnaePrincipal(fornecedor.getCnaePrincipal());
+                        existente.setCrt(fornecedor.getCrt());
+                        existente.setLogradouro(fornecedor.getLogradouro());
+                        existente.setNumero(fornecedor.getNumero());
+                        existente.setComplemento(fornecedor.getComplemento());
+                        existente.setBairro(fornecedor.getBairro());
+                        existente.setCidade(fornecedor.getCidade());
+                        existente.setUf(fornecedor.getUf());
+                        existente.setCep(fornecedor.getCep());
+                        existente.setCMun(fornecedor.getCMun());
+                        existente.setEmail(fornecedor.getEmail());
+                        existente.setTelefone(fornecedor.getTelefone());
+                        existente.setChavePix(fornecedor.getChavePix());
+                        existente.setLeadTime(fornecedor.getLeadTime());
+                        existente.setLimiteCredito(fornecedor.getLimiteCredito());
+                        existente.setObservacoes(fornecedor.getObservacoes());
+                        
+                        if (fornecedor.getFoto() != null && !fornecedor.getFoto().isBlank()) {
+                            existente.setFoto(fornecedor.getFoto());
                         }
-                        return repository.save(fornecedor);
+                        
+                        existente.setEmpresa(empresaLogada);
+                        return repository.save(existente);
                     }).orElseGet(() -> {
                         fornecedor.setEmpresa(empresaLogada);
                         return repository.save(fornecedor);
@@ -115,7 +154,8 @@ public class FornecedorController {
                     
             return ResponseEntity.ok(salvo);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro ao registrar fornecedor: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro interno na consolidação dos dados: " + e.getMessage());
         }
     }
 
@@ -124,14 +164,13 @@ public class FornecedorController {
     public ResponseEntity<?> deletar(
             @PathVariable Long id,
             @RequestHeader(value = "User-Role", defaultValue = "USER") String userRole,
-            @RequestHeader(value = "Empresa-Id") Long empresaId) {
+            @RequestHeader(value = "X-Empresa-Id") Long empresaId) {
         
         if (!"MASTER".equalsIgnoreCase(userRole) && !"ADMIN".equalsIgnoreCase(userRole)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permissão negada.");
         }
 
         return repository.findById(id).map(fornecedor -> {
-            // 🔒 BARREIRA MULTI-TENANT: Impede que uma empresa delete dados de outra informando IDs sequenciais na URL
             if (!fornecedor.getEmpresa().getId().equals(empresaId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado a este registro.");
             }
@@ -153,7 +192,7 @@ public class FornecedorController {
             @PathVariable Long id, 
             @RequestParam("foto") MultipartFile file,
             @RequestHeader(value = "User-Role", defaultValue = "USER") String userRole,
-            @RequestHeader(value = "Empresa-Id") Long empresaId) {
+            @RequestHeader(value = "X-Empresa-Id") Long empresaId) {
         
         if (!"MASTER".equalsIgnoreCase(userRole) && !"ADMIN".equalsIgnoreCase(userRole)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permissão negada.");
@@ -162,7 +201,6 @@ public class FornecedorController {
         if (file == null || file.isEmpty()) return ResponseEntity.badRequest().body("Arquivo inválido.");
 
         return repository.findById(id).map(fornecedor -> {
-            // 🔒 BARREIRA MULTI-TENANT: Garante a posse do registro antes de aceitar a mídia
             if (!fornecedor.getEmpresa().getId().equals(empresaId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
             }

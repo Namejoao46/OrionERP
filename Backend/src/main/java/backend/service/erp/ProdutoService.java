@@ -3,6 +3,7 @@ package backend.service.erp;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import backend.repository.erp.FornecedorRepository;
 import backend.repository.erp.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProdutoService {
@@ -22,109 +24,109 @@ public class ProdutoService {
     private final FornecedorRepository fornecedorRepository;
 
     @Transactional(readOnly = true)
-    public List<Produto> listarTodos() {
-        System.out.println("[LOG PRODUTO-SERVICE] Listando todos os produtos.");
-        return repository.findAll();
+    public List<Produto> listarTodos(Long empresaId) {
+        long startTime = System.nanoTime();
+        log.info("[TRACKING-PRODUTO] [GET] Listando catálogo geral para Empresa ID: {}", empresaId);
+        
+        List<Produto> produtos = repository.findByFornecedor_Empresa_Id(empresaId);
+        double elapsedMs = (System.nanoTime() - startTime) / 1_000_000.0;
+        log.info("[TRACKING-PRODUTO] [SUCCESS] Itens retornados: {} | Tempo: {}ms", produtos.size(), String.format("%.2f", elapsedMs));
+        return produtos;
     }
 
     @Transactional(readOnly = true)
-    public List<Produto> listarAtivos() {
-        System.out.println("[LOG PRODUTO-SERVICE] Listando produtos com status ATIVO.");
-        return repository.findByStatus("ATIVO");
+    public List<Produto> listarAtivos(Long empresaId) {
+        log.info("[TRACKING-PRODUTO] Filtrando produtos ATIVOS. Empresa ID: {}", empresaId);
+        return repository.findByStatusAndFornecedor_Empresa_Id("ATIVO", empresaId);
     }
 
     @Transactional(readOnly = true)
-    public List<Produto> buscarPorDescricao(String termo) {
-        System.out.println("[LOG PRODUTO-SERVICE] Buscando por descrição. Termo: " + termo);
-        return repository.buscarPorDescricao(termo);
+    public List<Produto> buscarPorDescricao(String termo, Long empresaId) {
+        log.info("[TRACKING-PRODUTO] Pesquisa de catálogo por string: '{}' | Empresa: {}", termo, empresaId);
+        return repository.buscarPorDescricaoEMultiTenant(termo, empresaId);
     }
 
     @Transactional(readOnly = true)
-    public Produto buscarPorId(Long id) {
-        System.out.println("[LOG PRODUTO-SERVICE] Buscando produto por ID: " + id);
+    public Produto buscarPorId(Long id, Long empresaId) {
+        log.info("[TRACKING-PRODUTO] Buscando registro único por ID: {} | Empresa Contexto: {}", id, empresaId);
         if (id == null) {
-            throw new IllegalArgumentException("O ID fornecido não pode ser nulo.");
+            throw new IllegalArgumentException("O ID do produto fornecido não pode ser nulo.");
         }
+        
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
+                .filter(p -> p.getFornecedor() != null && 
+                             p.getFornecedor().getEmpresa() != null && 
+                             p.getFornecedor().getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new RuntimeException("Produto não localizado ou você não possui permissão de visualização para o ID: " + id));
     }
 
     @Transactional(readOnly = true)
-    public List<Produto> listarPorFornecedor(Long fornecedorId) {
-        System.out.println("[LOG PRODUTO-SERVICE] Buscando produtos do fornecedor ID: " + fornecedorId);
+    public List<Produto> listarPorFornecedor(Long fornecedorId, Long empresaId) {
+        log.info("[TRACKING-PRODUTO] Listando produtos associados ao Fornecedor ID: {} | Empresa: {}", fornecedorId, empresaId);
         if (fornecedorId == null) {
             throw new IllegalArgumentException("O ID do fornecedor não pode ser nulo.");
         }
-        return repository.findByFornecedorId(fornecedorId);
+        return repository.findByFornecedorIdAndEmpresaId(fornecedorId, empresaId);
     }
 
     @Transactional
-    public Produto cadastrar(ProdutoRequest req) {
-        System.out.println("\n--- [LOG PRODUTO-SERVICE] Iniciando Cadastro de Produto ---");
-        if (req == null) {
-            throw new IllegalArgumentException("A requisição não pode ser nula.");
-        }
+    public Produto cadastrar(ProdutoRequest req, Long empresaId) {
+        long startTime = System.nanoTime();
+        log.info("[TRACKING-PRODUTO] [CREATE] Tentando inserir novo produto na base de dados para Empresa: {}", empresaId);
         
-        if (req.descricao() == null || req.descricao().isBlank()) {
-            throw new IllegalArgumentException("A descrição do produto é obrigatória.");
-        }
-        if (req.ncm() == null || req.ncm().isBlank()) {
-            throw new IllegalArgumentException("O NCM do produto é obrigatório.");
-        }
+        if (req == null) throw new IllegalArgumentException("A requisição não pode ser nula.");
+        if (req.descricao() == null || req.descricao().isBlank()) throw new IllegalArgumentException("A descrição do produto é obrigatória.");
+        if (req.ncm() == null || req.ncm().isBlank()) throw new IllegalArgumentException("O NCM do produto é obrigatório.");
 
         if (req.codigoBarras() != null && !req.codigoBarras().isBlank()) {
-            repository.findByCodigoBarras(req.codigoBarras()).ifPresent(existente -> {
-                throw new IllegalArgumentException(
-                    "Este código de barras já está cadastrado no produto: " + existente.getDescricao()
-                );
+            repository.findByCodigoBarrasAndFornecedor_Empresa_Id(req.codigoBarras().trim(), empresaId).ifPresent(existente -> {
+                throw new IllegalArgumentException("Este código de barras já está cadastrado nesta empresa sob o produto: " + existente.getDescricao());
             });
         }
 
-        Produto produto = mapearRequest(new Produto(), req);
+        Produto produto = new Produto();
+        mapearRequest(produto, req, empresaId);
         
-        // Se não digitou preço de venda direto, calcula pela margem
         if (req.precoVenda() == null || req.precoVenda().compareTo(BigDecimal.ZERO) == 0) {
             produto.setPrecoVenda(calcularPrecoVenda(produto));
         }
         
-        return repository.save(produto);
+        Produto salvo = repository.save(produto);
+        double elapsedMs = (System.nanoTime() - startTime) / 1_000_000.0;
+        log.info("[TRACKING-PRODUTO] [SUCCESS] Produto cadastrado sob ID: {} | Tempo: {}ms", salvo.getId(), String.format("%.2f", elapsedMs));
+        return salvo;
     }
 
     @Transactional
-    public Produto editar(Long id, ProdutoRequest req) {
-        System.out.println("\n--- [LOG PRODUTO-SERVICE] Iniciando Edição do Produto ID: " + id + " ---");
-        if (req == null) {
-            throw new IllegalArgumentException("A requisição não pode ser nula.");
-        }
+    public Produto editar(Long id, ProdutoRequest req, Long empresaId) {
+        log.info("[TRACKING-PRODUTO] [UPDATE] Editando informações do Produto ID: {}", id);
+        if (req == null) throw new IllegalArgumentException("A requisição não pode ser nula.");
         
-        Produto produto = buscarPorId(id);
+        Produto produto = buscarPorId(id, empresaId);
 
         if (req.codigoBarras() != null && !req.codigoBarras().isBlank()) {
-            repository.findByCodigoBarras(req.codigoBarras()).ifPresent(existente -> {
+            repository.findByCodigoBarrasAndFornecedor_Empresa_Id(req.codigoBarras().trim(), empresaId).ifPresent(existente -> {
                 if (!existente.getId().equals(id)) {
-                    throw new IllegalArgumentException(
-                        "Este código de barras já está cadastrado no produto: " + existente.getDescricao()
-                    );
+                    throw new IllegalArgumentException("Este código de barras já está em uso por outro produto: " + existente.getDescricao());
                 }
             });
         }
 
-        mapearRequest(produto, req);
+        mapearRequest(produto, req, empresaId);
         
-        // Se a margem mudou ou o preço digitado veio zerado, recalcula. Caso contrário respeita o input da tela
         if (req.precoVenda() == null || req.precoVenda().compareTo(BigDecimal.ZERO) == 0) {
             produto.setPrecoVenda(calcularPrecoVenda(produto));
         } else {
             produto.setPrecoVenda(req.precoVenda());
         }
         
-        System.out.println("[LOG PRODUTO-SERVICE] Persistindo alterações da edição no banco...");
         return repository.save(produto);
     }
 
     @Transactional
-    public Produto duplicar(Long id) {
-        Produto original = buscarPorId(id);
+    public Produto duplicar(Long id, Long empresaId) {
+        log.info("[TRACKING-PRODUTO] Clonando estrutura cadastral do Produto ID: {}", id);
+        Produto original = buscarPorId(id, empresaId);
         Produto copia = new Produto();
 
         copia.setFornecedor(original.getFornecedor());
@@ -150,15 +152,31 @@ public class ProdutoService {
     }
 
     @Transactional
-    public Produto alterarStatus(Long id, String novoStatus) {
-        Produto produto = buscarPorId(id);
+    public Produto alterarStatus(Long id, String novoStatus, Long empresaId) {
+        Produto produto = buscarPorId(id, empresaId);
         produto.setStatus(novoStatus);
         return repository.save(produto);
     }
 
     @Transactional
     public void atualizarCustoMedioEEstoque(Long produtoId, BigDecimal quantidadeEntrada, BigDecimal custoRealUnitario) {
-        Produto produto = buscarPorId(produtoId);
+        Produto produto = repository.findById(produtoId)
+                .orElseThrow(() -> new RuntimeException("Produto não localizado para mutação de estoque: " + produtoId));
+        
+        Long empresaId = (produto.getFornecedor() != null && produto.getFornecedor().getEmpresa() != null) 
+                ? produto.getFornecedor().getEmpresa().getId() 
+                : null;
+
+        if (empresaId == null) {
+            throw new IllegalStateException("Falha crítica de segurança: Não foi possível determinar o Tenant para o produto ID: " + produtoId);
+        }
+
+        this.atualizarCustoMedioEEstoque(produtoId, quantidadeEntrada, custoRealUnitario, empresaId);
+    }
+
+    @Transactional
+    public void atualizarCustoMedioEEstoque(Long produtoId, BigDecimal quantidadeEntrada, BigDecimal custoRealUnitario, Long empresaId) {
+        Produto produto = buscarPorId(produtoId, empresaId);
 
         BigDecimal estoqueAtual = produto.getEstoqueAtual() != null ? produto.getEstoqueAtual() : BigDecimal.ZERO;
         BigDecimal custoAtual   = produto.getCustoMedio()   != null ? produto.getCustoMedio()   : custoRealUnitario;
@@ -180,14 +198,14 @@ public class ProdutoService {
     }
 
     @SuppressWarnings("UnnecessaryTemporaryOnConversionFromString")
-    private Produto mapearRequest(Produto produto, ProdutoRequest req) {
-        System.out.println("[LOG PRODUTO-SERVICE] Vinculando e mapeando ProdutoRequest para a Entidade...");
+    private void mapearRequest(Produto produto, ProdutoRequest req, Long empresaId) {
         if (req.fornecedorId() == null) {
             throw new IllegalArgumentException("Todo produto deve estar obrigatoriamente vinculado a um fornecedor.");
         }
         
         Fornecedor fornecedor = fornecedorRepository.findById(req.fornecedorId())
-                .orElseThrow(() -> new IllegalArgumentException("Fornecedor não encontrado com o ID informado."));
+                .filter(f -> f.getEmpresa() != null && f.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new IllegalArgumentException("Fornecedor associado inválido ou fora do escopo da sua empresa ativa."));
                 
         produto.setFornecedor(fornecedor);
         
@@ -201,10 +219,7 @@ public class ProdutoService {
         produto.setUnidadeMedida(req.unidadeMedida());
         produto.setCategoria(req.categoria());
         produto.setStatus(req.status() != null ? req.status() : "ATIVO");
-        
-        // 🌟 CORREÇÃO CRÍTICA: Passando o estoque enviado na requisição para a entidade JPA persistir!
         produto.setEstoqueAtual(req.estoqueAtual() != null ? req.estoqueAtual() : BigDecimal.ZERO);
-        
         produto.setEstoqueMinimo(req.estoqueMinimo());
         produto.setEstoqueMaximo(req.estoqueMaximo());
         produto.setLocalizacaoFisica(req.localizacaoFisica());
@@ -214,13 +229,9 @@ public class ProdutoService {
         produto.setNcm(req.ncm());
         produto.setCest(req.cest());
         
-        if (req.origemProduto() != null && !req.origemProduto().isBlank()) {
-            try {
-                produto.setOrigemProduto(Integer.parseInt(req.origemProduto().trim()));
-            } catch (NumberFormatException e) {
-                produto.setOrigemProduto(0);
-            }
-        } else {
+        try {
+            produto.setOrigemProduto(req.origemProduto() != null ? Integer.parseInt(req.origemProduto().trim()) : 0);
+        } catch (NumberFormatException e) {
             produto.setOrigemProduto(0);
         }
 
@@ -228,7 +239,6 @@ public class ProdutoService {
         produto.setAliquotaIcms(req.aliquotaIcms());
         produto.setAliquotaPis(req.aliquotaPis());
         produto.setAliquotaCofins(req.aliquotaCofins());
-        return produto;
     }
 
     private BigDecimal calcularPrecoVenda(Produto produto) {
@@ -236,44 +246,30 @@ public class ProdutoService {
         if (base == null || produto.getMargemLucro() == null) {
             return produto.getPrecoVenda() != null ? produto.getPrecoVenda() : BigDecimal.ZERO;
         }
-
-        BigDecimal factor = BigDecimal.ONE.add(
-            produto.getMargemLucro().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP)
-        );
+        BigDecimal factor = BigDecimal.ONE.add(produto.getMargemLucro().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP));
         return base.multiply(factor).setScale(2, RoundingMode.HALF_UP);
     }
     
     @Transactional
-    public void deletar(Long id) {
-        System.out.println("[LOG PRODUTO-SERVICE] Solicitando exclusão do produto ID: " + id);
-        Produto produto = buscarPorId(id);
+    public void deletar(Long id, Long empresaId) {
+        log.warn("[TRACKING-PRODUTO] [DELETE] Comando de destruição invocado para ID: {}", id);
+        Produto produto = buscarPorId(id, empresaId);
 
-        // Regra de segurança: impede a deleção se houver estoque físico
         if (produto.getEstoqueAtual() != null && produto.getEstoqueAtual().compareTo(BigDecimal.ZERO) > 0) {
-            throw new IllegalStateException("Não é permitido deletar um produto com saldo em estoque positivo (" 
-                + produto.getEstoqueAtual() + " un). Zere o estoque antes de excluir.");
+            throw new IllegalStateException("Impossível deletar o produto. Saldo físico em estoque positivo (" + produto.getEstoqueAtual() + " un).");
         }
 
         repository.delete(produto);
-        System.out.println("[LOG PRODUTO-SERVICE] Produto ID " + id + " deletado permanentemente.");
     }
 
     @Transactional(readOnly = true)
-    public List<Produto> listarEstoqueBaixo() {
-        return repository.findAll().stream()
-                .filter(p -> p.getEstoqueMinimo() != null && p.getEstoqueAtual().compareTo(p.getEstoqueMinimo()) <= 0)
-                .toList();
+    public List<Produto> listarEstoqueBaixo(Long empresaId) {
+        return repository.buscarEstoqueBaixoMultiTenant(empresaId);
     }
 
     @Transactional(readOnly = true)
-    public BigDecimal calcularTotalPatrimonialEstoque() {
-        return repository.findAll().stream()
-                .map(p -> {
-                    BigDecimal custo = p.getCustoMedio() != null ? p.getCustoMedio() : p.getPrecoCusto();
-                    if (custo == null || p.getEstoqueAtual() == null) return BigDecimal.ZERO;
-                    return p.getEstoqueAtual().multiply(custo);
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(2, RoundingMode.HALF_UP);
+    public BigDecimal calcularTotalPatrimonialEstoque(Long empresaId) {
+        BigDecimal resultado = repository.calcularPatrimonioTotalBanco(empresaId);
+        return resultado != null ? resultado.setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO.setScale(2);
     }
 }

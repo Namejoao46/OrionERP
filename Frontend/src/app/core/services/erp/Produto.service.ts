@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -10,11 +10,34 @@ export class ProdutoService {
     console.log('[TRACKING-SERVICE] ProdutoService instanciado e monitorado via Logs.');
   }
 
+  private obtenerUserRole(): string {
+    return localStorage.getItem('userRole') || 'USER'; 
+  }
+
+  private obtenerEmpresaId(): string {
+    const empresaId = localStorage.getItem('empresaId');
+
+    if (!empresaId || empresaId === '0' || empresaId.trim() === '') {
+      console.warn('[TRACKING-SERVICE] [WARN] Tenant inválido ("0" ou nulo) detectado. Aplicando fallback seguro para Empresa ID: "1".');
+      return '1';
+    }
+    
+    return empresaId;
+  }
+
+  private criarHeadersSeguranca(): HttpHeaders {
+    return new HttpHeaders({ 
+      'User-Role': this.obtenerUserRole(),
+      'X-Empresa-Id': this.obtenerEmpresaId()
+    });
+  }
+
   listarTodos(): Observable<any[]> {
     const startTime = performance.now();
-    console.log(`[TRACKING-SERVICE] [GET] Listando catálogo geral de produtos.`);
+    const headers = this.criarHeadersSeguranca();
+    console.log(`[TRACKING-SERVICE] [GET] Listando catálogo geral de produtos isolado por empresa.`);
 
-    return this.http.get<any[]>(this.apiUrl).pipe(
+    return this.http.get<any[]>(this.apiUrl, { headers }).pipe(
       tap((res) => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Catálogo carregado. Total: ${res.length} itens | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
@@ -28,9 +51,10 @@ export class ProdutoService {
 
   listarAtivos(): Observable<any[]> {
     const startTime = performance.now();
+    const headers = this.criarHeadersSeguranca();
     console.log(`[TRACKING-SERVICE] [GET] Filtrando apenas produtos ativos para operação comercial.`);
 
-    return this.http.get<any[]>(`${this.apiUrl}/ativos`).pipe(
+    return this.http.get<any[]>(`${this.apiUrl}/ativos`, { headers }).pipe(
       tap((res) => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Lista de produtos ativos pronta. Quantidade: ${res.length} | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
@@ -44,11 +68,12 @@ export class ProdutoService {
 
   buscar(termo: string): Observable<any[]> {
     const startTime = performance.now();
+    const headers = this.criarHeadersSeguranca();
     console.log(`[TRACKING-SERVICE] [GET] Executando query de busca incremental por string. Termo pesquisado: "${termo}"`);
 
     const params = new HttpParams().set('termo', termo);
 
-    return this.http.get<any[]>(`${this.apiUrl}/buscar`, { params }).pipe(
+    return this.http.get<any[]>(`${this.apiUrl}/buscar`, { headers, params }).pipe(
       tap((res) => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Busca refinada concluída. Correspondências encontradas para "${termo}": ${res.length} | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
@@ -62,9 +87,10 @@ export class ProdutoService {
 
   cadastrar(produto: any): Observable<any> {
     const startTime = performance.now();
+    const headers = this.criarHeadersSeguranca();
     console.log(`[TRACKING-SERVICE] [POST] Cadastrando novo SKU no sistema. Rota base: ${this.apiUrl}`, { payload: produto });
 
-    return this.http.post(this.apiUrl, produto).pipe(
+    return this.http.post(this.apiUrl, produto, { headers }).pipe(
       tap((res: any) => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Produto cadastrado na base com sucesso. ID Gerado: ${res?.id} | SKU: ${res?.descricao} | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
@@ -78,9 +104,10 @@ export class ProdutoService {
 
   editar(id: number, produto: any): Observable<any> {
     const startTime = performance.now();
+    const headers = this.criarHeadersSeguranca();
     console.log(`[TRACKING-SERVICE] [PUT] Alterando dados cadastrais estruturais do produto ID: ${id}`, { payloadModificacao: produto });
 
-    return this.http.put(`${this.apiUrl}/${id}`, produto).pipe(
+    return this.http.put(`${this.apiUrl}/${id}`, produto, { headers }).pipe(
       tap((res: any) => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Atualização do produto concluída para o ID ${id}. Tempo: ${(endTime - startTime).toFixed(2)}ms`);
@@ -94,11 +121,12 @@ export class ProdutoService {
 
   alterarStatus(id: number, status: string): Observable<any> {
     const startTime = performance.now();
+    const headers = this.criarHeadersSeguranca();
     console.log(`[TRACKING-SERVICE] [PATCH] Alteração de estado de ativação de SKU. ID: ${id} -> Novo Status Desejado: "${status}"`);
 
     const params = new HttpParams().set('status', status);
 
-    return this.http.patch(`${this.apiUrl}/${id}/status`, {}, { params }).pipe(
+    return this.http.patch(`${this.apiUrl}/${id}/status`, {}, { headers, params }).pipe(
       tap((res: any) => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Transição de estado de ativação consolidada para o ID ${id}. Estado atual: ${res?.status || status} | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
@@ -112,9 +140,10 @@ export class ProdutoService {
 
   listarPorFornecedor(fornecedorId: number): Observable<any[]> {
     const startTime = performance.now();
+    const headers = this.criarHeadersSeguranca();
     console.log(`[TRACKING-SERVICE] [GET] Buscando produtos vinculados ao fornecedor ID: ${fornecedorId}`);
 
-    return this.http.get<any[]>(`${this.apiUrl}/por-fornecedor/${fornecedorId}`).pipe(
+    return this.http.get<any[]>(`${this.apiUrl}/por-fornecedor/${fornecedorId}`, { headers }).pipe(
       tap((res) => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Produtos do fornecedor ${fornecedorId} carregados. Total: ${res.length} itens | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
@@ -128,9 +157,10 @@ export class ProdutoService {
 
   deletar(id: number): Observable<void> {
     const startTime = performance.now();
+    const headers = this.criarHeadersSeguranca();
     console.log(`[TRACKING-SERVICE] [DELETE] Solicitando exclusão do produto ID: ${id}`);
 
-    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers }).pipe(
       tap(() => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Produto ID ${id} excluído com sucesso do banco | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
@@ -144,9 +174,10 @@ export class ProdutoService {
 
   listarEstoqueBaixo(): Observable<any[]> {
     const startTime = performance.now();
+    const headers = this.criarHeadersSeguranca();
     console.log(`[TRACKING-SERVICE] [GET] Buscando itens com estoque em nível crítico.`);
 
-    return this.http.get<any[]>(`${this.apiUrl}/estoque-baixo`).pipe(
+    return this.http.get<any[]>(`${this.apiUrl}/estoque-baixo`, { headers }).pipe(
       tap((res) => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Alerta de reposição gerado. Total crítico: ${res.length} SKUs | Tempo: ${(endTime - startTime).toFixed(2)}ms`);
@@ -160,9 +191,10 @@ export class ProdutoService {
 
   obterValorTotalEstoque(): Observable<number> {
     const startTime = performance.now();
+    const headers = this.criarHeadersSeguranca();
     console.log(`[TRACKING-SERVICE] [GET] Requisitando avaliação patrimonial de inventário.`);
 
-    return this.http.get<number>(`${this.apiUrl}/patrimonio-total`).pipe(
+    return this.http.get<number>(`${this.apiUrl}/patrimonio-total`, { headers }).pipe(
       tap((valor) => {
         const endTime = performance.now();
         console.log(`[TRACKING-SERVICE] [SUCCESS] Avaliação financeira de pátio: BRL ${valor} | Tempo: ${(endTime - startTime).toFixed(2)}ms`);

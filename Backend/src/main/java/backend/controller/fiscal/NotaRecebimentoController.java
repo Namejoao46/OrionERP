@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,12 +30,25 @@ public class NotaRecebimentoController {
     private final NotaRecebimentoService service;
 
     @PostMapping("/importar-xml")
-    public ResponseEntity<?> importarXml(@RequestParam("xml") MultipartFile arquivo) {
+    public ResponseEntity<?> importarXml(
+            @RequestParam("xml") MultipartFile arquivo,
+            // 🪙 Captura o ID da Empresa de forma explícita via Header (Substitua "X-Empresa-Id" pelo nome que seu front/gateway usa)
+            @RequestHeader(value = "X-Empresa-Id", required = false) Long empresaId) {
+        
         if (arquivo.isEmpty()) {
             return ResponseEntity.badRequest().body("Arquivo XML não enviado.");
         }
+        
         try {
-            NotaImportadaResponse resposta = service.importarXml(arquivo.getInputStream());
+            NotaImportadaResponse resposta;
+            
+            // Se o cabeçalho veio preenchido, usa o fluxo Multi-Tenant direto. Se não, usa o fallback do SecurityContext
+            if (empresaId != null) {
+                resposta = service.importarXml(arquivo.getInputStream(), empresaId);
+            } else {
+                resposta = service.importarXml(arquivo.getInputStream());
+            }
+            
             return ResponseEntity.ok(resposta);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(409).body(Map.of("erro", e.getMessage()));

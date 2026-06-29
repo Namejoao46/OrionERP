@@ -2,6 +2,9 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CompraService } from '../../../../../core/services/finance/compra.service';
+import { Fornecedor, FornecedorService } from '../../../../../core/services/erp/fornecedor.service';
+import { ProdutoService } from '../../../../../core/services/erp/Produto.service';
+
 
 @Component({
   selector: 'app-compra-produto',
@@ -12,25 +15,67 @@ import { CompraService } from '../../../../../core/services/finance/compra.servi
 })
 export class CompraProdutoComponent implements OnInit {
   
+  // Guardando o fornecedorId selecionado para o fluxo
+  fornecedorSelecionadoId: number | null = null;
+
   compra = {
     produtoId: null as number | null,
     quantidadeComprada: null as number | null,
     precoCustoUnitario: null as number | null
   };
 
-  // Lista simulada de produtos (substitua pela busca do seu serviço de produtos se necessário)
-  produtos = [
-    { id: 1, descricao: 'Produto A' },
-    { id: 2, descricao: 'Produto B' },
-    { id: 3, descricao: 'Produto C' }
-  ];
+  // Listas reais carregadas da API
+  fornecedores: Fornecedor[] = [];
+  produtos: any[] = []; 
 
   constructor(
     private compraService: CompraService,
+    private fornecedorService: FornecedorService,
+    private produtoService: ProdutoService,
     private cdr: ChangeDetectorRef 
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.carregarFornecedores();
+  }
+
+  // Busca os fornecedores cadastrados na inicialização
+  carregarFornecedores(): void {
+    this.fornecedorService.listarTodos().subscribe({
+      next: (dados) => {
+        this.fornecedores = dados;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erro ao buscar fornecedores:', err)
+    });
+  }
+
+  // 🔥 Método engatado no evento (change) do seletor de Fornecedores
+  aoAlterarFornecedor(): void {
+    // Reseta o produto selecionado anteriormente caso mude de fornecedor
+    this.compra.produtoId = null;
+    this.compra.precoCustoUnitario = null;
+    this.produtos = [];
+
+    if (this.fornecedorSelecionadoId) {
+      // Carrega os produtos vinculados de forma dinâmica filtrados na API
+      this.produtoService.listarPorFornecedor(this.fornecedorSelecionadoId).subscribe({
+        next: (dados) => {
+          this.produtos = dados;
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Erro ao buscar produtos por fornecedor:', err)
+      });
+    }
+  }
+
+  // Preenche automaticamente o preço sugerido quando o usuário escolhe o produto real
+  aoAlterarProduto(): void {
+    const prod = this.produtos.find(p => p.id === Number(this.compra.produtoId));
+    if (prod) {
+      this.compra.precoCustoUnitario = prod.precoCusto; // ou o campo correspondente ao valor no seu backend
+    }
+  }
 
   salvarCompra() {
     if (!this.compra.produtoId || !this.compra.quantidadeComprada || !this.compra.precoCustoUnitario) {
@@ -52,6 +97,8 @@ export class CompraProdutoComponent implements OnInit {
   }
 
   limparFormulario() {
+    this.fornecedorSelecionadoId = null;
+    this.produtos = [];
     this.compra = { 
       produtoId: null, 
       quantidadeComprada: null, 

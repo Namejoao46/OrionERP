@@ -28,11 +28,12 @@ export class ProdutosFornecedor implements OnInit, OnChanges, OnDestroy {
   private subProdutoSalvo!: Subscription;
 
   ngOnInit(): void {
+    // Se o ID já estiver disponível no carregamento inicial, faz a busca
     if (this.fornecedorId) {
       this.carregarProdutos();
     }
 
-    // Escuta eventos de salvamento do modal para atualizar a lista do fornecedor sem F5
+    // Escuta eventos de salvamento do modal para atualizar a lista sem F5
     this.subProdutoSalvo = this.modalService.produtoSalvo$.subscribe(() => {
       console.log('[TRACKING-PRODUTOS] Novo produto detectado, atualizando lista do fornecedor.');
       this.carregarProdutos();
@@ -40,23 +41,40 @@ export class ProdutosFornecedor implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['fornecedorId'] && !changes['fornecedorId'].firstChange) {
-      console.log('[TRACKING-PRODUTOS] Alteração detectada no ID do Fornecedor. Atualizando lista de itens.');
-      this.carregarProdutos();
+    // 🚀 MELHORIA: Removido o bloqueio de 'firstChange'. Se o ID vier na inicialização por fluxo assíncrono do pai, ele roda!
+    if (changes['fornecedorId']) {
+      const idAtual = changes['fornecedorId'].currentValue;
+      console.log('[TRACKING-PRODUTOS] Alteração detectada no ID do Fornecedor pelo Input:', idAtual);
+      
+      if (idAtual) {
+        this.fornecedorId = idAtual;
+        this.carregarProdutos();
+      }
     }
   }
 
   carregarProdutos() {
+    if (!this.fornecedorId) {
+      console.warn('[TRACKING-PRODUTOS] Abortando carregamento: fornecedorId está nulo ou inválido.');
+      return;
+    }
+
     this.isLoading = true;
-    this.produtoService.listarPorFornecedor(this.fornecedorId).subscribe({
+    // 🚀 MELHORIA: Cast explícito para Number prevenindo incompatibilidades de tipo com a URL do Backend
+    const idFormatado = Number(this.fornecedorId);
+
+    this.produtoService.listarPorFornecedor(idFormatado).subscribe({
       next: (dados) => {
-        this.produtos = dados;
-        this.produtosFiltrados = dados;
+        console.log(`[TRACKING-PRODUTOS] Sucesso! Encontrados ${dados?.length || 0} itens para o fornecedor #${idFormatado}`, dados);
+        this.produtos = dados || [];
+        this.produtosFiltrados = dados || [];
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('[TRACKING-PRODUTOS] Falha ao recuperar produtos do fornecedor logado:', err);
+        this.produtos = [];
+        this.produtosFiltrados = [];
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -79,7 +97,6 @@ export class ProdutosFornecedor implements OnInit, OnChanges, OnDestroy {
     this.modalService.notificarAbrirCardProduto(produto);
   }
 
-  // 🌟 NOVO: Abre o card do formulário limpo, injetando o vínculo do fornecedor atual
   adicionarNovoProduto() {
     const novoProdutoVazio = {
       descricao: '',

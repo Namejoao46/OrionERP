@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,50 +31,52 @@ public class ProdutoController {
     private final ProdutoService service;
 
     @GetMapping
-    public List<Produto> listarTodos() {
-        System.out.println("[LOG PRODUTO] Buscando todos os produtos cadastrados.");
-        return service.listarTodos();
+    public List<Produto> listarTodos(@RequestHeader("X-Empresa-Id") Long empresaId) {
+        System.out.println("[LOG PRODUTO] Buscando todos os produtos cadastrados para Empresa ID: " + empresaId);
+        return service.listarTodos(empresaId);
     }
 
     @GetMapping("/ativos")
-    public List<Produto> listarAtivos() {
-        System.out.println("[LOG PRODUTO] Filtrando apenas produtos ativos.");
-        return service.listarAtivos();
+    public List<Produto> listarAtivos(@RequestHeader("X-Empresa-Id") Long empresaId) {
+        System.out.println("[LOG PRODUTO] Filtrando apenas produtos ativos para Empresa ID: " + empresaId);
+        return service.listarAtivos(empresaId);
     }
 
     @GetMapping("/buscar")
-    public List<Produto> buscar(@RequestParam String termo) {
-        System.out.println("[LOG PRODUTO] Pesquisa de produto por termo. Valor buscado: '" + termo + "'");
-        return service.buscarPorDescricao(termo);
+    public List<Produto> buscar(@RequestParam String termo, @RequestHeader("X-Empresa-Id") Long empresaId) {
+        System.out.println("[LOG PRODUTO] Pesquisa por termo: '" + termo + "' | Empresa: " + empresaId);
+        return service.buscarPorDescricao(termo, empresaId);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Produto> buscarPorId(@PathVariable Long id) {
-        System.out.println("[LOG PRODUTO] Localizando produto específico pelo ID: " + id);
-        return ResponseEntity.ok(service.buscarPorId(id));
+    public ResponseEntity<Produto> buscarPorId(@PathVariable Long id, @RequestHeader("X-Empresa-Id") Long empresaId) {
+        System.out.println("[LOG PRODUTO] Localizando ID: " + id + " no contexto da Empresa: " + empresaId);
+        return ResponseEntity.ok(service.buscarPorId(id, empresaId));
     }
 
     @GetMapping("/por-fornecedor/{fornecedorId}")
-    public ResponseEntity<List<Produto>> listarPorFornecedor(@PathVariable Long fornecedorId) {
-        System.out.println("[LOG PRODUTO] Requisição recebida para listar produtos do fornecedor ID: " + fornecedorId);
-        List<Produto> produtos = service.listarPorFornecedor(fornecedorId);
+    public ResponseEntity<List<Produto>> listarPorFornecedor(
+            @PathVariable Long fornecedorId, 
+            @RequestHeader("X-Empresa-Id") Long empresaId) {
+        System.out.println("[LOG PRODUTO] Listar produtos do fornecedor ID: " + fornecedorId + " | Empresa: " + empresaId);
+        List<Produto> produtos = service.listarPorFornecedor(fornecedorId, empresaId);
         return ResponseEntity.ok(produtos);
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody ProdutoRequest req) {
+    public ResponseEntity<?> cadastrar(@RequestBody ProdutoRequest req, @RequestHeader("X-Empresa-Id") Long empresaId) {
         System.out.println("=================================================");
-        System.out.println("[LOG PRODUTO] Requisição de cadastro de produto recebida.");
+        System.out.println("[LOG PRODUTO] Requisição de cadastro recebida para Empresa: " + empresaId);
         if (req != null) {
             System.out.println("[LOG PRODUTO] Descrição informada: " + req.descricao());
-            System.out.println("[LOG PRODUTO] ID do Fornecedor vinculado: " + req.fornecedorId());
+            System.out.println("[LOG PRODUTO] ID do Fornecedor: " + req.fornecedorId());
         }
         try {
-            Produto salvo = service.cadastrar(req);
-            System.out.println("[LOG PRODUTO] Produto inserido com sucesso. ID gerado: " + salvo.getId());
+            Produto salvo = service.cadastrar(req, empresaId);
+            System.out.println("[LOG PRODUTO] Produto inserido com sucesso. ID: " + salvo.getId());
             return ResponseEntity.ok(salvo);
         } catch (IllegalArgumentException e) {
-            System.out.println("[LOG PRODUTO] AVISO: Validação de negócio recusou o cadastro. Motivo: " + e.getMessage());
+            System.out.println("[LOG PRODUTO] Validação recusou o cadastro: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         } finally {
             System.out.println("=================================================");
@@ -81,15 +84,18 @@ public class ProdutoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editar(@PathVariable Long id, @RequestBody ProdutoRequest req) {
+    public ResponseEntity<?> editar(
+            @PathVariable Long id, 
+            @RequestBody ProdutoRequest req, 
+            @RequestHeader("X-Empresa-Id") Long empresaId) {
         System.out.println("=================================================");
-        System.out.println("[LOG PRODUTO] Requisição para editar o produto ID: " + id);
+        System.out.println("[LOG PRODUTO] Requisição para editar o produto ID: " + id + " | Empresa: " + empresaId);
         try {
-            Produto atualizado = service.editar(id, req);
+            Produto atualizado = service.editar(id, req, empresaId);
             System.out.println("[LOG PRODUTO] Atualização persistida com sucesso.");
             return ResponseEntity.ok(atualizado);
         } catch (IllegalArgumentException e) {
-            System.out.println("[LOG PRODUTO] ERRO: Não foi possível editar o produto. Motivo: " + e.getMessage());
+            System.out.println("[LOG PRODUTO] ERRO ao editar produto: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         } finally {
             System.out.println("=================================================");
@@ -97,15 +103,14 @@ public class ProdutoController {
     }
 
     @PostMapping("/{id}/duplicar")
-    public ResponseEntity<?> duplicar(@PathVariable Long id) {
-        System.out.println("[LOG PRODUTO] Executando comando de duplicação para o produto original ID: " + id);
+    public ResponseEntity<?> duplicar(@PathVariable Long id, @RequestHeader("X-Empresa-Id") Long empresaId) {
+        System.out.println("[LOG PRODUTO] Executando duplicação do ID: " + id + " | Empresa: " + empresaId);
         try {
-            Produto copia = service.duplicar(id);
-            System.out.println("[LOG PRODUTO] Sucesso ao duplicar! Novo ID criado: " + copia.getId());
+            Produto copia = service.duplicar(id, empresaId);
+            System.out.println("[LOG PRODUTO] Sucesso ao duplicar! Novo ID: " + copia.getId());
             return ResponseEntity.ok(copia);
         } catch (Exception e) {
-            System.out.println("[LOG PRODUTO] ERRO crítico ao tentar duplicar o produto.");
-            System.out.println("[LOG PRODUTO] Detalhes: " + e.getMessage());
+            System.out.println("[LOG PRODUTO] ERRO crítico ao clonar produto: " + e.getMessage());
             return ResponseEntity.badRequest().body("Erro ao duplicar produto: " + e.getMessage());
         }
     }
@@ -113,31 +118,31 @@ public class ProdutoController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> alterarStatus(
             @PathVariable Long id,
-            @RequestParam String status) {
-        System.out.println("[LOG PRODUTO] Mudança parcial de status solicitada. ID: " + id + " | Novo Status: " + status);
+            @RequestParam String status,
+            @RequestHeader("X-Empresa-Id") Long empresaId) {
+        System.out.println("[LOG PRODUTO] Mudança de status do ID: " + id + " para " + status + " | Empresa: " + empresaId);
         try {
-            Produto modificado = service.alterarStatus(id, status);
+            Produto modificado = service.alterarStatus(id, status, empresaId);
             System.out.println("[LOG PRODUTO] Status atualizado no banco.");
             return ResponseEntity.ok(modificado);
         } catch (Exception e) {
-            System.out.println("[LOG PRODUTO] ERRO ao modificar status do produto.");
-            System.out.println("[LOG PRODUTO] Detalhes: " + e.getMessage());
+            System.out.println("[LOG PRODUTO] ERRO ao modificar status: " + e.getMessage());
             return ResponseEntity.badRequest().body("Erro ao alterar status: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletar(@PathVariable Long id) {
+    public ResponseEntity<?> deletar(@PathVariable Long id, @RequestHeader("X-Empresa-Id") Long empresaId) {
         System.out.println("=================================================");
-        System.out.println("[LOG PRODUTO] Comando DELETE recebido para o ID: " + id);
+        System.out.println("[LOG PRODUTO] Comando DELETE recebido para o ID: " + id + " | Empresa: " + empresaId);
         try {
-            service.deletar(id);
-            return ResponseEntity.noContent().build(); // Retorna Status 204 (Sucesso, sem conteúdo)
+            service.deletar(id, empresaId);
+            return ResponseEntity.noContent().build();
         } catch (IllegalStateException e) {
-            System.out.println("[LOG PRODUTO] RECUSADO: Violência de regra de negócio: " + e.getMessage());
+            System.out.println("[LOG PRODUTO] RECUSADO por regra de negócio: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (RuntimeException e) {
-            System.out.println("[LOG PRODUTO] ERRO: Produto não encontrado para exclusão.");
+            System.out.println("[LOG PRODUTO] ERRO: Produto não encontrado.");
             return ResponseEntity.notFound().build();
         } finally {
             System.out.println("=================================================");
@@ -145,14 +150,14 @@ public class ProdutoController {
     }
 
     @GetMapping("/estoque-baixo")
-    public List<Produto> listarEstoqueBaixo() {
-        System.out.println("[LOG PRODUTO] Requisição para relatório de produtos com estoque baixo.");
-        return service.listarEstoqueBaixo();
+    public List<Produto> listarEstoqueBaixo(@RequestHeader("X-Empresa-Id") Long empresaId) {
+        System.out.println("[LOG PRODUTO] Requisição para relatório de estoque baixo da Empresa ID: " + empresaId);
+        return service.listarEstoqueBaixo(empresaId);
     }
 
     @GetMapping("/patrimonio-total")
-    public ResponseEntity<BigDecimal> obterValorTotalEstoque() {
-        System.out.println("[LOG PRODUTO] Requisitando avaliação monetária do estoque atual.");
-        return ResponseEntity.ok(service.calcularTotalPatrimonialEstoque());
+    public ResponseEntity<BigDecimal> obterValorTotalEstoque(@RequestHeader("X-Empresa-Id") Long empresaId) {
+        System.out.println("[LOG PRODUTO] Requisitando avaliação monetária do estoque para Empresa ID: " + empresaId);
+        return ResponseEntity.ok(service.calcularTotalPatrimonialEstoque(empresaId));
     }
 }

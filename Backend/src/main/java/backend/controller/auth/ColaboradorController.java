@@ -29,7 +29,8 @@ public class ColaboradorController {
 
     private final ColaboradorRepository repository;
 
-    private backend.service.gestao.GestaoService gestaoService;
+    // CORREÇÃO: Adicionado o modificador 'final' para que o @RequiredArgsConstructor injete o Bean corretamente
+    private final backend.service.gestao.GestaoService gestaoService;
 
     @GetMapping("/equipe")
     public List<Colaborador> listarEquipe(@AuthenticationPrincipal Colaborador logado) {
@@ -140,9 +141,6 @@ public class ColaboradorController {
                         .orElseThrow(() -> new RuntimeException("Usuário não encontrado no OrionERP pelo ID informado."));
             }
             
-            // ===================================================================
-            // GUARDA-COSTAS DOS DADOS CRÍTICOS: Salva o que NUNCA pode ser apagado
-            // ===================================================================
             byte[] fotoAtual = colaborador.getFoto();
             String senhaAtual = colaborador.getSenha();
             String loginAtual = colaborador.getLogin();
@@ -151,7 +149,6 @@ public class ColaboradorController {
 
             System.out.println(">>> [CATCH-ROUTE] Mesclando dados cadastrais com segurança...");
             
-            // Atualiza apenas os campos permitidos da tela de perfil
             colaborador.setNome(dadosAtualizados.getNome());
             colaborador.setSobrenome(dadosAtualizados.getSobrenome());
             colaborador.setCargo(dadosAtualizados.getCargo());
@@ -164,9 +161,6 @@ public class ColaboradorController {
                 colaborador.setDataNascimento(dadosAtualizados.getDataNascimento());
             }
 
-            // ===================================================================
-            // RESTAURAÇÃO FORÇADA: Impede o Hibernate de setar NULL nas colunas
-            // ===================================================================
             colaborador.setFoto(fotoAtual);
             colaborador.setSenha(senhaAtual);
             colaborador.setLogin(loginAtual);

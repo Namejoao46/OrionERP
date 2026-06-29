@@ -1,4 +1,6 @@
-/* Container Principal */
+/* ==========================================================================
+   1. CONTAINER PRINCIPAL (MENU LATERAL)
+   ========================================================================== */
 .conteiner {
     height: 74.5%;
     width: 15%;
@@ -12,7 +14,6 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    /* Ajustei o padding inicial para não colar no topo */
     padding-top: 80px; 
     z-index: 1000;
 }
@@ -26,7 +27,9 @@
     flex-grow: 1;
 }
 
-/* PADRÃO PARA TODOS OS ITENS */
+/* ==========================================================================
+   2. ITENS DO MENU E REGRAS DE INTERAÇÃO
+   ========================================================================== */
 .item-menu {
     width: 100%;
     display: flex;
@@ -39,25 +42,22 @@
     transition: all 0.3s ease;
     border-left: 5px solid transparent;
     box-sizing: border-box;
-    /* ADICIONADO: Margem para os itens não ficarem grudados */
     margin-bottom: 10px; 
 }
 
-/* EFEITO DE HOVER */
+/* Efeito de Hover nos itens */
 .item-menu:hover {
     background-color: rgba(255, 255, 255, 0.1);
     border-left: 5px solid #2B97FA;
-    /* Efeito sutil de brilho no hover */
     box-shadow: inset 10px 0 20px -10px rgba(43, 151, 250, 0.5);
 }
 
-/* Ajuste dos ícones para ficarem centralizados no modo colapsado */
+/* Ajuste dos ícones */
 .item-menu img {
     height: 28px;
     width: 28px;
     min-width: 28px;
     object-fit: contain;
-    /* Filtro opcional: deixa os ícones levemente azulados para combinar */
     filter: brightness(1.1); 
 }
 
@@ -70,21 +70,68 @@
     letter-spacing: 0.5px;
 }
 
-/* Botão de Toggle (Ajustado posição) */
+/* ==========================================================================
+   3. BOTÃO DE TOGGLE ANIMADO (3 TRAÇOS COMPLETOS)
+   ========================================================================== */
 .btn-toggle {
     position: absolute;
     top: 20px;
     right: 15px;
     background: rgba(43, 151, 250, 0.1);
     border: 1px solid #2B97FA;
-    color: white;
     cursor: pointer;
-    padding: 5px 10px;
+    transition: all 0.3s ease;
+    
+    /* Área controlada do botão */
+    width: 35px;
+    height: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribui as 3 linhas igualmente */
+    align-items: center;
+    padding: 6px; /* Padding interno para segurar as linhas */
     border-radius: 4px;
-    transition: 0.3s;
+    box-sizing: border-box;
 }
 
 .btn-toggle:hover {
     background: #2B97FA;
     box-shadow: 0 0 10px #2B97FA;
+}
+
+/* Base estrutural para os 3 traços idênticos */
+.btn-toggle .seta {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: white;
+    border-radius: 2px;
+    transition: all 0.3s ease-in-out;
+    transform-origin: left center; /* Pivô fixado na esquerda para o efeito perfeito */
+}
+
+/* Garante que os traços fiquem escuros no hover do botão */
+.btn-toggle:hover .seta {
+    background-color: #050a30;
+}
+
+/* ==========================================================================
+   ANIMAÇÃO DOS 3 TRAÇOS (BASEADO NA CLASSE .menuAberto)
+   ========================================================================== */
+
+/* ESTADO PADRÃO: MENU FECHADO / COLAPSADO (3 Linhas Horizontais Paralelas) */
+.btn-toggle .seta1 { transform: rotate(0deg); }
+.btn-toggle .seta2 { opacity: 1; transform: scaleX(1); }
+.btn-toggle .seta3 { transform: rotate(0deg); }
+
+/* ESTADO ATIVO: MENU ABERTO (.menuAberto) -> Forma o X */
+.btn-toggle.menuAberto .seta1 {
+    transform: rotate(45deg) translate(1px, -1px);
+}
+.btn-toggle.menuAberto .seta2 {
+    opacity: 0;
+    transform: scaleX(0); /* Linha do meio encolhe até sumir */
+}
+.btn-toggle.menuAberto .seta3 {
+    transform: rotate(-45deg) translate(1px, 1px);
 }

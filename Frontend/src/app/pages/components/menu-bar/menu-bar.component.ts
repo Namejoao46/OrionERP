@@ -1,8 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { MenuComponent } from "../menu/menu.component";
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { MensagemService } from '../../../core/services/ui/mensagem.service';
 import { NotificationService } from '../../../core/services/ui/notification.service';
@@ -16,7 +14,7 @@ import { ModalService } from '../../../core/services/ui/modal.service';
 @Component({
   selector: 'app-menu-bar',
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, MenuComponent],
+  imports: [RouterModule, CommonModule], // 🔥 FormsModule e MenuComponent removidos daqui
   templateUrl: './menu-bar.component.html',
   styleUrl: './menu-bar.component.css'
 })
@@ -24,7 +22,6 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   userName$: Observable<string | null>;
   userImage$: Observable<SafeUrl | null>;
   
-  // Tipagem assíncrona alinhada às streams do AuthService
   empresaNome$: Observable<string | null>;
   empresaLogo$: Observable<SafeUrl | null>;
   
@@ -42,13 +39,11 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService, 
     private modalService: ModalService
   ) {
-    // Escuta ativa do usuário logado
     this.userName$ = this.authService.userName$;
     this.userImage$ = this.authService.userImage$.pipe(
       map((base64: any) => this.sanitizarImagem(base64))
     );
 
-    // Escuta ativa da empresa (Exibe dinamicamente com base no papel/role de quem logou)
     this.empresaNome$ = this.authService.empresaNome$; 
     this.empresaLogo$ = this.authService.empresaLogo$.pipe(
       map((base64: any) => this.sanitizarImagem(base64))
@@ -140,8 +135,6 @@ export class MenuBarComponent implements OnInit, OnDestroy {
         this.authService.logout(); 
         this.router.navigate(['/login']); 
       } else if (acao === 'perfil') {
-        // ─── ALTERADO AQUI ──────────────────────────────────────────
-        // Notifica o ModalService em vez de mudar de página
         this.modalService.notificarAbrirPerfil();
       }
     });

@@ -14,13 +14,8 @@
     background-color: #000d1a;
     border-bottom: 4px solid #2B97FA;
     box-sizing: border-box;
-    padding-right: 20px; /* Garante uma folga no final da barra */
-}
-
-.conteiner_menu {
-    height: 100%;
-    width: 60px;
-    flex-shrink: 0;
+    padding-left: 20px;   /* 🔥 Adicionado para dar espaçamento inicial sem o menu */
+    padding-right: 20px;  /* Garante uma folga no final da barra */
 }
 
 /* ==========================================================================
@@ -30,8 +25,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-shrink: 0; /* IMPEDE que a logo encolha se a tela diminuir */
-    margin-right: auto; /* ❤️ O SEGREDO: Empurra todo o resto (busca, perfil) para a direita automaticamente */
+    flex-shrink: 0; 
+    margin-right: auto; /* Mantém empurrando as notificações e perfil para a extrema direita */
 }
 
 .conteiner_logo .img {
@@ -46,7 +41,7 @@
 
 .img h1 {
     color: white;
-    font-size: clamp(18px, 1.8vw, 32px); /* Ajustado o máximo para não ficar gigante e quebrar */
+    font-size: clamp(18px, 1.8vw, 32px); 
     font-weight: bold;
     font-family: 'Iceberg', sans-serif;
     border-bottom: 2px solid #2B97FA;
@@ -56,7 +51,7 @@
 .erp { color: #2B97FA; }
 
 .img img { 
-    height: 35px; /* Definição de altura fixa mais segura para alinhar com a sublogo */
+    height: 35px; 
     max-width: 50px; 
     object-fit: contain;
 }
@@ -71,14 +66,14 @@
 /* O pauzinho azul vertical */
 .divisor_azul {
     width: 2px;
-    height: 24px; /* Altura equilibrada com os textos */
-    background-color: #2B97FA; /* Usando o mesmo azul padrão do seu ERP */
+    height: 24px; 
+    background-color: #2B97FA; 
     border-radius: 2px;
 }
 
 /* Forçando a logo da empresa parceira a ser menor que a do Orion */
 .sub_logo_empresa img {
-    height: 22px; /* Menor que a logo do Orion */
+    height: 22px; 
     width: auto;
     object-fit: contain;
     border-radius: 4px;
@@ -90,70 +85,13 @@
     font-size: 0.9rem;
     font-weight: 500;
     white-space: nowrap;
-    max-width: 140px; /* Evita que nomes de empresas gigantescos quebrem o layout */
+    max-width: 140px; 
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 /* ==========================================================================
-   3. PESQUISA (CORRIGIDO: LUPA E ALINHAMENTO)
-   ========================================================================== */
-.conteiner_pesquisa {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Garante espaço entre input e lupa */
-    width: 250px;
-    height: 60%;
-    margin: 0 20px;
-    box-sizing: border-box;
-    cursor: pointer;
-    transition: 0.3s ease;
-    border-bottom: 2px solid #2B97FA;
-    border-left: 2px solid #2B97FA;
-}
-
-.conteiner_pesquisa input {
-    height: 100%;
-    width: 80%;
-    color: #2B97FA;
-    padding: 0 10px;
-    background-color: transparent;
-    border: none;
-    outline: none;
-}
-
-.conteiner_pesquisa input::placeholder { 
-    color: #2B97FA; 
-    font-size: 18px; 
-}
-
-.conteiner_pesquisa input:focus { 
-    color: #fff; 
-}
-
-/* Ajuste específico para o botão da lupa */
-.busca-btn {
-    all: unset; /* Remove estilos padrão de botão */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-right: 8px;
-    cursor: pointer;
-}
-
-.busca-btn img { 
-    width: 22px;   /* Tamanho corrigido para não quebrar o layout */
-    height: 22px; 
-    object-fit: contain;
-}
-
-.conteiner_pesquisa:hover {
-    transform: scale(1.05);
-    border-bottom: 3px solid #fff;
-}
-
-/* ==========================================================================
-   4. NOTIFICAÇÕES E ALERTAS (BADGES)
+   3. NOTIFICAÇÕES E ALERTAS (BADGES)
    ========================================================================== */
 .conteiner_notificacoes {
     height: 100%;
@@ -222,7 +160,7 @@
 }
 
 /* ==========================================================================
-   5. PERFIL DO USUÁRIO
+   4. PERFIL DO USUÁRIO
    ========================================================================== */
 .conteiner_perfil {
     display: flex;

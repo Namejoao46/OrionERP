@@ -1,27 +1,21 @@
 <nav class="conteiner">
-    <div class="conteiner_menu">
-        <app-menu></app-menu>
-    </div>
-
     <div class="conteiner_logo">
         <div class="img">
             <img src="assets/orion.png" alt="Orion Logo"> <h1>Orion<span class="erp">ERP</span></h1>
         </div>
 
-        <div class="sub_logo_empresa" *ngIf="(empresaNome$ | async) || (empresaLogo$ | async)">
-            <div class="divisor_azul"></div>
+        <div class="sub_logo_empresa">
+            <div class="divisor_azul" *ngIf="(empresaNome$ | async) || (empresaLogo$ | async)"></div>
                 
             <img *ngIf="empresaLogo$ | async as logoUrl" [src]="logoUrl" alt="Logo Empresa">
             
-            <span class="nome_empresa" *ngIf="empresaNome$ | async as nome">{{ nome }}</span>
+            <span class="nome_empresa" *ngIf="empresaNome$ | async as nome; else fallbackNomeMenu">
+                {{ nome }}
+            </span>
+            <ng-template #fallbackNomeMenu>
+                <span class="nome_empresa" style="opacity: 0.4; font-style: italic; font-size: 13px;">Geral</span>
+            </ng-template>
         </div>
-    </div>
-
-    <div class="conteiner_pesquisa">
-        <input type="search" placeholder="Busca...">
-        <button class="busca-btn">
-            <img src="assets/lupa.png" alt="lupa">
-        </button>
     </div>
 
     <div class="conteiner_notificacoes">

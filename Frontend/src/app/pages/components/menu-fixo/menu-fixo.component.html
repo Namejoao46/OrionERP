@@ -1,6 +1,8 @@
 <div class="conteiner" [class.colapsado]="!isMenuAberto">
-    <button class="btn-toggle" (click)="toggleMenu()">
-        {{ isMenuAberto ? '❮' : '❯' }}
+    <button class="btn-toggle" (click)="toggleMenu()" [class.menuAberto]="isMenuAberto">
+        <span class="seta seta1"></span>
+        <span class="seta seta2"></span>
+        <span class="seta seta3"></span>
     </button>
 
     <ng-container *ngIf="roleAtual">

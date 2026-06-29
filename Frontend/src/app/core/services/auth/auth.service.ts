@@ -54,20 +54,16 @@ export class AuthService {
 
   login(login: string, senha: string): Observable<any> {
     console.log('============= [AuthService] -> ENVIANDO REQUISIÇÃO DE LOGIN =============');
-    console.log('Login informado:', login);
-    
     return this.http.post<any>(`${this.apiUrl}/login`, { login, senha }).pipe(
       tap({
         next: (res) => {
           console.log('============= [AuthService] <- RESPOSTA DE LOGIN SUCESSO =============');
-          console.log('Dados crus retornados pelo endpoint de login:', res);
           this.setUserData(res);
           console.log('========================================================================');
         },
         error: (err) => {
           console.error('============= [AuthService] ! ERRO NA AUTENTICAÇÃO DE LOGIN =============');
           console.error('Status:', err.status);
-          console.error('Detalhe do erro de autenticação:', err.error);
           console.log('========================================================================');
         }
       })
@@ -81,7 +77,6 @@ export class AuthService {
       return;
     }
 
-    // Alvo da correção: extrai de 'dados.id' ou fallback para 'dados.userId'
     const idUsuario = dados.id || dados.userId;
     console.log('ID mapeado e resolvido do back-end para indexação:', idUsuario);
 
@@ -95,7 +90,6 @@ export class AuthService {
     if (dados.token) localStorage.setItem('token', dados.token);
     if (dados.nome) localStorage.setItem('userName', dados.nome);
     
-    // GUARDAR DEMAIS INFORMAÇÕES LOGO NO LOGIN (Evita formulário em branco no primeiro acesso)
     if (dados.sobrenome) localStorage.setItem('userSobrenome', dados.sobrenome);
     if (dados.cargo) localStorage.setItem('userCargo', dados.cargo);
     if (dados.cpf) localStorage.setItem('userCpf', dados.cpf);
@@ -104,12 +98,19 @@ export class AuthService {
     if (dados.tipoColaborador) localStorage.setItem('userTipoColaborador', dados.tipoColaborador);
     if (dados.dataNascimento) localStorage.setItem('userDataNascimento', dados.dataNascimento);
 
+    // 🔥 MELHORIA: Captura dinâmica do vínculo de ID de empresa vindo do Login
+    const idEmpresa = dados.empresaId || (dados.empresa ? dados.empresa.id : null);
+    if (idEmpresa) {
+      console.log(`[AuthService] Sincronizando empresaId: ${idEmpresa} no LocalStorage`);
+      localStorage.setItem('empresaId', idEmpresa.toString());
+      this.carregarDadosEmpresa(idEmpresa);
+    }
+
     this.tokenSubject.next(dados.token || null);
     this.userNameSubject.next(dados.nome || null);
 
     if (dados.foto) {
       const fotoLimpa = dados.foto.replace(/\s/g, '');
-      console.log(`[AuthService] Foto recebida. Tamanho da String Base64 limpa: ${fotoLimpa.length} caracteres.`);
       localStorage.setItem('userImage', fotoLimpa);
       this.userImageSubject.next(fotoLimpa);
     } else {
@@ -118,7 +119,6 @@ export class AuthService {
 
     if (dados.role) {
       const roleLimpa = dados.role.toString().replace('ROLE_', '').trim().toUpperCase();
-      console.log('[AuthService] Nível de acesso (Role) mapeado:', roleLimpa);
       localStorage.setItem('userRole', roleLimpa);
       this.userRoleSubject.next(roleLimpa);
     }
@@ -129,8 +129,6 @@ export class AuthService {
     this.empresaService.buscarPorId(empresaId).subscribe({
       next: (empresa) => {
         console.log('============= [AuthService] <- EMPRESA PARCEIRA LOCALIZADA =============');
-        console.log('Dados brutos da empresa retornados:', empresa);
-        
         const nome = empresa.nomeFantasia || empresa.nome;
         const logo = empresa.logo;
 
@@ -154,9 +152,7 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    const autenticado = !!this.tokenSubject.value;
-    console.log('[AuthService] Verificação isAuthenticated():', autenticado);
-    return autenticado;
+    return !!this.tokenSubject.value;
   }
 
   getRole(): string {
@@ -164,7 +160,7 @@ export class AuthService {
   }
 
   getUsuarioLogado(): any {
-    const estadoAtual = {
+    return {
       token: this.tokenSubject.value,
       nome: this.userNameSubject.value,
       role: this.userRoleSubject.value,
@@ -172,18 +168,14 @@ export class AuthService {
       empresaNome: this.empresaNomeSubject.value,
       empresaLogo: this.empresaLogoSubject.value
     };
-    console.log('[AuthService] Captura instantânea de getUsuarioLogado():', estadoAtual);
-    return estadoAtual;
   }
 
   atualizarNomeEmMemoria(novoNome: string) {
-    console.log(`[AuthService] Atualizando nome de exibição em memória: "${novoNome}"`);
     localStorage.setItem('userName', novoNome);
     this.userNameSubject.next(novoNome);
   }
 
   atualizarDadosPerfilEmMemoria(respostaBack: any) {
-    console.log('[AuthService] Sincronizando dados adicionais do perfil no LocalStorage:', respostaBack);
     if (respostaBack.sobrenome) localStorage.setItem('userSobrenome', respostaBack.sobrenome);
     if (respostaBack.cargo) localStorage.setItem('userCargo', respostaBack.cargo);
     if (respostaBack.cpf) localStorage.setItem('userCpf', respostaBack.cpf);
@@ -192,14 +184,12 @@ export class AuthService {
   }
 
   atualizarFotoEmMemoria(base64Foto: string) {
-    console.log('[AuthService] Injetando nova foto Base64 reativa na memória...');
     const fotoLimpa = base64Foto.replace(/\s/g, '');
     localStorage.setItem('userImage', fotoLimpa);
     this.userImageSubject.next(fotoLimpa);
   }
 
   logout() {
-    console.warn('============= [AuthService] DISPARANDO LOGOUT / LIMPEZA DE SESSÃO =============');
     localStorage.clear();
     this.userIdSubject.next(null);
     this.tokenSubject.next(null);
@@ -208,7 +198,5 @@ export class AuthService {
     this.userRoleSubject.next(null);
     this.empresaNomeSubject.next(null);
     this.empresaLogoSubject.next(null);
-    console.log('[AuthService] Limpeza executada. Todos os Subjects voltaram para null.');
-    console.log('================================================================================');
   }
 }

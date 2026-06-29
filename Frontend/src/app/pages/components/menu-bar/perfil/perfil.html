@@ -69,17 +69,22 @@
         <span class="skill-tag">CSS/Tailwind</span>
       </div>
 
-      <hr class="divisor" *ngIf="(empresaNome$ | async) || (empresaLogo$ | async)">
+      <hr class="divisor">
 
-      <div class="dados-empresa-sidebar" *ngIf="(empresaNome$ | async) || (empresaLogo$ | async)">
+      <div class="dados-empresa-sidebar">
         <div class="topo-empresa-sidebar">
           <h3>Empresa Vinculada</h3>
           <button *ngIf="isMaster" class="btn-empresa-master" title="Configurações da Empresa (Acesso Master)">⚙️</button>
         </div>
         
         <div class="empresa-info-bloco">
-          <img *ngIf="empresaLogo$ | async as logoUrl" [src]="logoUrl" alt="Logo Empresa" class="logo-sidebar">
-          <p>{{ (empresaNome$ | async) || 'Não informada' }}</p>
+          <ng-container *ngIf="(empresaNome$ | async) || (empresaLogo$ | async); else semEmpresaSidebar">
+            <img *ngIf="empresaLogo$ | async as logoUrl" [src]="logoUrl" alt="Logo Empresa" class="logo-sidebar">
+            <p>{{ (empresaNome$ | async) }}</p>
+          </ng-container>
+          <ng-template #semEmpresaSidebar>
+            <p style="opacity: 0.5; font-style: italic;">Nenhuma empresa vinculada</p>
+          </ng-template>
         </div>
       </div>
     </aside>

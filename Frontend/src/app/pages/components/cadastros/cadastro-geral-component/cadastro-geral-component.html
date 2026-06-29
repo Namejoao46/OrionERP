@@ -3,7 +3,7 @@
   <div class="top-actions-grid">
     <div class="photo-upload-wrapper" *ngIf="roleLogado === 'ADMIN_DEV'">
       <div class="avatar-preview logo-preview">
-        <img [src]="'assets/images/default-company.png'" alt="Logo da Empresa" id="img-logo-preview">
+        <img [src]="logoPreviewUrl ? logoPreviewUrl : 'assets/images/default-company.png'" alt="Logo da Empresa" id="img-logo-preview">
       </div>
       <div class="photo-inputs">
         <label for="logoInput" class="btn-photo-label">
@@ -16,7 +16,7 @@
 
     <div class="photo-upload-wrapper" [ngClass]="{'full-width-top': roleLogado !== 'ADMIN_DEV'}">
       <div class="avatar-preview">
-        <img [src]="'assets/images/default-avatar.png'" alt="Foto do Usuário">
+        <img [src]="fotoPreviewUrl ? fotoPreviewUrl : 'assets/images/default-avatar.png'" alt="Foto do Usuário">
       </div>
       <div class="photo-inputs">
         <label for="fotoUsuarioInput" class="btn-photo-label">

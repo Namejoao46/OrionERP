@@ -16,7 +16,6 @@ import { NotificationService } from '../../../../core/services/ui/notification.s
 })
 export class CadastroGeralComponent implements OnInit {
   
-  // Objeto Empresa expandido com as propriedades de Capital Mensal
   empresa = { 
     nomeFantasia: '', 
     cnpj: '', 
@@ -40,7 +39,11 @@ export class CadastroGeralComponent implements OnInit {
   
   roleLogado: string = '';
   logoArquivo: File | null = null;
-  fotoUsuarioArquivo: File | null = null; // Captura de arquivo independente para o perfil
+  fotoUsuarioArquivo: File | null = null; 
+
+  // Variáveis para armazenar as URLs de preview local das imagens
+  logoPreviewUrl: string | null = null;
+  fotoPreviewUrl: string | null = null;
 
   constructor(
     private http: HttpClient, 
@@ -68,21 +71,23 @@ export class CadastroGeralComponent implements OnInit {
     }
   }
 
-  // Tratamento de arquivo para a Logo da Empresa
   onLogoSelected(event: any) {
     const arquivo: File = event.target.files[0];
     if (arquivo) {
       this.logoArquivo = arquivo;
-      console.log('📁 [FILE-LOGO] Arquivo de logo da empresa selecionado:', arquivo.name);
+      // Gera o preview local para renderizar na tela imediatamente
+      this.logoPreviewUrl = URL.createObjectURL(arquivo);
+      console.log('📁 [FILE-LOGO] Arquivo de logo selecionado:', arquivo.name);
     }
   }
 
-  // Tratamento de arquivo para a Foto de Perfil do Usuário
   onFotoUsuarioSelected(event: any) {
     const arquivo: File = event.target.files[0];
     if (arquivo) {
       this.fotoUsuarioArquivo = arquivo;
-      console.log('📁 [FILE-USER] Arquivo de foto de perfil do usuário selecionado:', arquivo.name);
+      // Gera o preview local para renderizar na tela imediatamente
+      this.fotoPreviewUrl = URL.createObjectURL(arquivo);
+      console.log('📁 [FILE-USER] Arquivo de foto selecionado:', arquivo.name);
     }
   }
 
@@ -91,7 +96,7 @@ export class CadastroGeralComponent implements OnInit {
     
     this.empresaService.cadastrar(this.empresa, this.logoArquivo).subscribe({
       next: (empresaCriada: any) => {
-        console.log('✅ [SUCESSO ETAPA 1] Empresa criada no Back-end!');
+        console.log('✅ [SUCESSO ETAPA 1] Empresa criada no Back-end! ID:', empresaCriada.id);
         
         const payloadMaster = { 
           ...this.usuario, 
@@ -125,9 +130,8 @@ export class CadastroGeralComponent implements OnInit {
 
     this.http.post('http://localhost:8080/api/colaboradores/cadastrar', payloadColab).subscribe({
       next: (colabCriado: any) => {
-        console.log('✅ [SUCESSO] Colaborador cadastrado base concluído.');
+        console.log('✅ [SUCESSO] Colaborador cadastrado base concluído. ID gerado:', colabCriado.id);
         
-        // Se houver arquivo de foto de usuário, processa o upload na rota específica de mídia
         if (this.fotoUsuarioArquivo && colabCriado.id) {
           this.fazerUploadFotoPerfil(colabCriado.id, 'Colaborador adicionado à sua equipe com sucesso!');
         } else {
@@ -146,7 +150,7 @@ export class CadastroGeralComponent implements OnInit {
   private enviarRequisicaoAuth(payload: any, mensagemSucesso: string) {
     this.http.post('http://localhost:8080/api/auth/registrar', payload).subscribe({
       next: (respostaAuth: any) => {
-        console.log('✅ [SUCESSO ETAPA 2] Registro de autenticação concluído com êxito!');
+        console.log('✅ [SUCESSO ETAPA 2] Registro de autenticação concluído! ID Usuário:', respostaAuth.id);
         
         if (this.fotoUsuarioArquivo && respostaAuth.id) {
           this.fazerUploadFotoPerfil(respostaAuth.id, mensagemSucesso);
@@ -169,8 +173,10 @@ export class CadastroGeralComponent implements OnInit {
     const formData = new FormData();
     formData.append('foto', this.fotoUsuarioArquivo);
 
-    console.log(`➡️ [MEDIA-UPLOAD] Transmitindo foto de perfil do usuário ID: ${usuarioId}`);
-    this.http.put(`http://localhost:8080/api/colaboradores/${usuarioId}/foto`, formData).subscribe({
+    console.log(`➡️ [MEDIA-UPLOAD] Transmitindo foto para o ID: ${usuarioId}`);
+    
+    // CORREÇÃO: Alterado de .put para .post e corrigida a rota para /upload-foto para espelhar seu Controller Java
+    this.http.post(`http://localhost:8080/api/colaboradores/${usuarioId}/upload-foto`, formData).subscribe({
       next: () => {
         console.log('✅ [SUCESSO MEDIA] Foto de perfil enviada e persistida.');
         this.notificationService.show(msgSucessoOriginal, 'success');
@@ -178,7 +184,6 @@ export class CadastroGeralComponent implements OnInit {
       },
       error: (err) => {
         console.error('⚠️ [AVISO MEDIA] Registro textual salvo, mas falha ao enviar foto.', err);
-        // 🛠️ CORREÇÃO: Alterado de 'warning' para 'info' para alinhar com a assinatura do método
         this.notificationService.show('Cadastro realizado, porém houve falha ao salvar a imagem.', 'info', 4000);
         this.sairDaPagina();
       }
@@ -213,6 +218,8 @@ export class CadastroGeralComponent implements OnInit {
     this.empresa = { nomeFantasia: '', cnpj: '', plano: 'Basico', capitalMesAtual: null, capitalMesAnterior: null };
     this.logoArquivo = null;
     this.fotoUsuarioArquivo = null;
+    this.logoPreviewUrl = null;
+    this.fotoPreviewUrl = null;
 
     const logoInput = document.getElementById('logoInput') as HTMLInputElement;
     if (logoInput) logoInput.value = '';

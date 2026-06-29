@@ -17,8 +17,8 @@
           (change)="aoAlterarFornecedor()" 
           required
         >
-          <option [value]="null" disabled selected>Escolha o fornecedor fornecedor...</option>
-          <option *ngFor="let forn of fornecedores" [value]="forn.id">
+          <option [ngValue]="null" disabled selected>Escolha o fornecedor...</option>
+          <option *ngFor="let forn of fornecedores" [ngValue]="forn.id">
             {{ forn.razaoSocial }} {{ forn.nomeFantasia ? '- ' + forn.nomeFantasia : '' }}
           </option>
         </select>
@@ -31,16 +31,16 @@
         <span class="input-icon">📦</span>
         <select 
           id="produto" 
-          name="produtoId" 
+          name="produtoId"
           [(ngModel)]="compra.produtoId" 
           (change)="aoAlterarProduto()"
           [disabled]="!fornecedorSelecionadoId"
           required
         >
-          <option [value]="null" disabled selected>
+          <option [ngValue]="null" disabled selected>
             {{ !fornecedorSelecionadoId ? 'Aguardando seleção de fornecedor...' : 'Selecione o produto...' }}
           </option>
-          <option *ngFor="let prod of produtos" [value]="prod.id">
+          <option *ngFor="let prod of produtos" [ngValue]="prod.id">
             {{ prod.descricao }} (Estoque atual: {{ prod.quantidadeEstoque ?? 0 }})
           </option>
         </select>
@@ -84,13 +84,30 @@
       </div>
     </div>
 
+    <div class="form-group">
+      <label for="status">Status Inicial do Pedido</label>
+      <div class="input-wrapper">
+        <span class="input-icon">⚙️</span>
+        <select 
+          id="status" 
+          name="status" 
+          [(ngModel)]="compra.status" 
+          required
+        >
+          <option value="Em Análise">Em Análise</option>
+          <option value="Aprovado">Aprovado</option>
+          <option value="Cancelado">Cancelado</option>
+        </select>
+      </div>
+    </div>
+
     <div class="total-preview" *ngIf="compra.quantidadeComprada && compra.precoCustoUnitario">
       Previsão Total do Pedido: <span>{{ (compra.quantidadeComprada * compra.precoCustoUnitario) | currency:'BRL' }}</span>
     </div>
 
     <div class="form-actions">
       <button type="button" class="btn-cancel" (click)="limparFormulario()">Limpar</button>
-      <button type="submit" class="btn-submit" [disabled]="!compra.produtoId">Registrar Compra ▲</button>
+      <button type="submit" class="btn-submit" [disabled]="compra.produtoId === null">Registrar Compra ▲</button>
     </div>
   </form>
 </div>

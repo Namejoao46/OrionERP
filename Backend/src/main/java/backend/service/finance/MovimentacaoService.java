@@ -48,11 +48,11 @@ public class MovimentacaoService {
     }
 
     public DashboardGastosDTO obterDadosDashboardGastos() {
-        // 1. Total Comprado (Soma histórica de SAÍDAS)
-        BigDecimal totalComprado = repository.somarPorTipo("SAIDA");
+        // 1. Total Comprado (🔥 ALTERADO: Agora busca a soma de TODOS os Pedidos de Compra salvos)
+        BigDecimal totalComprado = repository.obterTotalHistoricoPedidos();
 
-        // 2. Compras do Mês Atual (🔥 Atualizado: Agora sem parâmetros, direto via Firebird)
-        BigDecimal comprasMes = repository.somarComprasDoMes();
+        // 2. Compras do Mês Atual (🔥 ALTERADO: Agora busca a soma dos Pedidos de Compra do mês)
+        BigDecimal comprasMes = repository.somarPedidosDoMes();
         
         // 3. Contagem de Pedidos de Compra Pendentes
         Long pedidosPendentes = pedidoCompraRepository.count(); 
@@ -63,9 +63,9 @@ public class MovimentacaoService {
         return new DashboardGastosDTO(totalComprado, comprasMes, pedidosPendentes, proveedoresAtivos);
     }
 
-    // 🔥 Adicionado: Processa a evolução de compras revertendo para a ordem cronológica
+    // 🔥 ALTERADO: Agora processa a evolução de compras baseado na tabela de PEDIDOS_COMPRA
     public List<EvolucaoComprasDTO> obterEvolucaoCompras() {
-        List<Object[]> resultados = repository.buscarEvolucaoComprasNativa();
+        List<Object[]> resultados = repository.buscarEvolucaoPedidosNativa();
         
         List<EvolucaoComprasDTO> lista = resultados.stream().map(reg -> new EvolucaoComprasDTO(
             (String) reg[0],

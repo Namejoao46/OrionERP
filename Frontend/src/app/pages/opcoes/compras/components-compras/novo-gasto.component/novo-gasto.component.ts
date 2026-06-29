@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core'; // 🔥 Adicionado ChangeDetectorRef
+import { Component, ChangeDetectorRef } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MovimentacaoService } from '../../../../../core/services/finance/movimentacao.service'; 
@@ -11,7 +11,7 @@ import { MovimentacaoService } from '../../../../../core/services/finance/movime
   styleUrl: './novo-gasto.component.css'
 })
 export class NovoGastoComponent {
-  // 🔥 Inicialize o valor estritamente vazio para não travar a primeira checagem
+  // Estrutura do Gasto Manual
   gasto = {
     descricao: '',
     valor: null,
@@ -23,7 +23,6 @@ export class NovoGastoComponent {
   categorias = ['Infraestrutura', 'Logística', 'Marketing', 'Fornecedores', 'Impostos', 'Outros'];
   metodos = ['PIX', 'Boleto', 'Cartão de Crédito', 'Transferência'];
 
-  // 🔥 Injete o cdr no construtor
   constructor(
     private movimentacaoService: MovimentacaoService,
     private cdr: ChangeDetectorRef 
@@ -35,12 +34,21 @@ export class NovoGastoComponent {
       return;
     }
 
-    this.movimentacaoService.registrarMovimentacaoManual(this.gasto).subscribe({
-      next: (res) => {
+    // 🔥 Recupera a empresa logada do localStorage para isolar o registro
+    const empresaId = localStorage.getItem('empresaId'); 
+    
+    // Injeta o ID da empresa no payload enviado ao backend
+    const gastoPayload = {
+      ...this.gasto,
+      empresaId: empresaId ? Number(empresaId) : null 
+    };
+
+    this.movimentacaoService.registrarMovimentacaoManual(gastoPayload).subscribe({
+      next: (res: any) => { 
         alert('Gasto manual registrado com sucesso no Financeiro!');
         this.limparFormulario();
       },
-      error: (err) => console.error('Erro ao registrar despesa:', err)
+      error: (err: any) => console.error('Erro ao registrar despesa:', err)
     });
   }
 
@@ -52,7 +60,6 @@ export class NovoGastoComponent {
       metodoPagamento: '', 
       tipo: 'SAIDA' 
     };
-    // 🔥 Força o Angular a validar e aceitar a mudança de valores imediatamente, eliminando o erro NG0100
     this.cdr.detectChanges(); 
   }
 }

@@ -35,7 +35,7 @@ public class CompraService {
         Movimentacao despesaFinanceira = new Movimentacao();
         despesaFinanceira.setDescricao("Compra de estoque: " + produto.getDescricao());
         despesaFinanceira.setValor(totalGasto);
-        despesaFinanceira.setTipo("SAIDA"); 
+        despesaFinanceira.setTipo("SAIDA");
         despesaFinanceira.setCategoria("Gastos / Fornecedores");
         despesaFinanceira.setMetodoPagamento("Boleto");
         despesaFinanceira.setDataHora(LocalDateTime.now());

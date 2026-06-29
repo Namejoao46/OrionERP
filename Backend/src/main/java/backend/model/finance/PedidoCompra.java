@@ -21,8 +21,11 @@ public class PedidoCompra {
     private Produto produto;
 
     @ManyToOne
-    @JoinColumn(name = "fornecedor_id", nullable = false)
+    @JoinColumn(name = "CLIENTE_FORNECEDOR", nullable = false)
     private Fornecedor fornecedor;
+
+    @Column(name = "FORNECEDOR_ID")
+    private Long fornecedorIdAux;
 
     @Column(nullable = false)
     private BigDecimal quantidade;
@@ -35,4 +38,12 @@ public class PedidoCompra {
 
     @Column(name = "data_pedido")
     private LocalDateTime dataPedido = LocalDateTime.now();
+
+    @PrePersist
+    @PreUpdate
+    public void prePersist() {
+        if (this.fornecedor != null) {
+            this.fornecedorIdAux = this.fornecedor.getId();
+        }
+    }
 }

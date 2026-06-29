@@ -5,7 +5,6 @@ import { CompraService } from '../../../../../core/services/finance/compra.servi
 import { Fornecedor, FornecedorService } from '../../../../../core/services/erp/fornecedor.service';
 import { ProdutoService } from '../../../../../core/services/erp/Produto.service';
 
-
 @Component({
   selector: 'app-compra-produto',
   standalone: true,
@@ -21,7 +20,8 @@ export class CompraProdutoComponent implements OnInit {
   compra = {
     produtoId: null as number | null,
     quantidadeComprada: null as number | null,
-    precoCustoUnitario: null as number | null
+    precoCustoUnitario: null as number | null,
+    status: 'Em Análise' // 🔥 ADICIONADO: Propriedade dinâmica para o formulário
   };
 
   // Listas reais carregadas da API
@@ -42,57 +42,75 @@ export class CompraProdutoComponent implements OnInit {
   // Busca os fornecedores cadastrados na inicialização
   carregarFornecedores(): void {
     this.fornecedorService.listarTodos().subscribe({
-      next: (dados) => {
+      next: (dados: any) => {
         this.fornecedores = dados;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Erro ao buscar fornecedores:', err)
+      error: (err: any) => console.error('Erro ao buscar fornecedores:', err)
     });
   }
 
-  // 🔥 Método engatado no evento (change) do seletor de Fornecedores
+  // Método engatado no evento (change) do seletor de Fornecedores
   aoAlterarFornecedor(): void {
-    // Reseta o produto selecionado anteriormente caso mude de fornecedor
     this.compra.produtoId = null;
     this.compra.precoCustoUnitario = null;
     this.produtos = [];
 
     if (this.fornecedorSelecionadoId) {
-      // Carrega os produtos vinculados de forma dinâmica filtrados na API
-      this.produtoService.listarPorFornecedor(this.fornecedorSelecionadoId).subscribe({
-        next: (dados) => {
+      const fornecedorId = Number(this.fornecedorSelecionadoId);
+      
+      this.produtoService.listarPorFornecedor(fornecedorId).subscribe({
+        next: (dados: any) => {
           this.produtos = dados;
           this.cdr.detectChanges();
         },
-        error: (err) => console.error('Erro ao buscar produtos por fornecedor:', err)
+        error: (err: any) => console.error('Erro ao buscar produtos por fornecedor:', err)
       });
     }
   }
 
   // Preenche automaticamente o preço sugerido quando o usuário escolhe o produto real
   aoAlterarProduto(): void {
-    const prod = this.produtos.find(p => p.id === Number(this.compra.produtoId));
-    if (prod) {
-      this.compra.precoCustoUnitario = prod.precoCusto; // ou o campo correspondente ao valor no seu backend
+    if (this.compra.produtoId !== null) {
+      const prod = this.produtos.find(p => p.id === Number(this.compra.produtoId));
+      if (prod) {
+        this.compra.precoCustoUnitario = prod.precoCusto; 
+      }
     }
   }
 
   salvarCompra() {
-    if (!this.compra.produtoId || !this.compra.quantidadeComprada || !this.compra.precoCustoUnitario) {
+    if (this.compra.produtoId === null || !this.compra.quantidadeComprada || !this.compra.precoCustoUnitario) {
       alert('Por favor, preencha todos os campos do pedido de compra.');
       return;
     }
 
-    this.compraService.registrarCompraFornecedor(
-      this.compra.produtoId,
-      this.compra.quantidadeComprada,
-      this.compra.precoCustoUnitario
-    ).subscribe({
+    const empresaId = localStorage.getItem('empresaId');
+
+    const pedidoPayload = {
+      produto: { 
+        id: Number(this.compra.produtoId) 
+      },
+      fornecedor: {
+        id: Number(this.fornecedorSelecionadoId)
+      },
+      quantidade: Number(this.compra.quantidadeComprada),
+      valorTotal: Number(this.compra.quantidadeComprada) * Number(this.compra.precoCustoUnitario),
+      status: this.compra.status, // 🔥 ALTERADO: Agora envia dinamicamente o status selecionado da tela
+      dataPedido: new Date().toISOString(),
+      empresa: empresaId ? { id: Number(empresaId) } : null
+    };
+
+    this.compraService.registrarCompraFornecedor(pedidoPayload).subscribe({
       next: () => {
-        alert('Pedido de compra registrado com sucesso!');
+        alert(`Pedido de compra registrado com sucesso (${this.compra.status})!`);
         this.limparFormulario();
       },
-      error: (err) => console.error('Erro ao registrar pedido de compra:', err)
+      error: (err: any) => {
+        console.error('Erro ao registrar pedido de compra:', err);
+        const detalhe = err.error?.detalhe || 'Erro de validação nas regras de negócio do servidor.';
+        alert(`Erro ao salvar: ${detalhe}`);
+      }
     });
   }
 
@@ -102,7 +120,8 @@ export class CompraProdutoComponent implements OnInit {
     this.compra = { 
       produtoId: null, 
       quantidadeComprada: null, 
-      precoCustoUnitario: null 
+      precoCustoUnitario: null,
+      status: 'Em Análise' // 🔥 Reseta voltando para o padrão padrão estável
     };
     this.cdr.detectChanges(); 
   }
